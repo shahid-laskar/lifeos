@@ -53,3 +53,9 @@ class ReadingProgressResponse(BaseModel):
     surah_number: int
     last_ayah_number: int
     updated_at: datetime
+
+
+class QuranWeeklySummaryResponse(BaseModel):
+    surahs_read_last_7_days: int
+    active_days_last_7_days: int
+

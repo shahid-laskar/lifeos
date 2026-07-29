@@ -200,3 +200,25 @@ def test_get_reading_progress_no_record_returns_404(
 def test_reading_progress_requires_auth(client: TestClient) -> None:
     resp = client.get("/api/v1/quran/reading-progress")
     assert resp.status_code == 401
+
+
+def test_get_weekly_reading_summary(client: TestClient, auth_headers: dict) -> None:
+    # Update progress for multiple surahs
+    client.put(
+        "/api/v1/quran/reading-progress",
+        json={"surah_number": 1, "last_ayah_number": 2},
+        headers=auth_headers,
+    )
+    client.put(
+        "/api/v1/quran/reading-progress",
+        json={"surah_number": 2, "last_ayah_number": 10},
+        headers=auth_headers,
+    )
+    
+    # Check the weekly summary
+    resp = client.get("/api/v1/quran/reading-progress/summary/weekly", headers=auth_headers)
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["surahs_read_last_7_days"] == 2
+    assert data["active_days_last_7_days"] == 1
+

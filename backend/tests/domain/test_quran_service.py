@@ -202,3 +202,27 @@ def test_no_engagement_fields_on_quran_entities(service: QuranService) -> None:
     p = service.update_reading_progress(USER, surah_number=112, last_ayah_number=1)
     p_fields = {f for f in vars(p)}
     assert "streak" not in p_fields
+
+
+def test_get_weekly_summary(service: QuranService) -> None:
+    from datetime import timedelta
+    now = datetime.now(timezone.utc)
+    
+    # Add progress from 1 day ago (surah 1, 2)
+    p1 = service.update_reading_progress(USER, surah_number=1, last_ayah_number=1)
+    p1.updated_at = now - timedelta(days=1)
+    service._repo.upsert_reading_progress(p1)
+    
+    p2 = service.update_reading_progress(USER, surah_number=2, last_ayah_number=5)
+    p2.updated_at = now - timedelta(days=1)
+    service._repo.upsert_reading_progress(p2)
+    
+    # Add progress from 10 days ago (surah 3) - outside window
+    p3 = service.update_reading_progress(USER, surah_number=3, last_ayah_number=10)
+    p3.updated_at = now - timedelta(days=10)
+    service._repo.upsert_reading_progress(p3)
+    
+    summary = service.get_weekly_summary(USER, as_of=now)
+    assert summary["surahs_read_last_7_days"] == 2
+    assert summary["active_days_last_7_days"] == 1
+

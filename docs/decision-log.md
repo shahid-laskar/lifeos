@@ -377,4 +377,27 @@ prevention).
 Expected review date: When integrating a real email provider (e.g., SendGrid)
 for production deployment.
 
+---
 
+## ADR-010: Qur'an Reading History / Weekly Summary
+
+Date: 2026-07-29
+Status: Accepted
+
+Decision: Implement a weekly summary endpoint in the Qur'an domain (`app/domain/quran/`) 
+that aggregates a user's reading progress over the past 7 days.
+- The summary will compute how many distinct surahs the user made progress on within the window.
+- The system will *not* track session duration, total ayahs read per day, or reading speed, as doing so requires invasive client-side event tracking.
+- The system will calculate consistency over the trailing 7 days without creating an all-or-nothing streak counter (e.g., "Read on 3 of the last 7 days").
+
+Reason: This builds upon the existing `quran_reading_progress` records (introduced in ADR-007). Providing a weekly summary encourages consistency and fulfills the "Qur'an reading history / weekly summary" slice in the Foundation tier. Designing it to aggregate simple progress updates over a rolling 7-day window honors Article 2 (Consistency over Intensity) without requiring complex telemetry.
+
+Alternatives considered:
+- Fine-grained session tracking (e.g., exact time spent reading): Rejected. Article 9 (Privacy Is Sacred) and the Master Prompt dictate minimizing data collection. Tracking time spent requires "heartbeat" pings from the client, which is excessive and invasive.
+- Streak counters (e.g., "7-day reading streak"): Rejected. Directly violates ADR-003 and Article 2 by introducing fragile gamification.
+
+Trade-offs: The summary relies on the user actively updating their reading progress (or the client doing it periodically when pages are turned). It does not know *how much* was read between updates, only that progress was logged. This is an accepted and deliberate trade-off for privacy and simplicity.
+
+Constitutional articles engaged: Art. 2 (Consistency over Intensity), Art. 6 (Humility over Gamification), Art. 9 (Privacy Is Sacred — no telemetry), ADR-003.
+
+Expected review date: If/when a "yearly reading goal" (Khatam tracking) is prioritized.

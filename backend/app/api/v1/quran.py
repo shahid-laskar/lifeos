@@ -25,6 +25,7 @@ from app.domain.quran.service import (
 from app.domain.quran.models import (
     BookmarkRequest,
     BookmarkResponse,
+    QuranWeeklySummaryResponse,
     ReadingProgressRequest,
     ReadingProgressResponse,
     SurahResponse,
@@ -213,3 +214,22 @@ def update_reading_progress(
         last_ayah_number=record.last_ayah_number,
         updated_at=record.updated_at,
     )
+
+
+@router.get("/reading-progress/summary/weekly", response_model=QuranWeeklySummaryResponse)
+def get_weekly_reading_summary(
+    current_user: Annotated[UserRecord, Depends(get_current_user)],
+    quran_service: Annotated[QuranService, Depends(get_quran_service)],
+) -> QuranWeeklySummaryResponse:
+    """Return a weekly summary of the user's reading progress.
+    
+    This calculates reading consistency (e.g., 'Read 3 surahs over 2 days in the past 7 days') 
+    without maintaining fragile streak counters or tracking invasive session duration metrics,
+    aligning with Article 2 (Consistency over Intensity).
+    """
+    summary = quran_service.get_weekly_summary(current_user.id)
+    return QuranWeeklySummaryResponse(
+        surahs_read_last_7_days=summary["surahs_read_last_7_days"],
+        active_days_last_7_days=summary["active_days_last_7_days"],
+    )
+

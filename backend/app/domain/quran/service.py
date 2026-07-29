@@ -127,3 +127,33 @@ class QuranService:
 
     def get_all_reading_progress(self, user_id: str) -> list[QuranReadingProgress]:
         return self._repo.get_all_reading_progress(user_id)
+
+    def get_weekly_summary(
+        self, user_id: str, as_of: datetime | None = None
+    ) -> dict[str, int]:
+        from datetime import timedelta
+        
+        now = as_of or datetime.now(timezone.utc)
+        seven_days_ago = now - timedelta(days=7)
+        
+        all_progress = self.get_all_reading_progress(user_id)
+        
+        # Filter to progress updated in the last 7 days
+        recent_progress = [
+            p for p in all_progress 
+            if (p.updated_at.tzinfo is None and p.updated_at.replace(tzinfo=timezone.utc) >= seven_days_ago) or
+               (p.updated_at.tzinfo is not None and p.updated_at >= seven_days_ago)
+        ]
+        
+        # Unique surahs read
+        surahs_read = len(set(p.surah_number for p in recent_progress))
+        
+        # Unique days active (using the user's local timezone would be better, 
+        # but UTC date is an acceptable approximation for a simple 7-day window)
+        active_dates = set(p.updated_at.date() for p in recent_progress)
+        
+        return {
+            "surahs_read_last_7_days": surahs_read,
+            "active_days_last_7_days": len(active_dates),
+        }
+

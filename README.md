@@ -73,7 +73,20 @@ muslim-life-os/
 - No streak gamification (ADR-003, Article 2).
 - Documented in ADR-008.
 
-**82 tests passing** across all five slices (unit + API integration).
+### Slice 6: Forgot Password / Account Recovery — complete
+- Stateful, hashed reset tokens with explicit revocation.
+- Abstract `EmailService` protocol for future email provider integration, with a `ConsoleEmailService` mock for development.
+- Single-use, expiring tokens (1 hour).
+- Strict email enumeration prevention (generic success messages on request).
+- Documented in ADR-009.
+
+### Slice 7: Qur'an Reading History / Weekly Summary — complete
+- Added a weekly summary endpoint (`GET /quran/reading-progress/summary/weekly`).
+- Aggregates the last 7 days of reading progress into "surahs read" and "active days".
+- Follows Article 2 (Consistency over Intensity) by deliberately avoiding fragile streak counters and session-duration telemetry.
+- Documented in ADR-010.
+
+**89 tests passing** across all seven slices (unit + API integration).
 
 
 
@@ -81,12 +94,8 @@ muslim-life-os/
 
 Per 014_Feature_Prioritisation_Framework.md "Foundation" tier, candidates are:
 
-- **Forgot password / account recovery** — flagged as a near-term follow-up
-  in ADR-004 once email delivery infrastructure exists. Blocks all future
-  client implementations.
-- **Qur'an reading history / weekly summary** — aggregate per-surah progress
-  into a weekly reading summary (e.g. "read 3 surahs this week") using the
-  now-complete reading-progress data. Requires no new architecture.
+- **AI Foundation / Safe Persona Initialization** — setting up the framework and boundaries for the AI component before integrating it into daily coaching.
+- **Family Dashboard structure** — beginning the household/permission data model (026) required for multi-user features.
 
 Still deliberately deferred: AI Coach, Family, Community — see ADR-002 for
 the dependency reasoning (Memory 041, Safety 048, permissions 026 needed first).
