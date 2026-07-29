@@ -78,6 +78,8 @@ class UserService:
         *,
         country: str | None = None,
         timezone_name: str | None = None,
+        latitude: float | None = None,
+        longitude: float | None = None,
         prayer_calculation_method: CalculationMethod | None = None,
         asr_method: AsrMethod | None = None,
         goals: list[OnboardingGoal] | None = None,
@@ -91,6 +93,10 @@ class UserService:
             user.country = country
         if timezone_name is not None:
             user.timezone = timezone_name
+        if latitude is not None:
+            user.latitude = latitude
+        if longitude is not None:
+            user.longitude = longitude
         if prayer_calculation_method is not None:
             user.prayer_calculation_method = prayer_calculation_method
         if asr_method is not None:

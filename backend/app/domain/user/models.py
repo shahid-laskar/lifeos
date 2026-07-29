@@ -58,6 +58,8 @@ class UserProfileUpdateRequest(BaseModel):
 
     country: str | None = Field(None, min_length=2, max_length=2)
     timezone: str | None = None
+    latitude: float | None = Field(None, ge=-90, le=90)
+    longitude: float | None = Field(None, ge=-180, le=180)
     prayer_calculation_method: CalculationMethod | None = None
     asr_method: AsrMethod | None = None
     goals: list[OnboardingGoal] | None = None
@@ -70,6 +72,8 @@ class UserProfileResponse(BaseModel):
     preferred_language: str
     country: str | None
     timezone: str | None
+    latitude: float | None
+    longitude: float | None
     prayer_calculation_method: CalculationMethod | None
     asr_method: AsrMethod | None
     goals: list[OnboardingGoal]

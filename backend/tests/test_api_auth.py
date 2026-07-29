@@ -108,10 +108,15 @@ def test_progressive_profile_update_and_onboarding_status(client: TestClient):
     assert status_body["prayer_preferences_set"] is False
     assert status_body["first_meaningful_outcome_available"] is False
 
-    # Set country + timezone only.
+    # Set country + timezone + lat/lon.
     resp = client.patch(
         "/api/v1/users/me/profile",
-        json={"country": "GB", "timezone": "Europe/London"},
+        json={
+            "country": "GB",
+            "timezone": "Europe/London",
+            "latitude": 51.5074,
+            "longitude": -0.1278
+        },
         headers=headers,
     )
     assert resp.status_code == 200

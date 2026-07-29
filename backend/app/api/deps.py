@@ -27,6 +27,13 @@ def get_user_service(db: Annotated[Session, Depends(get_db)]) -> UserService:
     return UserService(SqlAlchemyUserRepository(db))
 
 
+def get_habit_service(db: Annotated[Session, Depends(get_db)]):
+    from app.infrastructure.habit_repository_sqlalchemy import SqlAlchemyHabitRepository
+    from app.domain.habit.service import HabitService
+
+    return HabitService(SqlAlchemyHabitRepository(db))
+
+
 def get_current_user(
     credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(bearer_scheme)],
     user_service: Annotated[UserService, Depends(get_user_service)],

@@ -28,6 +28,8 @@ def _to_record(row: UserORM) -> UserRecord:
         preferred_language=row.preferred_language,
         country=row.country,
         timezone=row.timezone,
+        latitude=row.latitude,
+        longitude=row.longitude,
         prayer_calculation_method=(
             CalculationMethod(row.prayer_calculation_method)
             if row.prayer_calculation_method
@@ -46,6 +48,8 @@ def _apply_record_to_row(record: UserRecord, row: UserORM) -> None:
     row.preferred_language = record.preferred_language
     row.country = record.country
     row.timezone = record.timezone
+    row.latitude = record.latitude
+    row.longitude = record.longitude
     row.prayer_calculation_method = (
         record.prayer_calculation_method.value if record.prayer_calculation_method else None
     )

@@ -178,3 +178,47 @@ two tokens issued within the same wall-clock second had identical `iat`/`exp`
 claims and were therefore byte-identical (JWT has second-level precision).
 Fixed by adding a `jti` (unique token ID) claim to every token. This also
 gives the future revocation-list follow-up work a stable handle to key off.
+
+---
+
+## ADR-005: Connect Prayer Times to User Profile
+
+Date: 2026-07-29
+Status: Accepted
+
+Decision: Connect the existing Prayer Times domain with the User domain so that a logged-in user can fetch their daily prayer times using the settings stored in their profile (latitude, longitude, timezone, calculation method) without passing these parameters on every request.
+
+Reason: This is the most logical next step to integrate the two completed vertical slices (Prayer Times and User/Onboarding). It provides immediate value by simplifying client calls, reducing payload sizes, and ensuring consistency across user devices. It also fulfills the "Foundation" priority mentioned in the README.
+
+Alternatives considered:
+- Qur'an domain (read-only): Deferred because connecting the core profile settings is fundamental before adding entirely new domains.
+- Habit tracking: Deferred because users need a seamless, personalized way to view prayer times before they can start tracking habits effectively.
+
+Trade-offs: None. This integration is essential for any personalized experience.
+
+Constitutional articles engaged: Art. 19 (Engineering Principles - modularity, connecting bounded contexts gracefully).
+
+Expected review date: Once the habit tracking slice is being planned.
+
+---
+
+## ADR-006: Habit Tracking (Prayer Consistency) Domain
+
+Date: 2026-07-29
+Status: Accepted
+
+Decision: Implement the Habit Tracking domain specifically focused on Prayer Consistency. 
+The system will track which prayers (Fajr, Dhuhr, Asr, Maghrib, Isha) are marked as completed for a given date by the user. 
+In alignment with ADR-003 and 025_Gamification_and_Motivation.md, this domain will evaluate consistency based on a "completed on N of last 30 days" metric rather than relying on fragile all-or-nothing streaks. The schema will deliberately omit duration, streak-only counters, or engagement fields. 
+The domain will expose endpoints to log a prayer as completed (or missed/excused), and to retrieve the user's prayer completion history and consistency metrics.
+
+Reason: Tracking prayer consistency fulfills the "Habit tracking" Foundation tier slice mentioned in the project plan. By designing it to calculate "N of last 30 days" over simple streaks, we uphold the Product Constitution's principles of avoiding anxiety-inducing or manipulative gamification mechanisms.
+
+Alternatives considered:
+- Streak-based gamification: Explicitly rejected by ADR-003 and 025_Gamification_and_Motivation.md.
+
+Trade-offs: Calculating "N of last 30 days" requires querying a time window of historical data rather than just incrementing a single integer `streak` column, adding slight computational overhead, but this is an accepted trade-off for user well-being.
+
+Constitutional articles engaged: Art. 2, Art. 11 (Calm by Default).
+
+Expected review date: Before adding habit tracking for other domains (e.g. Qur'an reading, fasting).

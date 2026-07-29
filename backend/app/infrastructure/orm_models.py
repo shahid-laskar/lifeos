@@ -8,9 +8,9 @@ dataclass (app/domain/user/entities.py).
 """
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, date as date_type
 
-from sqlalchemy import JSON, Boolean, DateTime, String
+from sqlalchemy import JSON, Boolean, DateTime, String, Date
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.db import Base
@@ -27,6 +27,8 @@ class UserORM(Base):
     preferred_language: Mapped[str] = mapped_column(String(10), default="en", nullable=False)
     country: Mapped[str | None] = mapped_column(String(2), nullable=True)
     timezone: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    latitude: Mapped[float | None] = mapped_column(nullable=True)
+    longitude: Mapped[float | None] = mapped_column(nullable=True)
     prayer_calculation_method: Mapped[str | None] = mapped_column(String(32), nullable=True)
     asr_method: Mapped[str | None] = mapped_column(String(16), nullable=True)
     goals: Mapped[list] = mapped_column(JSON, default=list, nullable=False)
@@ -34,3 +36,17 @@ class UserORM(Base):
     terms_accepted_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
+
+class PrayerLogORM(Base):
+    __tablename__ = "prayer_logs"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    user_id: Mapped[str] = mapped_column(String(36), index=True, nullable=False)
+    date: Mapped[date_type] = mapped_column(Date, index=True, nullable=False)
+    prayer_name: Mapped[str] = mapped_column(String(16), nullable=False)
+    status: Mapped[str] = mapped_column(String(16), nullable=False)
+    
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+

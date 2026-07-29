@@ -29,6 +29,8 @@ def _to_profile_response(user: UserRecord) -> UserProfileResponse:
         preferred_language=user.preferred_language,
         country=user.country,
         timezone=user.timezone,
+        latitude=user.latitude,
+        longitude=user.longitude,
         prayer_calculation_method=user.prayer_calculation_method,
         asr_method=user.asr_method,
         goals=user.goals,
@@ -50,9 +52,11 @@ def update_my_profile(
     user_service: Annotated[UserService, Depends(get_user_service)],
 ) -> UserProfileResponse:
     updated = user_service.update_profile(
-        current_user.id,
+        user_id=current_user.id,
         country=request.country,
         timezone_name=request.timezone,
+        latitude=request.latitude,
+        longitude=request.longitude,
         prayer_calculation_method=request.prayer_calculation_method,
         asr_method=request.asr_method,
         goals=request.goals,
@@ -65,7 +69,12 @@ def update_my_profile(
 def get_onboarding_status(
     current_user: Annotated[UserRecord, Depends(get_current_user)],
 ) -> OnboardingStatusResponse:
-    location_set = current_user.country is not None and current_user.timezone is not None
+    location_set = (
+        current_user.country is not None 
+        and current_user.timezone is not None
+        and current_user.latitude is not None
+        and current_user.longitude is not None
+    )
     prayer_preferences_set = (
         current_user.prayer_calculation_method is not None and current_user.asr_method is not None
     )
