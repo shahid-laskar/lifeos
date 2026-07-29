@@ -54,6 +54,39 @@ def get_dhikr_service(db: Annotated[Session, Depends(get_db)]):
     return DhikrService(SqlAlchemyDhikrRepository(db))
 
 
+def _build_ai_service():
+    from app.core.config import get_settings
+    from app.domain.ai.service import AIService
+    from app.infrastructure.ai_repository import InMemoryConversationRepository, InMemoryMemoryRepository
+    from app.infrastructure.ai_gateway import StubAIGateway, OpenAIGateway
+
+    settings = get_settings()
+    if settings.ai_provider == "openai" and settings.openai_api_key:
+        gateway = OpenAIGateway(
+            api_key=settings.openai_api_key,
+            base_url=settings.openai_base_url or None,
+        )
+    else:
+        gateway = StubAIGateway()
+
+    return AIService(
+        gateway=gateway,
+        conversation_repo=InMemoryConversationRepository(),
+        memory_repo=InMemoryMemoryRepository(),
+    )
+
+
+# Module-level singleton so conversation state persists across requests.
+_ai_service_instance = None
+
+
+def get_ai_service():
+    global _ai_service_instance  # noqa: PLW0603
+    if _ai_service_instance is None:
+        _ai_service_instance = _build_ai_service()
+    return _ai_service_instance
+
+
 def get_current_user(
     credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(bearer_scheme)],
     user_service: Annotated[UserService, Depends(get_user_service)],

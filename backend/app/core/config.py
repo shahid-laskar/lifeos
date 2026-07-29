@@ -23,6 +23,18 @@ class Settings(BaseSettings):
     # tracking field here - see ADR-003 in docs/decision-log.md.
     enable_diagnostic_logging: bool = True
 
+    # --- CORS (070_Backend_Security.md) ---
+    # Comma-separated list of allowed origins for production. Development
+    # uses a fixed localhost allowlist; this field is ignored in development.
+    allowed_origins: str = ""
+
+    # --- AI Gateway (ADR-012, 039_AI_Principles.md) ---
+    # Set to "openai" to enable real AI responses. Leave empty for the
+    # development stub (no network calls, no API key required).
+    ai_provider: str = ""
+    openai_api_key: str = ""
+    openai_base_url: str = ""
+
     # --- Database (ADR-004: SQLite for development) ---
     database_url: str = "sqlite:///./muslim_life_os.db"
 

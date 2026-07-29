@@ -93,15 +93,31 @@ muslim-life-os/
 - Created robust, accessible feature pages for Dashboard, Prayer Times, Qur'an, Dhikr, Habits, and Profile.
 - Implemented Onboarding flow following progressive disclosure principles (ADR-004).
 
-**89 backend tests passing** across all backend slices (unit + API integration).
+**109 backend tests passing** across all backend slices (unit + API integration).
 
 
-## Next slice (proposed — needs an ADR before starting)
+## Phase 1 completion programme (ADR-012)
 
-Per 014_Feature_Prioritisation_Framework.md "Foundation" tier, candidates are:
+ADR-012 defines the Phase 1 foundation delivery and quality gates. The delivery
+proceeds as vertical, deployable increments. Each increment must include
+implementation, automated tests, security checks, operational documentation, and
+a reproducible delivery artefact.
 
-- **AI Foundation / Safe Persona Initialization** — setting up the framework and boundaries for the AI component before integrating it into daily coaching.
-- **Family Dashboard structure** — beginning the household/permission data model (026) required for multi-user features.
+See `docs/decision-log.md` (ADR-012) and the implementation plan at
+`../implementation_plan_phase01.md` for the full programme.
+
+### Phase 1 delivery sequence
+
+| # | Increment | Status |
+|---|-----------|--------|
+| 1 | Delivery baseline (CI, Docker, standards) | ✅ Complete |
+| 2 | Web foundation hardening (modules, typed contracts, a11y, i18n, offline UI) | ✅ Complete |
+| 3 | PWA and offline foundation (enhanced SW, typed operation queue, update banner) | ✅ Complete |
+| 4 | AI foundation (provider-neutral gateway, versioned prompts, safety, privacy) | ✅ Complete |
+| 5 | Family capability foundations (roles, invitations, private-by-default) | ✅ Complete |
+| 6 | Data, analytics, and governance foundations (retention policy, data API) | ✅ Complete |
+| 7 | DevOps, security, and operations foundations (CORS, headers, rate limiting, audit) | ✅ Complete |
+| 8 | Mobile foundation (shared platform-neutral packages: types, auth, offline, i18n) | ✅ Complete |
 
 Still deliberately deferred: AI Coach, Family, Community — see ADR-002 for
 the dependency reasoning (Memory 041, Safety 048, permissions 026 needed first).

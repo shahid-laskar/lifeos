@@ -13,6 +13,9 @@ _db_fd, _db_path = tempfile.mkstemp(suffix=".db")
 os.close(_db_fd)
 os.environ["MLOS_DATABASE_URL"] = f"sqlite:///{_db_path}"
 os.environ["MLOS_JWT_SECRET_KEY"] = "test-only-secret-never-use-in-production"
+# Disable slowapi rate limiting in the test suite so tests that hit auth
+# endpoints many times don't trip the per-IP limits.
+os.environ["RATELIMIT_ENABLED"] = "0"
 
 import pytest  # noqa: E402
 from fastapi.testclient import TestClient  # noqa: E402

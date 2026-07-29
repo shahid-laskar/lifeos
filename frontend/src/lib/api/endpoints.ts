@@ -37,4 +37,15 @@ export const ENDPOINTS = {
   DHIKR_ITEMS:     `${API_BASE}/dhikr/items`,
   DHIKR_LOG:       `${API_BASE}/dhikr/sessions`,
   DHIKR_SUMMARY:   `${API_BASE}/dhikr/summary`,
+
+  // AI (ADR-012 Increment 4)
+  AI_CONVERSATIONS: `${API_BASE}/ai/conversations`,
+  AI_MEMORY:        `${API_BASE}/ai/memory`,
+
+  // Family (ADR-012 Increment 5)
+  FAMILIES:         `${API_BASE}/families`,
+
+  // Governance (ADR-012 Increment 6)
+  DATA_POLICY:      `${API_BASE}/governance/data-policy`,
+  MY_DATA:          `${API_BASE}/governance/my-data`,
 } as const

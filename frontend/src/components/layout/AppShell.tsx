@@ -15,14 +15,16 @@ import {
 import { useAuthStore } from '@/store/authStore'
 import toast from 'react-hot-toast'
 import ConnectivityBanner from '@/components/system/ConnectivityBanner'
+import AppUpdateBanner from '@/components/system/AppUpdateBanner'
+import { strings } from '@/lib/i18n/strings'
 
 const NAV_ITEMS = [
-  { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/prayer',    icon: Clock,           label: 'Prayer Times' },
-  { to: '/quran',     icon: BookOpen,        label: "Qur'an" },
-  { to: '/dhikr',     icon: Heart,           label: 'Dhikr' },
-  { to: '/habits',    icon: CheckSquare,     label: 'Habits' },
-  { to: '/profile',   icon: User,            label: 'Profile' },
+  { to: '/dashboard', icon: LayoutDashboard, label: strings.nav.dashboard },
+  { to: '/prayer',    icon: Clock,           label: strings.nav.prayer },
+  { to: '/quran',     icon: BookOpen,        label: strings.nav.quran },
+  { to: '/dhikr',     icon: Heart,           label: strings.nav.dhikr },
+  { to: '/habits',    icon: CheckSquare,     label: strings.nav.habits },
+  { to: '/profile',   icon: User,            label: strings.nav.profile },
 ] as const
 
 export default function AppShell() {
@@ -34,11 +36,11 @@ export default function AppShell() {
   function handleLogout() {
     logout()
     navigate('/login')
-    toast.success('Signed out. As-salāmu ʿalaykum.')
+    toast.success(strings.app.signedOut)
   }
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ background: 'var(--color-bg-primary)' }}>
+    <div className="flex h-screen overflow-hidden" style={{ background: 'var(--color-bg-primary)' }} lang="en">
       {/* ── Mobile overlay ─────────────────────────────────── */}
       {sidebarOpen && (
         <div
@@ -83,14 +85,14 @@ export default function AppShell() {
           <button
             className="ml-auto lg:hidden p-1 rounded-lg transition-colors hover:opacity-70"
             onClick={() => setSidebarOpen(false)}
-            aria-label="Close menu"
+            aria-label={strings.app.closeMenu}
           >
             <X size={18} style={{ color: 'var(--color-text-secondary)' }} />
           </button>
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+        <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1" aria-label="Main navigation">
           {NAV_ITEMS.map(({ to, icon: Icon, label }) => (
             <NavLink
               key={to}
@@ -157,6 +159,7 @@ export default function AppShell() {
 
       {/* ── Main content ────────────────────────────────────── */}
       <div className="flex flex-1 flex-col overflow-hidden">
+        <AppUpdateBanner />
         <ConnectivityBanner />
         {/* Mobile header */}
         <header
@@ -167,7 +170,8 @@ export default function AppShell() {
             onClick={() => setSidebarOpen(true)}
             className="p-2 rounded-lg"
             style={{ color: 'var(--color-text-secondary)' }}
-            aria-label="Open menu"
+            aria-label={strings.app.openMenu}
+            aria-expanded={sidebarOpen}
           >
             <Menu size={20} />
           </button>
@@ -180,7 +184,7 @@ export default function AppShell() {
         </header>
 
         {/* Page content */}
-        <main className="flex-1 overflow-y-auto">
+        <main id="main-content" className="flex-1 overflow-y-auto" tabIndex={-1}>
           <div className="max-w-5xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
             <Outlet />
           </div>

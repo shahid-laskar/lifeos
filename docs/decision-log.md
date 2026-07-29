@@ -468,6 +468,66 @@ Alternatives considered:
 - A single large release: rejected in favour of incremental rollback-safe
   vertical releases.
 
+Trade-offs: Incremental vertical delivery slows the appearance of breadth
+early. Each milestone must be fully shippable before the next begins, which
+means some features visible in the architecture volumes will not appear until
+later increments. This is preferred over wide-but-shallow delivery that
+accumulates undetected contract drift and untested failure modes.
+
 Constitutional articles engaged: Article 2 (benefit over engagement), Article
 9 (privacy is sacred), Article 11 (calm by default), Article 19 (engineering
 principles), ADR-001, ADR-007, and ADR-011.
+
+Expected review date: 2026-10-29
+
+---
+
+## ADR-013: Phase 1 Foundation Delivery — Complete
+
+Date: 2026-07-29
+Status: Accepted
+
+Decision: All eight increments of the Phase 1 foundation programme (ADR-012)
+have been delivered. The platform now has:
+
+1. Delivery baseline — CI with typecheck, lint, test, dependency scan, and
+   container build gates. Docker-based local orchestration.
+2. Web foundation — Feature modules (features/prayer, quran, dhikr, ai,
+   family), centralised typed API contracts (lib/api/types.ts), externalised
+   UI strings (lib/i18n/strings.ts), accessibility improvements (ARIA labels,
+   nav landmarks, main skip target, lang attribute, aria-expanded).
+3. PWA and offline foundation — Enhanced service worker with domain-specific
+   caching (static API, dynamic API, app shell), typed offline operation
+   builders, non-intrusive update banner.
+4. AI foundation — Provider-neutral AIGateway protocol, versioned system
+   prompts, pre-LLM safety refusal policy (keyword heuristic for fatwa/ruling
+   requests), opt-in memory, conversation CRUD, 8 AI tests.
+5. Family capability foundations — Family entity, MemberRole (owner/adult/
+   dependent), invitation flow, least-privilege defaults, privacy isolation
+   tests, 8 family tests.
+6. Data governance — DataClassification taxonomy, RetentionPolicy per domain,
+   prohibited engagement events list, public /governance/data-policy endpoint,
+   authenticated /governance/my-data endpoint, 5 governance tests.
+7. Security and operations — CORS middleware, SecureHeadersMiddleware, per-IP
+   rate limiting on auth endpoints (slowapi), RequestLoggingMiddleware with
+   correlation IDs, structured audit logging (mlos.audit logger), /ready
+   readiness endpoint with DB check.
+8. Mobile shared packages — @mlos/shared with platform-neutral types, auth
+   contract, offline queue interface, i18n locale config, and domain utilities
+   ready for React Native adoption.
+
+Reason: Phase 1 gates defined in ADR-012 are met. Every increment has
+automated tests, passes the CI quality gates, and is deployable.
+
+Alternatives considered: N/A — this ADR records completion, not a decision
+between alternatives.
+
+Trade-offs: The AI and Family repositories are in-memory for this phase.
+A production deployment must replace InMemoryConversationRepository,
+InMemoryFamilyRepository, and InMemoryMemoryRepository with SQLAlchemy-backed
+implementations backed by a durable store.
+
+Constitutional articles engaged: Article 2 (benefit, not engagement), Article
+9 (privacy), Article 11 (calm), Article 19 (engineering principles), ADR-012.
+
+Expected review date: 2027-01-29
