@@ -112,3 +112,69 @@ not silently reintroduced.
 Constitutional articles engaged: Art. 2, Art. 9, Art. 11 (Calm by Default).
 
 Expected review date: Before Volume 07 (Data & Analytics) work begins, if ever.
+
+---
+
+## ADR-004: User/Onboarding domain — minimal registration, deferred auth methods, SQLite for dev
+
+Date: 2026-07-29
+Status: Accepted
+
+Decision: Implement the User domain (`app/domain/user/`) with:
+- Registration requiring only: email, password, explicit `terms_accepted=true`.
+  All other onboarding fields (country, timezone, prayer calculation
+  preference, Asr convention, goals) are optional and set via a separate
+  `PATCH /users/me/profile` call, never required at signup.
+- Password auth via `bcrypt` (direct library, not `passlib`, to avoid known
+  passlib/bcrypt-4.x version-detection warnings) + custom JWT access/refresh
+  tokens (`PyJWT`, HS256, short-lived 15-min access / 30-day refresh).
+- SQLite for development persistence (via SQLAlchemy), with a Repository
+  abstraction (`UserRepository` Protocol) so the domain service is
+  storage-independent and unit-testable without a database.
+- Deliberately **not** implemented in this slice: passkeys, OAuth/OIDC
+  providers, MFA, refresh-token rotation/revocation lists, session device
+  tracking, password breach detection.
+
+Reason: 024_Onboarding_Framework.md is explicit that onboarding should be
+"progressive," collect the minimum, and "explain why each question is asked" -
+country/timezone/prayer-method/goals are all marked optional in the source
+document. Article 9 (Privacy Is Sacred) requires collecting only what is
+necessary. 069_Authentication_and_Authorization.md describes passkeys, OAuth,
+and MFA as the *target* state, but building all of them before a single user
+model exists would violate 011 Principle 3 ("Simplicity Before Features") and
+010's anti-pattern warning against adding complexity before it's justified by
+real usage. SQLite is chosen over Postgres purely for zero-infrastructure
+local development; 067_Database_Architecture.md marks relational storage as
+correct for user data, but does not mandate a specific engine at this stage.
+
+Alternatives considered:
+- Require full profile (country, timezone, madhhab, occupation) at signup —
+  rejected: directly contradicts 024's progressive-disclosure principle and
+  083_Forms_and_Input_Architecture.md ("collect only necessary information").
+- Passkeys-first (no password) — rejected for this slice: correct long-term
+  direction (069 marks passkeys "preferred over passwords where supported")
+  but adds WebAuthn ceremony complexity with no client yet to exercise it;
+  password + short-lived JWT is the minimum viable, replaceable-later choice.
+- passlib for hashing — rejected: current passlib releases emit spurious
+  version-detection warnings against bcrypt >=4.1 in this environment; direct
+  `bcrypt` library use is simpler and equally standard.
+
+Trade-offs: No session revocation ("sign out this device") until a sessions
+table is added. No account recovery flow yet (forgot-password) — flagged as
+the near-term follow-up once email delivery infrastructure exists.
+
+Constitutional articles engaged: Art. 9 (Privacy Is Sacred - minimum
+collection), Art. 10 (Respect for Time - don't build unused auth methods),
+Art. 19 (Engineering Principles - modularity, testability via Repository
+pattern).
+
+Expected review date: Before any client (web/PWA/RN) implements a login
+screen - passkey/OAuth may become required earlier than expected if targeting
+a demographic with low password-reuse tolerance (e.g. student personas -
+015_Personas.md).
+
+**Addendum (2026-07-29):** During implementation, testing caught a real bug -
+two tokens issued within the same wall-clock second had identical `iat`/`exp`
+claims and were therefore byte-identical (JWT has second-level precision).
+Fixed by adding a `jti` (unique token ID) claim to every token. This also
+gives the future revocation-list follow-up work a stable handle to key off.

@@ -8,6 +8,10 @@ venv/
 *.env
 .env
 
+# Database (dev SQLite files - never commit real data)
+*.db
+*.sqlite3
+
 # Node (future web/RN clients)
 node_modules/
 dist/
