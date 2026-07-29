@@ -222,3 +222,55 @@ Trade-offs: Calculating "N of last 30 days" requires querying a time window of h
 Constitutional articles engaged: Art. 2, Art. 11 (Calm by Default).
 
 Expected review date: Before adding habit tracking for other domains (e.g. Qur'an reading, fasting).
+
+---
+
+## ADR-007: Qur'an Domain — read-only text, bookmarks, reading progress
+
+Date: 2026-07-29
+Status: Accepted
+
+Decision: Implement a Qur'an domain (`app/domain/quran/`) with three capabilities:
+1. **Read-only text access** — surah listing and ayah browsing backed by a bundled
+   JSON data file (`app/domain/quran/data/quran.json`) shipped with the application.
+   No external Qur'an API is called at runtime (Article 9: Privacy Is Sacred —
+   every request to a third-party API leaks IP address and reading behaviour).
+2. **Bookmarks** — authenticated users can add/remove per-ayah bookmarks.
+   Stored in a `quran_bookmarks` table. No social sharing, no public lists
+   (Article 6: Humility over Gamification — no public piety scores).
+3. **Reading progress** — authenticated users can record their last-read position
+   per surah. Stored in a `quran_reading_progress` table. Deliberately a simple
+   "last read" record, not a streak counter (ADR-003, Article 2).
+
+The Qur'an text dataset (Arabic + transliteration metadata) is stored as a
+bundled JSON file produced from the `quran-json` open-source project (MIT
+licence). The file is loaded once at startup into memory; it is never written to
+and never queried from a database — pure domain-level data (Article 8: domain
+logic in software, not models).
+
+Reason: The Qur'an domain is a zero-AI, zero-new-architecture, high-frequency
+feature nominated in the README as the next Foundation-tier slice after Habit
+Tracking. Users now have accounts and profiles to attach bookmarks and reading
+progress to (the dependency established by ADR-004). A bundled data approach is
+preferable to an external API call because:
+- It works offline (031_Offline_First_Experience.md requirement).
+- It does not leak which ayahs a user reads to any third party (Article 9).
+- Qur'anic text is immutable; there is no need for live data.
+
+Alternatives considered:
+- External Qur'an API (e.g. alquran.cloud): rejected — runtime network call leaks
+  user behaviour, breaks offline-first, adds external dependency and rate-limit
+  risk.
+- Database-backed text storage: rejected — the text is static; loading it into a
+  relational table adds migration complexity with no benefit; in-memory lookup is
+  faster and simpler.
+
+Trade-offs: The bundled JSON adds ~3 MB to the repository / container image. This
+is accepted as a one-time fixed cost; it never grows.
+
+Constitutional articles engaged: Art. 9 (Privacy Is Sacred), Art. 8 (AI has
+boundaries — this feature uses none), Art. 2 (Consistency over Intensity — reading
+progress, not streak), ADR-003 (no engagement fields in schema).
+
+Expected review date: Before implementing Tafsir, Memorisation, or any AI-assisted
+Qur'an feature — those will require the RAG/Knowledge-Graph architecture (042, 043).

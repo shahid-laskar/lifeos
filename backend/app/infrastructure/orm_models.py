@@ -1,10 +1,9 @@
 """
-SQLAlchemy ORM model for User.
+SQLAlchemy ORM models.
 
-This lives in the infrastructure layer deliberately - app/domain/user/ never
-imports from here. Only user_repository_sqlalchemy.py bridges the two,
-translating between this ORM row and the framework-agnostic UserRecord
-dataclass (app/domain/user/entities.py).
+All models live in the infrastructure layer deliberately - domain modules
+never import from here. Concrete repository implementations are the only
+bridges between ORM rows and framework-agnostic domain dataclasses.
 """
 from __future__ import annotations
 
@@ -50,3 +49,25 @@ class PrayerLogORM(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
 
+
+class QuranBookmarkORM(Base):
+    """User bookmark on a specific ayah (surah_number:ayah_number)."""
+    __tablename__ = "quran_bookmarks"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    user_id: Mapped[str] = mapped_column(String(36), index=True, nullable=False)
+    surah_number: Mapped[int] = mapped_column(nullable=False)
+    ayah_number: Mapped[int] = mapped_column(nullable=False)
+    note: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
+
+class QuranReadingProgressORM(Base):
+    """Last-read ayah per surah for a user — not a streak counter (ADR-003)."""
+    __tablename__ = "quran_reading_progress"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    user_id: Mapped[str] = mapped_column(String(36), index=True, nullable=False)
+    surah_number: Mapped[int] = mapped_column(nullable=False)
+    last_ayah_number: Mapped[int] = mapped_column(nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)

@@ -42,35 +42,49 @@ muslim-life-os/
 - Verified live: server boots, `/health`, `/api/v1/prayer/times`, and
   `/docs` (Swagger UI) all confirmed working end-to-end.
 
-### Slice 2: User / Onboarding — complete
-- Minimal registration (email, password, explicit terms acceptance) with
-  progressive profile completion — nothing else required at signup
-  (ADR-004, 024_Onboarding_Framework.md).
-- bcrypt password hashing + short-lived JWT access/refresh tokens.
-- Repository pattern (`UserRepository` Protocol) keeps the domain layer
-  fully unit-testable without a database — proven, not just claimed.
-- `/users/me/onboarding-status` gives every future client a single source
-  of truth for onboarding progress and First Meaningful Outcome readiness.
-- Verified live end-to-end: register → check status → progressively fill
-  profile → status correctly reflects First Meaningful Outcome availability.
+### Slice 3: Habit Tracking (Prayer Consistency) — complete
+- Log each of the 5 daily prayers as `completed`, `missed`, or `excused`.
+- Idempotent log endpoint: re-logging the same prayer on the same date updates
+  the status rather than creating a duplicate.
+- Consistency metric: "completed on N of last 30 days" — never a fragile
+  streak counter (ADR-003, Article 2).
+- Verified end-to-end: log → status → consistency metrics.
 
-**32 tests passing** across both slices (unit + API integration).
+### Slice 4: Qur'an Domain (read-only) — complete
+- Full surah catalogue: all 114 surahs with Arabic name, transliterated name,
+  meaning, ayah count, and revelation type — loaded from a bundled JSON file
+  at startup (no external API — Article 9: Privacy Is Sacred).
+- Public `GET /quran/surahs` and `GET /quran/surahs/{n}` require no auth.
+- Authenticated bookmarks: add/remove/list per-ayah bookmarks with optional
+  personal note. Add is idempotent; bookmarks are user-scoped (no public
+  piety lists — Article 6: Humility over Gamification).
+- Authenticated reading progress: `PUT /quran/reading-progress` records the
+  user's last-read ayah per surah. Simple last-read tracker, not a streak
+  counter (ADR-003, Article 2: Consistency over Intensity).
+- Ayah validation: adding a bookmark or progress record to ayah 8 of
+  Al-Fatihah (which has 7) is rejected with 422.
+- Documented in ADR-007.
+
+**68 tests passing** across all four slices (unit + API integration).
+
 
 ## Next slice (proposed — needs an ADR before starting)
 
 Per 014_Feature_Prioritisation_Framework.md "Foundation" tier, candidates are:
 
-- **Qur'an domain (read-only)** — zero-AI, zero new architecture, high-frequency
-  use, and now has a real user/account to attach bookmarks/reading-progress to.
-- **Connect Prayer Times to the User profile** — use the now-stored
-  country/timezone/prayer-method preferences so `/prayer/times` can be called
-  without repeating those parameters every request for a logged-in user.
-- **Habit tracking (prayer consistency, per 025_Gamification_and_Motivation.md)**
-  — "completed on N of last 30 days," never a fragile streak-only counter,
-  per ADR-003.
+- **Qur'an reading history / weekly summary** — aggregate per-surah progress
+  into a weekly reading summary (e.g. "read 3 surahs this week") using the
+  now-complete reading-progress data. Requires no new architecture.
+- **Dhikr Companion** — simple, zero-AI counter for adhkar (morning, evening,
+  post-prayer). High-frequency, zero new architecture, pure domain logic.
+  Depends on no other feature.
+- **Forgot password / account recovery** — flagged as a near-term follow-up
+  in ADR-004 once email delivery infrastructure exists. Blocks all future
+  client implementations.
 
 Still deliberately deferred: AI Coach, Family, Community — see ADR-002 for
 the dependency reasoning (Memory 041, Safety 048, permissions 026 needed first).
+
 
 ## Before you build anything
 

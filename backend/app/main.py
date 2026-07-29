@@ -9,7 +9,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from app.api.v1 import auth, prayer, users, habits
+from app.api.v1 import auth, prayer, users, habits, quran
 from app.core.config import get_settings
 from app.core.db import Base, engine
 from app.infrastructure import orm_models  # noqa: F401 - registers ORM models with Base
@@ -39,6 +39,7 @@ app.include_router(prayer.router, prefix=settings.api_v1_prefix)
 app.include_router(auth.router, prefix=settings.api_v1_prefix)
 app.include_router(users.router, prefix=settings.api_v1_prefix)
 app.include_router(habits.router, prefix=settings.api_v1_prefix)
+app.include_router(quran.router, prefix=settings.api_v1_prefix)
 
 
 @app.get("/health", tags=["system"])

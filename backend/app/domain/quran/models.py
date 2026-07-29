@@ -1,0 +1,55 @@
+"""
+Pydantic models for the Qur'an API — request/response shapes only.
+
+The domain entities (entities.py) are framework-agnostic dataclasses.
+These Pydantic models live at the API boundary and are responsible for
+validation and serialisation.
+"""
+from __future__ import annotations
+
+from datetime import datetime
+
+from pydantic import BaseModel, Field
+
+
+# ── Surah ──────────────────────────────────────────────────────────────────
+
+
+class SurahResponse(BaseModel):
+    number: int
+    arabic_name: str
+    transliterated_name: str
+    meaning: str
+    ayah_count: int
+    revelation_type: str
+
+
+# ── Bookmarks ──────────────────────────────────────────────────────────────
+
+
+class BookmarkRequest(BaseModel):
+    surah_number: int = Field(..., ge=1, le=114)
+    ayah_number: int = Field(..., ge=1)
+    note: str | None = Field(None, max_length=500)
+
+
+class BookmarkResponse(BaseModel):
+    id: str
+    surah_number: int
+    ayah_number: int
+    note: str | None
+    created_at: datetime
+
+
+# ── Reading progress ────────────────────────────────────────────────────────
+
+
+class ReadingProgressRequest(BaseModel):
+    surah_number: int = Field(..., ge=1, le=114)
+    last_ayah_number: int = Field(..., ge=1)
+
+
+class ReadingProgressResponse(BaseModel):
+    surah_number: int
+    last_ayah_number: int
+    updated_at: datetime

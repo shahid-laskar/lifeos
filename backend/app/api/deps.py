@@ -34,6 +34,14 @@ def get_habit_service(db: Annotated[Session, Depends(get_db)]):
     return HabitService(SqlAlchemyHabitRepository(db))
 
 
+def get_quran_service(db: Annotated[Session, Depends(get_db)]):
+    from app.infrastructure.quran_repository_sqlalchemy import SqlAlchemyQuranRepository
+    from app.domain.quran.service import QuranService
+
+    return QuranService(SqlAlchemyQuranRepository(db))
+
+
+
 def get_current_user(
     credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(bearer_scheme)],
     user_service: Annotated[UserService, Depends(get_user_service)],
