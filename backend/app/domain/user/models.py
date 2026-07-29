@@ -66,6 +66,24 @@ class UserProfileUpdateRequest(BaseModel):
     preferred_language: str | None = Field(None, min_length=2, max_length=10)
 
 
+class ProfileUpdateResponse(BaseModel):
+    user: UserProfileResponse
+    message: str
+
+
+class PasswordResetRequest(BaseModel):
+    email: EmailStr
+
+
+class PasswordResetConfirmRequest(BaseModel):
+    token: str = Field(..., description="The reset token received via email")
+    new_password: str = Field(
+        ...,
+        min_length=8,
+        description="Must be at least 8 characters.",
+    )
+
+
 class UserProfileResponse(BaseModel):
     id: str
     email: EmailStr

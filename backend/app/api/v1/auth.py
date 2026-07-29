@@ -17,7 +17,14 @@ from app.core.security import (
     create_refresh_token,
     decode_token,
 )
-from app.domain.user.models import RefreshRequest, TokenResponse, UserLoginRequest, UserRegisterRequest
+from app.domain.user.models import (
+    PasswordResetConfirmRequest,
+    PasswordResetRequest,
+    RefreshRequest,
+    TokenResponse,
+    UserLoginRequest,
+    UserRegisterRequest,
+)
 from app.domain.user.service import (
     EmailAlreadyRegisteredError,
     InvalidCredentialsError,
@@ -86,3 +93,34 @@ def refresh(
         access_token=create_access_token(user.id),
         refresh_token=request.refresh_token,
     )
+
+
+# ── Password Reset ────────────────────────────────────────────────────────────
+
+
+@router.post("/request-password-reset", status_code=status.HTTP_200_OK)
+def request_password_reset(
+    request: PasswordResetRequest,
+    user_service: Annotated[UserService, Depends(get_user_service)],
+) -> dict:
+    """Initiates the password reset flow.
+
+    Returns the same generic success message regardless of whether the email
+    exists in the system, to prevent email enumeration (ADR-009, Article 9).
+    """
+    user_service.request_password_reset(request.email)
+    return {"message": "If that email is registered, a password reset link has been sent."}
+
+
+@router.post("/reset-password", status_code=status.HTTP_200_OK)
+def reset_password(
+    request: PasswordResetConfirmRequest,
+    user_service: Annotated[UserService, Depends(get_user_service)],
+) -> dict:
+    """Completes the password reset flow using the token from the email."""
+    try:
+        user_service.reset_password(request.token, request.new_password)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return {"message": "Password successfully reset. You may now log in."}
+

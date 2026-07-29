@@ -326,3 +326,55 @@ Art. 9 (Privacy Is Sacred — no external API), ADR-003.
 Expected review date: Before adding custom dhikr or social dhikr circles —
 those require a scholar-review workflow and community permissions (026).
 
+---
+
+## ADR-009: Forgot Password / Account Recovery Flow
+
+Date: 2026-07-29
+Status: Accepted
+
+Decision: Implement a password recovery flow with the following architecture:
+1. **Stateful Reset Tokens**: When a user requests a password reset, generate a
+   cryptographically secure random token (e.g., using `secrets.token_urlsafe`).
+   Hash the token (using bcrypt, same as passwords) and store it in a new
+   `password_reset_tokens` table with an expiration time (e.g., 1 hour) and
+   the `user_id`. Do *not* use stateless JWTs for password resets, as revoking
+   them requires either a denylist or adding a `password_changed_at` field to
+   the user record. Storing hashed tokens is simpler and explicitly revokable
+   by deleting the record after use.
+2. **Abstract Email Service**: Introduce an `EmailService` Protocol in the
+   domain layer. This keeps the domain completely decoupled from email delivery
+   mechanisms (e.g., SendGrid, AWS SES).
+3. **Console Email Implementation**: For this Foundation tier slice, implement a
+   `ConsoleEmailService` in the infrastructure layer that simply logs the reset
+   link to stdout. This unblocks frontend/client development and testing
+   without requiring actual email infrastructure yet.
+4. **Security Measures**:
+   - The `/request-password-reset` endpoint must *always* return the same generic
+     success message, regardless of whether the email exists. This prevents
+     email enumeration attacks.
+   - Tokens must be single-use (deleted upon successful reset).
+   - Tokens expire after 1 hour.
+   - New passwords must meet the same complexity requirements as registration.
+
+Reason: This unblocks the last major Foundation-tier requirement for clients.
+Stateful, hashed tokens offer explicit revocation and are industry-standard for
+password resets. Decoupling email delivery allows us to build the flow now
+and swap in a real provider later (e.g., when deploying to production).
+
+Alternatives considered:
+- Stateless JWTs: Rejected because revoking them is complex (requires tracking
+  when the password last changed or maintaining a denylist).
+- Storing plain-text tokens: Rejected. If the DB is compromised, attackers
+  could use active reset tokens.
+
+Trade-offs: Stateful tokens require a new database table and occasional cleanup
+of expired tokens.
+
+Constitutional articles engaged: Art. 9 (Privacy Is Sacred — email enumeration
+prevention).
+
+Expected review date: When integrating a real email provider (e.g., SendGrid)
+for production deployment.
+
+

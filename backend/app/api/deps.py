@@ -22,9 +22,15 @@ bearer_scheme = HTTPBearer(auto_error=False)
 def get_user_service(db: Annotated[Session, Depends(get_db)]) -> UserService:
     # Local import avoids a module-level infrastructure->domain import cycle
     # at import time; keeps the dependency direction explicit at the call site.
-    from app.infrastructure.user_repository_sqlalchemy import SqlAlchemyUserRepository
+    from app.infrastructure.user_repository_sqlalchemy import SqlAlchemyUserRepository, SqlAlchemyPasswordResetTokenRepository
+    from app.infrastructure.console_email_service import ConsoleEmailService
 
-    return UserService(SqlAlchemyUserRepository(db))
+    return UserService(
+        repository=SqlAlchemyUserRepository(db),
+        token_repository=SqlAlchemyPasswordResetTokenRepository(db),
+        email_service=ConsoleEmailService(),
+    )
+
 
 
 def get_habit_service(db: Annotated[Session, Depends(get_db)]):

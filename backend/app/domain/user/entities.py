@@ -34,3 +34,13 @@ class UserRecord:
     prayer_calculation_method: CalculationMethod | None = None
     asr_method: AsrMethod | None = None
     goals: list[OnboardingGoal] = field(default_factory=list)
+
+
+@dataclass
+class PasswordResetToken:
+    id: str
+    user_id: str
+    hashed_token: str
+    expires_at: datetime
+    created_at: datetime
+

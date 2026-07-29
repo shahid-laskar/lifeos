@@ -9,11 +9,13 @@ No business rules live here (those belong in app/domain/user/service.py).
 from __future__ import annotations
 
 from sqlalchemy.orm import Session
+from sqlalchemy import select
 
 from app.domain.prayer.calculation_methods import AsrMethod, CalculationMethod
-from app.domain.user.entities import UserRecord
+from app.domain.user.entities import PasswordResetToken, UserRecord
 from app.domain.user.goals import OnboardingGoal
-from app.infrastructure.orm_models import UserORM
+from app.domain.user.repository import PasswordResetTokenRepository, UserRepository
+from app.infrastructure.orm_models import PasswordResetTokenORM, UserORM
 
 
 def _to_record(row: UserORM) -> UserRecord:
@@ -91,3 +93,41 @@ class SqlAlchemyUserRepository:
         self._session.commit()
         self._session.refresh(row)
         return _to_record(row)
+
+
+class SqlAlchemyPasswordResetTokenRepository:
+    def __init__(self, session: Session) -> None:
+        self._session = session
+
+    def create(self, token: PasswordResetToken) -> PasswordResetToken:
+        row = PasswordResetTokenORM(
+            id=token.id,
+            user_id=token.user_id,
+            hashed_token=token.hashed_token,
+            expires_at=token.expires_at,
+            created_at=token.created_at,
+        )
+        self._session.add(row)
+        self._session.commit()
+        return token
+
+    def get_by_hashed_token(self, hashed_token: str) -> PasswordResetToken | None:
+        stmt = select(PasswordResetTokenORM).where(PasswordResetTokenORM.hashed_token == hashed_token)
+        row = self._session.execute(stmt).scalar_one_or_none()
+        if row is None:
+            return None
+        return PasswordResetToken(
+            id=row.id,
+            user_id=row.user_id,
+            hashed_token=row.hashed_token,
+            expires_at=row.expires_at,
+            created_at=row.created_at,
+        )
+
+    def delete(self, token_id: str) -> None:
+        stmt = select(PasswordResetTokenORM).where(PasswordResetTokenORM.id == token_id)
+        row = self._session.execute(stmt).scalar_one_or_none()
+        if row is not None:
+            self._session.delete(row)
+            self._session.commit()
+
