@@ -274,3 +274,55 @@ progress, not streak), ADR-003 (no engagement fields in schema).
 
 Expected review date: Before implementing Tafsir, Memorisation, or any AI-assisted
 Qur'an feature — those will require the RAG/Knowledge-Graph architecture (042, 043).
+
+---
+
+## ADR-008: Dhikr Companion — curated adhkar catalogue, session logging
+
+Date: 2026-07-29
+Status: Accepted
+
+Decision: Implement a Dhikr Companion domain (`app/domain/dhikr/`) with:
+1. **Curated adhkar catalogue** — a bundled JSON file (`dhikr_items.json`)
+   containing well-known adhkar drawn from Hisnul Muslim (Fortress of the
+   Muslim) and established Sunnah sources. Items carry: Arabic text,
+   transliteration, meaning, recommended count, and category
+   (morning | evening | post_prayer | general). The catalogue is immutable,
+   loaded once at startup — no external API, no database table for it
+   (same pattern as ADR-007, Article 9: Privacy Is Sacred).
+2. **Session logging** — authenticated users can log dhikr sessions: which
+   item they completed and how many times. A single `dhikr_logs` table stores
+   these. No streak counter, no "total ever" KPI (ADR-003, Article 2:
+   Consistency over Intensity). The only aggregate exposed is "completed today
+   per category" — a calm, non-punishing daily summary.
+3. **Daily summary endpoint** — returns, for a given date, how many dhikr
+   sessions were logged per category. Deliberately not "N-day streak" — a
+   user who misses a day is not punished by resetting a number.
+
+Reason: Dhikr is a high-frequency, high-value Islamic practice (mentioned 100+
+times in the Qur'an). It requires no AI, no new infrastructure, and no
+cross-domain dependencies — the ideal Foundation-tier next slice. A companion
+app that lets users tap through adhkar and log them fulfils Article 1 (Benefit
+over Engagement): it helps users remember Allah without gamifying the act.
+
+Alternatives considered:
+- Streak-based gamification: rejected by ADR-003 and Article 2.
+- External adhkar API: rejected (Article 9 — leaks which adhkar a user reads).
+- Database-backed catalogue: rejected (catalogue is immutable; in-memory is
+  simpler and faster — same reasoning as ADR-007).
+- Allowing user-created custom dhikr: deferred — adds moderation complexity
+  (Islamic correctness review) without established user demand.
+
+Trade-offs: The bundled catalogue is curated and limited (~30 items). Users
+cannot add their own dhikr in this slice. Custom dhikr is a natural follow-up
+once a scholar-review process for user-contributed content exists (Art. 5:
+Evidence over Opinion — Islamic guidance cites sources).
+
+Constitutional articles engaged: Art. 1 (Benefit over Engagement), Art. 2
+(Consistency over Intensity), Art. 5 (Evidence over Opinion — sourced adhkar),
+Art. 6 (Humility over Gamification), Art. 8 (AI has boundaries — none used),
+Art. 9 (Privacy Is Sacred — no external API), ADR-003.
+
+Expected review date: Before adding custom dhikr or social dhikr circles —
+those require a scholar-review workflow and community permissions (026).
+

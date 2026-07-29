@@ -41,6 +41,12 @@ def get_quran_service(db: Annotated[Session, Depends(get_db)]):
     return QuranService(SqlAlchemyQuranRepository(db))
 
 
+def get_dhikr_service(db: Annotated[Session, Depends(get_db)]):
+    from app.infrastructure.dhikr_repository_sqlalchemy import SqlAlchemyDhikrRepository
+    from app.domain.dhikr.service import DhikrService
+
+    return DhikrService(SqlAlchemyDhikrRepository(db))
+
 
 def get_current_user(
     credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(bearer_scheme)],

@@ -65,22 +65,28 @@ muslim-life-os/
   Al-Fatihah (which has 7) is rejected with 422.
 - Documented in ADR-007.
 
-**68 tests passing** across all four slices (unit + API integration).
+### Slice 5: Dhikr Companion — complete
+- Curated adhkar catalogue (~28 items) drawn from Hisnul Muslim (Fortress of the Muslim)
+  and established Sunnah sources. Loaded from bundled JSON (no external API).
+- Authenticated session logging: log dhikr item id and recited count.
+- Daily summary endpoint: aggregate dhikr counts per category for a given date.
+- No streak gamification (ADR-003, Article 2).
+- Documented in ADR-008.
+
+**82 tests passing** across all five slices (unit + API integration).
+
 
 
 ## Next slice (proposed — needs an ADR before starting)
 
 Per 014_Feature_Prioritisation_Framework.md "Foundation" tier, candidates are:
 
-- **Qur'an reading history / weekly summary** — aggregate per-surah progress
-  into a weekly reading summary (e.g. "read 3 surahs this week") using the
-  now-complete reading-progress data. Requires no new architecture.
-- **Dhikr Companion** — simple, zero-AI counter for adhkar (morning, evening,
-  post-prayer). High-frequency, zero new architecture, pure domain logic.
-  Depends on no other feature.
 - **Forgot password / account recovery** — flagged as a near-term follow-up
   in ADR-004 once email delivery infrastructure exists. Blocks all future
   client implementations.
+- **Qur'an reading history / weekly summary** — aggregate per-surah progress
+  into a weekly reading summary (e.g. "read 3 surahs this week") using the
+  now-complete reading-progress data. Requires no new architecture.
 
 Still deliberately deferred: AI Coach, Family, Community — see ADR-002 for
 the dependency reasoning (Memory 041, Safety 048, permissions 026 needed first).

@@ -71,3 +71,17 @@ class QuranReadingProgressORM(Base):
     surah_number: Mapped[int] = mapped_column(nullable=False)
     last_ayah_number: Mapped[int] = mapped_column(nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
+
+class DhikrLogORM(Base):
+    """User log of reciting a dhikr item."""
+    __tablename__ = "dhikr_logs"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    user_id: Mapped[str] = mapped_column(String(36), index=True, nullable=False)
+    dhikr_item_id: Mapped[str] = mapped_column(String(64), nullable=False)
+    category: Mapped[str] = mapped_column(String(32), nullable=False)
+    count: Mapped[int] = mapped_column(nullable=False)
+    date: Mapped[date_type] = mapped_column(Date, index=True, nullable=False)
+    logged_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
