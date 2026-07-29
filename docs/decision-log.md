@@ -401,3 +401,24 @@ Trade-offs: The summary relies on the user actively updating their reading progr
 Constitutional articles engaged: Art. 2 (Consistency over Intensity), Art. 6 (Humility over Gamification), Art. 9 (Privacy Is Sacred — no telemetry), ADR-003.
 
 Expected review date: If/when a "yearly reading goal" (Khatam tracking) is prioritized.
+
+---
+
+## ADR-011: Frontend Web Application Implementation (React, Vite, Tailwind v4)
+
+Date: 2026-07-29
+Status: Accepted
+
+Decision: Implement the initial frontend web client using React, Vite, and Tailwind CSS v4. The application acts as a Single Page Application (SPA) communicating with the FastAPI backend via a proxied API connection in development. The design system is implemented using CSS variables (tokens) integrated with Tailwind.
+
+Reason: React provides the necessary component-driven architecture specified in 078_Component_Architecture.md. Vite offers a rapid, modern build toolchain. Tailwind CSS v4, configured strictly with design tokens, allows for rapid UI development while enforcing the design system rules established in 082_Design_System_Implementation.md. This stack fulfills the requirements for a modular, maintainable, and responsive frontend architecture (Volume 04).
+
+Alternatives considered:
+- Next.js (SSR/SSG): Deferred. While excellent for SEO, a pure SPA is sufficient for the authenticated, highly interactive "OS" nature of this product at this stage. It reduces deployment complexity for the initial Foundation tier.
+- Vue/Svelte: Rejected to align with the likely wider talent pool for React in the mobile space (React Native) if code-sharing or team scaling becomes necessary later.
+
+Trade-offs: A pure SPA means the initial payload might be larger than server-rendered HTML, and SEO is limited for public pages. Since the application is primarily an authenticated user dashboard, this is an acceptable trade-off for the richer interactive experience and simpler initial deployment model.
+
+Constitutional articles engaged: Art. 19 (Engineering Principles - simplicity, modularity), Art. 11 (Calm by Default - enabled via tokenized design system).
+
+Expected review date: When planning the mobile application phase (to assess if React Native is viable for code sharing) or if public-facing SEO requirements change.

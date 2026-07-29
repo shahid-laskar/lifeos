@@ -6,8 +6,8 @@ every contributor (human or AI) must follow.
 
 ## Build order (deliberate, per ADR-001/002 in `docs/decision-log.md`)
 
-1. **Backend API (FastAPI)** ← we are here
-2. React web app
+1. **Backend API (FastAPI)** ← complete
+2. **React web app** ← complete (Foundation tier)
 3. PWA layer
 4. React Native — Android
 5. React Native — iOS
@@ -86,8 +86,14 @@ muslim-life-os/
 - Follows Article 2 (Consistency over Intensity) by deliberately avoiding fragile streak counters and session-duration telemetry.
 - Documented in ADR-010.
 
-**89 tests passing** across all seven slices (unit + API integration).
+### Slice 8: Frontend Web Application — complete
+- Initialized React + Vite + TypeScript application (ADR-011).
+- Configured Tailwind CSS v4 using a strict CSS-variable design token system for "Calm by Default" aesthetics (Article 11).
+- Integrated with the backend API via a secure Axios client handling JWT tokens in-memory and automatic refresh token rotation.
+- Created robust, accessible feature pages for Dashboard, Prayer Times, Qur'an, Dhikr, Habits, and Profile.
+- Implemented Onboarding flow following progressive disclosure principles (ADR-004).
 
+**89 backend tests passing** across all backend slices (unit + API integration).
 
 
 ## Next slice (proposed — needs an ADR before starting)
