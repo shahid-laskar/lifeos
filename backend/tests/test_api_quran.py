@@ -44,6 +44,21 @@ def test_get_surah_al_baqarah(client: TestClient) -> None:
     assert data["revelation_type"] == "Medinan"
 
 
+def test_get_surah_ayahs_returns_verbatim_uthmani_text(client: TestClient) -> None:
+    resp = client.get("/api/v1/quran/surahs/1/ayahs")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["surah_number"] == 1
+    assert len(data["ayahs"]) == 7
+    assert data["ayahs"][0]["number_in_surah"] == 1
+    assert data["ayahs"][0]["text"].startswith("بِسْمِ")
+
+
+def test_get_surah_ayahs_not_found(client: TestClient) -> None:
+    resp = client.get("/api/v1/quran/surahs/115/ayahs")
+    assert resp.status_code == 404
+
+
 def test_get_surah_not_found(client: TestClient) -> None:
     resp = client.get("/api/v1/quran/surahs/115")
     assert resp.status_code == 404
@@ -221,4 +236,3 @@ def test_get_weekly_reading_summary(client: TestClient, auth_headers: dict) -> N
     data = resp.json()
     assert data["surahs_read_last_7_days"] == 2
     assert data["active_days_last_7_days"] == 1
-

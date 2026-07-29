@@ -21,6 +21,13 @@ class SurahInfo:
     revelation_type: RevelationType
 
 
+@dataclass(frozen=True)
+class AyahInfo:
+    """A verbatim ayah from the bundled Tanzil Uthmani text."""
+    number_in_surah: int
+    text: str
+
+
 @dataclass
 class QuranBookmark:
     """User-owned bookmark on a specific ayah."""

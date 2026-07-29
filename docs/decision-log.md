@@ -422,3 +422,52 @@ Trade-offs: A pure SPA means the initial payload might be larger than server-ren
 Constitutional articles engaged: Art. 19 (Engineering Principles - simplicity, modularity), Art. 11 (Calm by Default - enabled via tokenized design system).
 
 Expected review date: When planning the mobile application phase (to assess if React Native is viable for code sharing) or if public-facing SEO requirements change.
+
+---
+
+## ADR-012: Phase 1 Foundation Delivery and Quality Gates
+
+Date: 2026-07-29
+Status: Accepted
+
+Decision: Complete the documented Phase 1 foundations across the architecture
+volumes through vertical, deployable increments. Each increment must include
+implementation, automated tests, security checks, operational documentation,
+and a reproducible delivery artefact.
+
+The delivery baseline uses:
+
+- FastAPI as the backend authority under versioned `/api/v1` contracts.
+- React, Vite, and Tailwind v4 for the web client.
+- Docker-based local and staging environments.
+- CI gates for backend tests, frontend tests, linting, type checking, builds,
+  and container builds.
+- Privacy-safe operational diagnostics only; no worship-performance or
+  engagement telemetry.
+
+The next product capability after web hardening is a governed AI foundation,
+followed by family capability foundations. PWA/offline support, data
+governance, security, observability, mobile foundations, and operations are
+cross-cutting delivery requirements rather than deferred polish.
+
+Qur'an text must be delivered from a verified, application-controlled source.
+The frontend must not identify a user's reading behaviour to a third-party
+content API.
+
+Reason: The project has completed the backend and web Foundation slices, but
+the architecture volumes require repeatable delivery, offline resilience,
+testing, privacy protection, and operational readiness before expanding into
+AI, family, mobile, or enterprise capabilities.
+
+Alternatives considered:
+
+- Feature-first expansion without quality gates: rejected because it would
+  increase contract drift and operational risk.
+- Third-party Quran text requests from the browser: rejected under Article 9
+  and ADR-007 because reading behaviour can be disclosed externally.
+- A single large release: rejected in favour of incremental rollback-safe
+  vertical releases.
+
+Constitutional articles engaged: Article 2 (benefit over engagement), Article
+9 (privacy is sacred), Article 11 (calm by default), Article 19 (engineering
+principles), ADR-001, ADR-007, and ADR-011.

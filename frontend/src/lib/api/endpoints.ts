@@ -28,6 +28,7 @@ export const ENDPOINTS = {
 
   // Qur'an (ADR-007, ADR-010)
   QURAN_SURAHS:    `${API_BASE}/quran/surahs`,
+  QURAN_AYAHS:     (surah: number) => `${API_BASE}/quran/surahs/${surah}/ayahs`,
   QURAN_BOOKMARKS: `${API_BASE}/quran/bookmarks`,
   QURAN_PROGRESS:  `${API_BASE}/quran/reading-progress`,
   QURAN_WEEKLY:    `${API_BASE}/quran/reading-progress/summary/weekly`,

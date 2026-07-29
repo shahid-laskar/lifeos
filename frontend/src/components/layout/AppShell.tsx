@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import { useAuthStore } from '@/store/authStore'
 import toast from 'react-hot-toast'
+import ConnectivityBanner from '@/components/system/ConnectivityBanner'
 
 const NAV_ITEMS = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
@@ -156,6 +157,7 @@ export default function AppShell() {
 
       {/* ── Main content ────────────────────────────────────── */}
       <div className="flex flex-1 flex-col overflow-hidden">
+        <ConnectivityBanner />
         {/* Mobile header */}
         <header
           className="flex items-center gap-4 px-4 py-3 lg:hidden"

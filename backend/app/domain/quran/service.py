@@ -16,7 +16,7 @@ from app.domain.quran.entities import (
     QuranReadingProgress,
     SurahInfo,
 )
-from app.domain.quran.quran_data import get_surah, list_surahs
+from app.domain.quran.quran_data import get_ayahs, get_surah, list_surahs
 from app.domain.quran.repository import QuranRepository
 
 
@@ -46,6 +46,10 @@ class QuranService:
         if surah is None:
             raise SurahNotFoundError(f"Surah {surah_number} does not exist.")
         return surah
+
+    def get_ayahs(self, surah_number: int):
+        self.get_surah(surah_number)
+        return get_ayahs(surah_number) or ()
 
     def _validate_ayah(self, surah_number: int, ayah_number: int) -> SurahInfo:
         surah = self.get_surah(surah_number)
@@ -156,4 +160,3 @@ class QuranService:
             "surahs_read_last_7_days": surahs_read,
             "active_days_last_7_days": len(active_dates),
         }
-

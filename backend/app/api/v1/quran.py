@@ -25,10 +25,12 @@ from app.domain.quran.service import (
 from app.domain.quran.models import (
     BookmarkRequest,
     BookmarkResponse,
+    AyahResponse,
     QuranWeeklySummaryResponse,
     ReadingProgressRequest,
     ReadingProgressResponse,
     SurahResponse,
+    SurahAyahsResponse,
 )
 
 router = APIRouter(prefix="/quran", tags=["quran"])
@@ -75,6 +77,30 @@ def get_surah(
         meaning=s.meaning,
         ayah_count=s.ayah_count,
         revelation_type=s.revelation_type.value,
+    )
+
+
+@router.get("/surahs/{surah_number}/ayahs", response_model=SurahAyahsResponse)
+def get_surah_ayahs(
+    surah_number: int,
+    quran_service: Annotated[QuranService, Depends(get_quran_service)],
+) -> SurahAyahsResponse:
+    """Return verbatim Arabic Uthmani ayahs from the bundled Tanzil text.
+
+    This is public content and does not require authentication. Keeping the
+    text behind the application API prevents third parties from observing a
+    user's reading requests.
+    """
+    try:
+        ayahs = quran_service.get_ayahs(surah_number)
+    except SurahNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    return SurahAyahsResponse(
+        surah_number=surah_number,
+        ayahs=[
+            AyahResponse(number_in_surah=ayah.number_in_surah, text=ayah.text)
+            for ayah in ayahs
+        ],
     )
 
 
@@ -232,4 +258,3 @@ def get_weekly_reading_summary(
         surahs_read_last_7_days=summary["surahs_read_last_7_days"],
         active_days_last_7_days=summary["active_days_last_7_days"],
     )
-

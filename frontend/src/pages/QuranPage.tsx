@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/Button'
 import { Spinner } from '@/components/ui/Spinner'
 import client from '@/lib/api/client'
 import { ENDPOINTS } from '@/lib/api/endpoints'
+import { requestWithOfflineQueue } from '@/lib/offline/queue'
 
 interface Surah {
   number: number
@@ -24,14 +25,13 @@ interface Surah {
 }
 
 interface Ayah {
-  numberInSurah: number
+  number_in_surah: number
   text: string
 }
 
-interface AyahResponse {
-  data: {
-    ayahs: Ayah[]
-  }
+interface SurahAyahsResponse {
+  surah_number: number
+  ayahs: Ayah[]
 }
 
 export default function QuranPage() {
@@ -61,20 +61,22 @@ export default function QuranPage() {
     enabled: selectedSurah !== null,
     staleTime: 24 * 60 * 60 * 1000,
     queryFn: async () => {
-      const response = await fetch(`https://api.alquran.cloud/v1/surah/${selectedSurah}/quran-uthmani`)
-      if (!response.ok) throw new Error('Unable to load Quran text')
-      const payload = await response.json() as AyahResponse
-      return payload.data.ayahs
+      const response = await client.get<SurahAyahsResponse>(ENDPOINTS.QURAN_AYAHS(selectedSurah!))
+      return response.data.ayahs
     },
   })
 
   const { mutate: updateProgress, isPending: isUpdatingProgress } = useMutation({
     mutationFn: (ayahNumber: number) =>
-      client.put(ENDPOINTS.QURAN_PROGRESS, { surah_number: selectedSurah, last_ayah_number: ayahNumber }),
-    onSuccess: () => {
+      requestWithOfflineQueue({
+        method: 'put',
+        url: ENDPOINTS.QURAN_PROGRESS,
+        data: { surah_number: selectedSurah, last_ayah_number: ayahNumber },
+      }),
+    onSuccess: (result) => {
       qc.invalidateQueries({ queryKey: ['quran-progress'] })
       qc.invalidateQueries({ queryKey: ['quran-weekly'] })
-      toast.success('Reading progress saved.')
+      toast.success(result.queued ? 'Progress saved locally. It will sync when you reconnect.' : 'Reading progress saved.')
       setSelectedSurah(null)
     },
     onError: () => toast.error('Could not save progress. Please check ayah number.')
@@ -119,10 +121,10 @@ export default function QuranPage() {
           <Card padding="lg">
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
               {ayahs.map((ayah) => {
-                const isRead = (progress?.[selectedSurah]?.last_ayah_number ?? 0) >= ayah.numberInSurah
+                    const isRead = (progress?.[selectedSurah]?.last_ayah_number ?? 0) >= ayah.number_in_surah
                 return (
                   <div
-                    key={ayah.numberInSurah}
+                    key={ayah.number_in_surah}
                     style={{
                       paddingBottom: '1.25rem',
                       borderBottom: '1px solid var(--color-border)',
@@ -131,7 +133,7 @@ export default function QuranPage() {
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
                       <span style={{ color: 'var(--color-brand)', fontSize: '0.75rem', fontWeight: 600 }}>
-                        {ayah.numberInSurah}
+                        {ayah.number_in_surah}
                       </span>
                     </div>
                     <p className="arabic" lang="ar" style={{ color: 'var(--color-text-primary)', fontSize: '1.65rem', textAlign: 'right', lineHeight: 2.1 }}>
@@ -174,6 +176,9 @@ export default function QuranPage() {
             </Button>
           </div>
         </Card>
+        <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', textAlign: 'center' }}>
+          Arabic text: <a href="https://tanzil.net" target="_blank" rel="noreferrer" style={{ color: 'var(--color-brand)' }}>Tanzil Project</a> · Uthmani text, CC BY 3.0
+        </p>
       </div>
     )
   }

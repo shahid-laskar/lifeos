@@ -71,7 +71,14 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           rest.onMouseLeave?.(e)
         }}
       >
-        {loading && <span className="spinner" style={{ width: '14px', height: '14px' }} />}
+        {loading && (
+          <span
+            className="spinner"
+            style={{ width: '14px', height: '14px' }}
+            role="status"
+            aria-label="Loading"
+          />
+        )}
         {children}
       </button>
     )

@@ -15,6 +15,7 @@ import { Spinner } from '@/components/ui/Spinner'
 import client from '@/lib/api/client'
 import { ENDPOINTS } from '@/lib/api/endpoints'
 import { useAuthStore } from '@/store/authStore'
+import { requestWithOfflineQueue } from '@/lib/offline/queue'
 
 interface PrayerTimes {
   fajr: string; sunrise: string; dhuhr: string
@@ -81,11 +82,15 @@ export default function PrayerPage() {
 
   const { mutate: logPrayer, isPending } = useMutation({
     mutationFn: ({ prayer, status }: { prayer: string; status: string }) =>
-      client.post(`${ENDPOINTS.HABITS_LOG}?date=${logDate}`, { prayer_name: prayer, status }),
-    onSuccess: () => {
+      requestWithOfflineQueue({
+        method: 'post',
+        url: `${ENDPOINTS.HABITS_LOG}?date=${logDate}`,
+        data: { prayer_name: prayer, status },
+      }),
+    onSuccess: (result) => {
       qc.invalidateQueries({ queryKey: ['habits-status'] })
       qc.invalidateQueries({ queryKey: ['habits-metrics'] })
-      toast.success('Prayer logged. Alhamdulillah.')
+      toast.success(result.queued ? 'Prayer saved. It will sync when you reconnect.' : 'Prayer logged. Alhamdulillah.')
     },
     onError: () => toast.error('Could not log prayer. Please try again.'),
   })

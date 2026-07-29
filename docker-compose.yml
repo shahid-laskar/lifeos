@@ -1,0 +1,27 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    environment:
+      MLOS_ENVIRONMENT: development
+      MLOS_DATABASE_URL: sqlite:///./data/muslim_life_os.db
+      MLOS_JWT_SECRET_KEY: ${MLOS_JWT_SECRET_KEY:?Set MLOS_JWT_SECRET_KEY before starting}
+    volumes:
+      - backend-data:/app/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  backend-data:

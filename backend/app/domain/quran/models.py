@@ -24,6 +24,16 @@ class SurahResponse(BaseModel):
     revelation_type: str
 
 
+class AyahResponse(BaseModel):
+    number_in_surah: int
+    text: str
+
+
+class SurahAyahsResponse(BaseModel):
+    surah_number: int
+    ayahs: list[AyahResponse]
+
+
 # ── Bookmarks ──────────────────────────────────────────────────────────────
 
 
@@ -58,4 +68,3 @@ class ReadingProgressResponse(BaseModel):
 class QuranWeeklySummaryResponse(BaseModel):
     surahs_read_last_7_days: int
     active_days_last_7_days: int
-

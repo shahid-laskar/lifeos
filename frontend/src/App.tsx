@@ -1,10 +1,13 @@
-import { useEffect } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from 'react-hot-toast'
 
 import { useAuthStore } from '@/store/authStore'
 import { clearTokens, getRefreshToken } from '@/lib/api/client'
+import AppErrorBoundary from '@/components/system/AppErrorBoundary'
+import OfflineSync from '@/components/system/OfflineSync'
+import { Spinner } from '@/components/ui/Spinner'
 
 // Layouts
 import AppShell from '@/components/layout/AppShell'
@@ -13,13 +16,21 @@ import AppShell from '@/components/layout/AppShell'
 import LoginPage      from '@/pages/auth/LoginPage'
 import RegisterPage   from '@/pages/auth/RegisterPage'
 import ForgotPassword from '@/pages/auth/ForgotPasswordPage'
-import DashboardPage  from '@/pages/DashboardPage'
-import PrayerPage     from '@/pages/PrayerPage'
-import QuranPage      from '@/pages/QuranPage'
-import DhikrPage      from '@/pages/DhikrPage'
-import HabitsPage     from '@/pages/HabitsPage'
-import ProfilePage    from '@/pages/ProfilePage'
-import OnboardingPage from '@/pages/OnboardingPage'
+const DashboardPage  = lazy(() => import('@/pages/DashboardPage'))
+const PrayerPage     = lazy(() => import('@/pages/PrayerPage'))
+const QuranPage      = lazy(() => import('@/pages/QuranPage'))
+const DhikrPage      = lazy(() => import('@/pages/DhikrPage'))
+const HabitsPage     = lazy(() => import('@/pages/HabitsPage'))
+const ProfilePage    = lazy(() => import('@/pages/ProfilePage'))
+const OnboardingPage = lazy(() => import('@/pages/OnboardingPage'))
+
+function RouteFallback() {
+  return (
+    <div style={{ display: 'grid', placeItems: 'center', minHeight: '16rem' }}>
+      <Spinner size={28} label="Loading page" />
+    </div>
+  )
+}
 
 // ── React Query client ────────────────────────────────────────────
 const queryClient = new QueryClient({
@@ -72,9 +83,12 @@ export default function App() {
   }, [])
 
   return (
-    <QueryClientProvider client={queryClient}>
+    <AppErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+      <OfflineSync />
       <BrowserRouter>
-        <Routes>
+        <Suspense fallback={<RouteFallback />}>
+          <Routes>
           {/* ── Guest routes ────────────────────────────────── */}
           <Route path="/login"    element={<GuestOnly><LoginPage /></GuestOnly>} />
           <Route path="/register" element={<GuestOnly><RegisterPage /></GuestOnly>} />
@@ -94,7 +108,8 @@ export default function App() {
 
           {/* ── Fallback ─────────────────────────────────── */}
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
-        </Routes>
+          </Routes>
+        </Suspense>
       </BrowserRouter>
 
       {/* Toast notifications — calm, non-punishing (Article 3 & 11) */}
@@ -113,6 +128,7 @@ export default function App() {
           error:   { iconTheme: { primary: 'var(--color-error)', secondary: 'transparent' } },
         }}
       />
-    </QueryClientProvider>
+      </QueryClientProvider>
+    </AppErrorBoundary>
   )
 }
