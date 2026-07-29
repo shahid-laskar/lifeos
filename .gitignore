@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.venv/
+venv/
+*.env
+.env
+
+# Node (future web/RN clients)
+node_modules/
+dist/
+build/
+.expo/
+
+# OS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
