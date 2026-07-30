@@ -1,0 +1,106 @@
+import { useQuery } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
+import { AyahReader } from "@/components/quran/ayah-reader";
+import { BookmarksTab } from "@/components/quran/bookmarks-tab";
+import { SurahList } from "@/components/quran/surah-list";
+import { PageHeader } from "@/components/layout/page-header";
+import { getSurahs } from "@/lib/api/endpoints";
+import type { SurahResponse } from "@/lib/api/types";
+import { cn } from "@/lib/utils";
+
+export const Route = createFileRoute("/_authenticated/quran")({
+  ssr: false,
+  head: () => ({
+    meta: [
+      { title: "Qur'an — Muslim Life OS" },
+      {
+        name: "description",
+        content: "Read the Qur'an surah by surah, bookmark ayahs and keep your place.",
+      },
+      { property: "og:title", content: "Qur'an — Muslim Life OS" },
+      {
+        property: "og:description",
+        content: "Read the Qur'an surah by surah, bookmark ayahs and keep your place.",
+      },
+    ],
+  }),
+  component: QuranPage,
+});
+
+type Tab = "surahs" | "bookmarks";
+
+function QuranPage() {
+  const [activeTab, setActiveTab] = useState<Tab>("surahs");
+  const [openSurah, setOpenSurah] = useState<SurahResponse | null>(null);
+
+  // Pre-fetch surahs so the bookmarks tab can resolve names
+  const surahsQuery = useQuery({
+    queryKey: ["surahs"],
+    queryFn: getSurahs,
+    staleTime: 24 * 60 * 60 * 1000,
+  });
+
+  // ── Ayah reader view ─────────────────────────────────────────────────────
+  if (openSurah) {
+    return (
+      <div className="fixed inset-0 z-50 flex flex-col bg-background">
+        <AyahReader
+          surah={openSurah}
+          onBack={() => setOpenSurah(null)}
+        />
+      </div>
+    );
+  }
+
+  // ── Main Qur'an screen ────────────────────────────────────────────────────
+  return (
+    <>
+      <PageHeader
+        title="Qur'an"
+        arabic="القُرْآن"
+        subtitle="Read at your own pace"
+      />
+
+      {/* Tab bar */}
+      <div
+        role="tablist"
+        aria-label="Qur'an sections"
+        className="mx-5 mb-4 flex rounded-xl border border-border bg-muted/50 p-1"
+      >
+        {(["surahs", "bookmarks"] as const).map((tab) => (
+          <button
+            key={tab}
+            id={`quran-tab-${tab}`}
+            role="tab"
+            aria-selected={activeTab === tab}
+            type="button"
+            onClick={() => setActiveTab(tab)}
+            className={cn(
+              "flex-1 rounded-lg py-2 text-sm font-medium capitalize transition-colors",
+              activeTab === tab
+                ? "bg-card text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            {tab === "surahs" ? "All Surahs" : "Bookmarks"}
+          </button>
+        ))}
+      </div>
+
+      {/* Tab panels */}
+      <div className="pb-24">
+        {activeTab === "surahs" ? (
+          <SurahList onSelect={setOpenSurah} />
+        ) : (
+          <BookmarksTab
+            surahs={surahsQuery.data ?? []}
+            onNavigateToSurah={(s) => {
+              setOpenSurah(s);
+            }}
+          />
+        )}
+      </div>
+    </>
+  );
+}

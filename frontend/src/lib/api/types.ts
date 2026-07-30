@@ -1,208 +1,230 @@
+export type PrayerName = "fajr" | "dhuhr" | "asr" | "maghrib" | "isha";
+
+export const PRAYER_NAMES: PrayerName[] = [
+  "fajr",
+  "dhuhr",
+  "asr",
+  "maghrib",
+  "isha",
+];
+
+export const PRAYER_LABELS: Record<PrayerName, { latin: string; arabic: string }> = {
+  fajr: { latin: "Fajr", arabic: "الفجر" },
+  dhuhr: { latin: "Dhuhr", arabic: "الظهر" },
+  asr: { latin: "Asr", arabic: "العصر" },
+  maghrib: { latin: "Maghrib", arabic: "المغرب" },
+  isha: { latin: "Isha", arabic: "العشاء" },
+};
+
+export type PrayerStatus = "completed" | "missed" | "excused";
+
+export type PrayerTimes = Record<PrayerName, string> & { sunrise: string };
+
+export type PrayerTimeResponse = {
+  date: string;
+  latitude: number;
+  longitude: number;
+  method: CalculationMethod;
+  asr_method: AsrMethod;
+  times: PrayerTimes;
+  high_latitude_adjustment_applied?: boolean;
+};
+
+export type CalculationMethod =
+  | "MWL"
+  | "ISNA"
+  | "EGYPTIAN"
+  | "UMM_AL_QURA"
+  | "KARACHI"
+  | "TEHRAN";
+
+export const CALCULATION_METHODS: { value: CalculationMethod; label: string }[] = [
+  { value: "MWL", label: "Muslim World League" },
+  { value: "ISNA", label: "ISNA (North America)" },
+  { value: "EGYPTIAN", label: "Egyptian General Authority" },
+  { value: "UMM_AL_QURA", label: "Umm al-Qura (Makkah)" },
+  { value: "KARACHI", label: "University of Karachi" },
+  { value: "TEHRAN", label: "Institute of Geophysics, Tehran" },
+];
+
+export type AsrMethod = "STANDARD" | "HANAFI";
+
+export type OnboardingGoal =
+  | "pray_consistently"
+  | "read_quran_daily"
+  | "memorise_quran"
+  | "learn_arabic"
+  | "improve_productivity"
+  | "build_healthier_habits"
+  | "strengthen_family_organisation"
+  | "manage_community_activities";
+
+export const ONBOARDING_GOALS: {
+  value: OnboardingGoal;
+  label: string;
+  note: string;
+}[] = [
+  { value: "pray_consistently", label: "Pray consistently", note: "Keep the five daily prayers" },
+  { value: "read_quran_daily", label: "Read Qur'an daily", note: "A gentle portion each day" },
+  { value: "memorise_quran", label: "Memorise Qur'an", note: "Build hifz slowly and steadily" },
+  { value: "learn_arabic", label: "Learn Arabic", note: "Understand the words you recite" },
+  { value: "improve_productivity", label: "Improve productivity", note: "Order your days with intention" },
+  { value: "build_healthier_habits", label: "Build healthier habits", note: "Care for the body you were given" },
+  { value: "strengthen_family_organisation", label: "Strengthen family life", note: "Share the journey at home" },
+  { value: "manage_community_activities", label: "Manage community activities", note: "Organise with your jamaah" },
+];
+
+export type UserProfile = {
+  id?: string;
+  email?: string;
+  country?: string | null;
+  timezone?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  prayer_calculation_method?: CalculationMethod | null;
+  asr_method?: AsrMethod | null;
+  goals?: OnboardingGoal[] | null;
+  preferred_language?: string | null;
+};
+
 /**
- * Typed API contracts for all backend endpoints.
- *
- * These types mirror the Pydantic response models in app/domain/{domain}/models.py.
- * Keeping them here centralises the contract so frontend code never
- * duplicates inline interface definitions. If the backend contract changes,
- * update here and TypeScript will surface the downstream impact.
+ * Matches OnboardingStatusResponse from openapi.json exactly.
+ * Fields: account_created, location_set, prayer_preferences_set, goals_set,
+ * first_meaningful_outcome_available.
+ * DRIFT NOTE: prior version had invented fields `prayer_method_set` and
+ * `profile_complete` — both removed.
  */
+export type OnboardingStatus = {
+  account_created: boolean;
+  location_set: boolean;
+  prayer_preferences_set: boolean;
+  goals_set: boolean;
+  first_meaningful_outcome_available: boolean;
+};
 
-// ── Auth ─────────────────────────────────────────────────────────────────────
+export type AuthTokensResponse = {
+  access_token: string;
+  refresh_token: string;
+  token_type?: string;
+};
 
-export interface TokenResponse {
-  access_token: string
-  refresh_token: string
-}
+export type DhikrCategory = "morning" | "evening" | "post_prayer" | "general";
 
-// ── User / Profile ────────────────────────────────────────────────────────────
+export const DHIKR_CATEGORIES: { value: DhikrCategory; label: string }[] = [
+  { value: "morning", label: "Morning" },
+  { value: "evening", label: "Evening" },
+  { value: "post_prayer", label: "Post-Prayer" },
+  { value: "general", label: "General" },
+];
 
-export interface UserProfile {
-  id: string
-  email: string
-  preferred_language: string
-  country: string | null
-  timezone: string | null
-  latitude: number | null
-  longitude: number | null
-  prayer_calculation_method: string | null
-  asr_method: string | null
-  goals: string[]
-  created_at: string
-}
+/**
+ * Matches DhikrDailySummaryResponse from openapi.json.
+ * All totals have default: 0 in the spec, so they are always present.
+ * DRIFT NOTE: prior version marked totals as optional — corrected.
+ */
+export type DhikrDailySummaryResponse = {
+  date: string;
+  total_morning: number;
+  total_evening: number;
+  total_post_prayer: number;
+  total_general: number;
+};
 
-export interface OnboardingStatus {
-  steps_completed: string[]
-  is_complete: boolean
-  first_meaningful_outcome_available: boolean
-}
+export type QuranWeeklySummaryResponse = {
+  surahs_read_last_7_days: number;
+  active_days_last_7_days: number;
+};
 
-// ── Prayer ────────────────────────────────────────────────────────────────────
+export type ConsistencyMetrics = {
+  days_completed_last_30: number;
+  total_prayers_logged_last_30: number;
+};
 
-export interface PrayerTimes {
-  fajr: string
-  sunrise: string
-  dhuhr: string
-  asr: string
-  maghrib: string
-  isha: string
-  date: string
-  method: string
-  high_latitude_adjustment_applied: boolean
-}
+export type PrayerLogEntry = {
+  prayer: PrayerName;
+  status: PrayerStatus;
+  date?: string;
+};
 
-export interface PrayerLogEntry {
-  prayer_name: string
-  date: string
-  status: 'completed' | 'missed' | 'excused'
-}
+/* --------------------------------- quran --------------------------------- */
 
-export interface PrayerConsistency {
-  days_checked: number
-  completed_days: number
-  consistency_percent: number
-}
+/** Matches SurahResponse from openapi.json. */
+export type SurahResponse = {
+  number: number;
+  arabic_name: string;
+  transliterated_name: string;
+  meaning: string;
+  ayah_count: number;
+  /** Either "Meccan" or "Medinan" */
+  revelation_type: string;
+};
 
-// ── Quran ─────────────────────────────────────────────────────────────────────
+/** Matches AyahResponse from openapi.json. */
+export type AyahResponse = {
+  number_in_surah: number;
+  text: string;
+};
 
-export interface Surah {
-  number: number
-  arabic_name: string
-  transliterated_name: string
-  meaning: string
-  ayah_count: number
-  revelation_type: 'meccan' | 'medinan'
-}
+/** Matches SurahAyahsResponse from openapi.json. */
+export type SurahAyahsResponse = {
+  surah_number: number;
+  ayahs: AyahResponse[];
+};
 
-export interface Ayah {
-  number_in_surah: number
-  text: string
-}
+/** Matches BookmarkRequest from openapi.json. */
+export type BookmarkRequest = {
+  surah_number: number;
+  ayah_number: number;
+  note?: string | null;
+};
 
-export interface SurahAyahsResponse {
-  surah_number: number
-  ayahs: Ayah[]
-}
+/** Matches BookmarkResponse from openapi.json. */
+export type BookmarkResponse = {
+  id: string;
+  surah_number: number;
+  ayah_number: number;
+  note: string | null;
+  created_at: string;
+};
 
-export interface QuranBookmark {
-  id: string
-  surah_number: number
-  ayah_number: number
-  note: string | null
-  created_at: string
-}
+/** Matches ReadingProgressRequest from openapi.json. */
+export type ReadingProgressRequest = {
+  surah_number: number;
+  last_ayah_number: number;
+};
 
-export interface ReadingProgress {
-  surah_number: number
-  last_ayah_number: number
-  updated_at: string
-}
+/** Matches ReadingProgressResponse from openapi.json. */
+export type ReadingProgressResponse = {
+  surah_number: number;
+  last_ayah_number: number;
+  updated_at: string;
+};
 
-export interface WeeklySummary {
-  surahs_read: number
-  active_days: number
-  week_start: string
-  week_end: string
-}
+/* --------------------------------- dhikr --------------------------------- */
 
-// ── Habits ────────────────────────────────────────────────────────────────────
+/** Matches DhikrItemResponse from openapi.json. */
+export type DhikrItemResponse = {
+  id: string;
+  category: string;
+  arabic_text: string;
+  transliteration: string;
+  meaning: string;
+  recommended_count: number;
+  source: string;
+};
 
-export interface HabitLogEntry {
-  prayer_name: string
-  date: string
-  status: 'completed' | 'missed' | 'excused'
-  created_at: string
-}
+/** Matches DhikrLogRequest from openapi.json. */
+export type DhikrLogRequest = {
+  dhikr_item_id: string;
+  count: number;
+};
 
-export interface ConsistencyMetrics {
-  days_checked: number
-  completed_days: number
-  consistency_percent: number
-}
-
-// ── Dhikr ────────────────────────────────────────────────────────────────────
-
-export interface DhikrItem {
-  id: string
-  arabic: string
-  transliteration: string
-  translation: string
-  category: string
-  recommended_count: number
-  source: string
-}
-
-export interface DhikrSession {
-  dhikr_item_id: string
-  count: number
-  date: string
-}
-
-export interface DhikrSummary {
-  date: string
-  by_category: Record<string, number>
-  total: number
-}
-
-// ── AI ────────────────────────────────────────────────────────────────────────
-
-export interface ConversationSummary {
-  id: string
-  title: string | null
-  created_at: string
-  updated_at: string
-}
-
-export interface ConversationMessage {
-  role: 'user' | 'assistant'
-  content: string
-  safety_outcome: 'safe' | 'refused' | 'flagged'
-  source_refs: string[]
-  created_at: string
-}
-
-export interface Conversation extends ConversationSummary {
-  messages: ConversationMessage[]
-}
-
-export interface MemoryEntry {
-  id: string
-  content: string
-  created_at: string
-}
-
-// ── Family ────────────────────────────────────────────────────────────────────
-
-export interface FamilyMember {
-  user_id: string
-  role: 'owner' | 'adult' | 'dependent'
-  joined_at: string
-}
-
-export interface Family {
-  id: string
-  name: string
-  owner_id: string
-  members: FamilyMember[]
-  created_at: string
-  updated_at: string
-}
-
-export interface FamilyInvitation {
-  id: string
-  family_id: string
-  invited_email: string
-  status: 'pending' | 'accepted' | 'revoked' | 'expired'
-  created_at: string
-  expires_at: string | null
-}
-
-// ── Governance ────────────────────────────────────────────────────────────────
-
-export interface RetentionPolicy {
-  domain: string
-  classification: string
-  retention_days: number | null
-  deletion_on_account_close: boolean
-  export_supported: boolean
-  notes: string
-}
+/** Matches DhikrLogResponse from openapi.json. */
+export type DhikrLogResponse = {
+  id: string;
+  dhikr_item_id: string;
+  category: string;
+  count: number;
+  date: string;
+  logged_at: string;
+};

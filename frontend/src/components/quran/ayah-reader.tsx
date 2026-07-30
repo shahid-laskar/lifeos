@@ -1,0 +1,240 @@
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { ArrowLeft, Bookmark, BookmarkCheck } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { LoadingBlock } from "@/components/brand/pattern";
+import { ErrorState } from "@/components/brand/states";
+import {
+  addBookmark,
+  getBookmarks,
+  getSurahAyahs,
+  removeBookmark,
+  updateReadingProgress,
+} from "@/lib/api/endpoints";
+import type { SurahResponse } from "@/lib/api/types";
+
+/**
+ * Debounce helper — returns a function that fires `fn` after `delay` ms of
+ * inactivity. Complies with CONSTITUTION.md: we debounce reading-progress
+ * updates at 2 s, not on every scroll event.
+ */
+function useDebounce<T extends unknown[]>(
+  fn: (...args: T) => void,
+  delay: number,
+) {
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  return useCallback(
+    (...args: T) => {
+      if (timer.current) clearTimeout(timer.current);
+      timer.current = setTimeout(() => fn(...args), delay);
+    },
+    [fn, delay],
+  );
+}
+
+function AyahCard({
+  numberInSurah,
+  text,
+  surahNumber,
+  isBookmarked,
+  onBookmark,
+  onUnbookmark,
+}: {
+  numberInSurah: number;
+  text: string;
+  surahNumber: number;
+  isBookmarked: boolean;
+  onBookmark: (ayah: number) => void;
+  onUnbookmark: (ayah: number) => void;
+}) {
+  return (
+    <article
+      id={`ayah-${numberInSurah}`}
+      className="border-b border-border px-5 py-6 last:border-none"
+    >
+      <div className="mb-4 flex items-center justify-between">
+        {/* Ayah number circle */}
+        <span className="flex size-9 items-center justify-center rounded-full border border-border text-sm font-semibold tabular-nums text-muted-foreground">
+          {numberInSurah}
+        </span>
+
+        {/* Bookmark toggle */}
+        <button
+          type="button"
+          aria-label={
+            isBookmarked
+              ? `Remove bookmark from ayah ${numberInSurah}`
+              : `Bookmark ayah ${numberInSurah}`
+          }
+          onClick={() =>
+            isBookmarked
+              ? onUnbookmark(numberInSurah)
+              : onBookmark(numberInSurah)
+          }
+          className="flex size-9 items-center justify-center rounded-full transition-colors hover:bg-gold/10"
+        >
+          {isBookmarked ? (
+            <BookmarkCheck className="size-5 text-gold" />
+          ) : (
+            <Bookmark className="size-5 text-muted-foreground" />
+          )}
+        </button>
+      </div>
+
+      {/* Arabic text — RTL, Amiri, ≥28px as per CONSTITUTION.md */}
+      <p
+        lang="ar"
+        dir="rtl"
+        className="arabic text-right text-[30px] leading-[2.2] text-foreground"
+      >
+        {text}
+      </p>
+    </article>
+  );
+}
+
+export function AyahReader({
+  surah,
+  onBack,
+}: {
+  surah: SurahResponse;
+  onBack: () => void;
+}) {
+  const queryClient = useQueryClient();
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  const ayahsQuery = useQuery({
+    queryKey: ["surah-ayahs", surah.number],
+    queryFn: () => getSurahAyahs(surah.number),
+    staleTime: 24 * 60 * 60 * 1000,
+  });
+
+  const bookmarksQuery = useQuery({
+    queryKey: ["bookmarks"],
+    queryFn: getBookmarks,
+  });
+
+  // Set of ayah numbers that are bookmarked for this surah
+  const bookmarkedAyahs = useMemo(() => {
+    const set = new Set<number>();
+    if (!bookmarksQuery.data) return set;
+    for (const b of bookmarksQuery.data) {
+      if (b.surah_number === surah.number) set.add(b.ayah_number);
+    }
+    return set;
+  }, [bookmarksQuery.data, surah.number]);
+
+  const addBookmarkMutation = useMutation({
+    mutationFn: (ayahNumber: number) =>
+      addBookmark({ surah_number: surah.number, ayah_number: ayahNumber }),
+    onSettled: () =>
+      queryClient.invalidateQueries({ queryKey: ["bookmarks"] }),
+  });
+
+  const removeBookmarkMutation = useMutation({
+    mutationFn: (ayahNumber: number) =>
+      removeBookmark(surah.number, ayahNumber),
+    onSettled: () =>
+      queryClient.invalidateQueries({ queryKey: ["bookmarks"] }),
+  });
+
+  // Scroll-debounced reading progress update (2 s debounce per spec)
+  const [lastVisibleAyah, setLastVisibleAyah] = useState(1);
+
+  const debouncedProgressUpdate = useDebounce(
+    useCallback(
+      (ayahNumber: number) => {
+        void updateReadingProgress({
+          surah_number: surah.number,
+          last_ayah_number: ayahNumber,
+        }).then(() => {
+          queryClient.invalidateQueries({ queryKey: ["reading-progress"] });
+        });
+      },
+      [surah.number, queryClient],
+    ),
+    2000,
+  );
+
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    function onScroll() {
+      const articles = container!.querySelectorAll("article[id^='ayah-']");
+      let bottomMost = 1;
+      for (const el of articles) {
+        const rect = el.getBoundingClientRect();
+        if (rect.top < window.innerHeight * 0.75) {
+          const num = parseInt(el.id.replace("ayah-", ""), 10);
+          if (!isNaN(num) && num > bottomMost) bottomMost = num;
+        }
+      }
+      if (bottomMost !== lastVisibleAyah) {
+        setLastVisibleAyah(bottomMost);
+        debouncedProgressUpdate(bottomMost);
+      }
+    }
+
+    container.addEventListener("scroll", onScroll, { passive: true });
+    return () => container.removeEventListener("scroll", onScroll);
+  }, [debouncedProgressUpdate, lastVisibleAyah]);
+
+  return (
+    <div className="flex h-full flex-col">
+      {/* Reader header */}
+      <header className="flex items-center gap-3 border-b border-border bg-card/95 px-4 py-3 backdrop-blur">
+        <button
+          type="button"
+          id="ayah-reader-back"
+          aria-label="Back to surah list"
+          onClick={onBack}
+          className="flex size-9 items-center justify-center rounded-full transition-colors hover:bg-accent"
+        >
+          <ArrowLeft className="size-5" />
+        </button>
+        <div className="flex-1 min-w-0">
+          <p className="truncate font-semibold text-foreground">
+            {surah.number}. {surah.transliterated_name}
+          </p>
+          <p className="text-xs text-muted-foreground">{surah.meaning}</p>
+        </div>
+        <p
+          lang="ar"
+          dir="rtl"
+          className="arabic shrink-0 text-[22px] text-gold"
+          style={{ lineHeight: 1.4 }}
+        >
+          {surah.arabic_name}
+        </p>
+      </header>
+
+      {/* Scrollable ayah list */}
+      <div ref={scrollContainerRef} className="flex-1 overflow-y-auto">
+        {ayahsQuery.isPending ? (
+          <LoadingBlock label="Loading ayahs…" />
+        ) : ayahsQuery.isError ? (
+          <ErrorState
+            title="Couldn't load this surah"
+            message="Check your connection and try again."
+            onRetry={() => ayahsQuery.refetch()}
+            className="m-5"
+          />
+        ) : (
+          <div className="pb-24">
+            {ayahsQuery.data.ayahs.map((ayah) => (
+              <AyahCard
+                key={ayah.number_in_surah}
+                numberInSurah={ayah.number_in_surah}
+                text={ayah.text}
+                surahNumber={surah.number}
+                isBookmarked={bookmarkedAyahs.has(ayah.number_in_surah)}
+                onBookmark={(n) => addBookmarkMutation.mutate(n)}
+                onUnbookmark={(n) => removeBookmarkMutation.mutate(n)}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

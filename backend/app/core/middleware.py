@@ -32,6 +32,14 @@ def configure_cors(app, settings) -> None:
             "http://localhost:5173",
             "http://localhost:4173",
             "http://localhost:8080",
+            "http://localhost:8081",
+            "http://127.0.0.1:5173",
+            "http://127.0.0.1:8080",
+            "http://127.0.0.1:8081",
+            # Network IP — allows browsers on the LAN to reach the API
+            "http://10.44.0.209:5173",
+            "http://10.44.0.209:8080",
+            "http://10.44.0.209:8081",
         ]
     else:
         origins = [o.strip() for o in settings.allowed_origins.split(",") if o.strip()]

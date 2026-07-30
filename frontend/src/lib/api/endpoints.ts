@@ -1,51 +1,232 @@
-// API configuration
-// Governed by 062_API_Architecture.md — the backend API contract is authoritative.
-// Proxy configured in vite.config.ts: /api → http://127.0.0.1:8000
+import { apiFetch } from "./client";
+import type {
+  AuthTokensResponse,
+  BookmarkRequest,
+  BookmarkResponse,
+  ConsistencyMetrics,
+  DhikrCategory,
+  DhikrDailySummaryResponse,
+  DhikrItemResponse,
+  DhikrLogRequest,
+  DhikrLogResponse,
+  OnboardingStatus,
+  PrayerLogEntry,
+  PrayerName,
+  PrayerStatus,
+  PrayerTimeResponse,
+  PrayerTimes,
+  QuranWeeklySummaryResponse,
+  ReadingProgressRequest,
+  ReadingProgressResponse,
+  SurahAyahsResponse,
+  SurahResponse,
+  UserProfile,
+} from "./types";
+import { PRAYER_NAMES } from "./types";
 
-export const API_BASE = '/api/v1'
+/* ---------------------------------- auth --------------------------------- */
 
-export const ENDPOINTS = {
-  // Auth (ADR-004, ADR-009)
-  REGISTER:        `${API_BASE}/auth/register`,
-  LOGIN:           `${API_BASE}/auth/login`,
-  REFRESH:         `${API_BASE}/auth/refresh`,
-  REQUEST_RESET:   `${API_BASE}/auth/request-password-reset`,
-  RESET_PASSWORD:  `${API_BASE}/auth/reset-password`,
+export function register(input: {
+  email: string;
+  password: string;
+  terms_accepted: boolean;
+  preferred_language: string;
+}) {
+  return apiFetch<AuthTokensResponse>("/api/v1/auth/register", {
+    method: "POST",
+    body: input,
+    auth: false,
+  });
+}
 
-  // Users (ADR-004)
-  ME:              `${API_BASE}/users/me`,
-  PROFILE:         `${API_BASE}/users/me/profile`,
-  ONBOARDING:      `${API_BASE}/users/me/onboarding-status`,
+export function login(input: { email: string; password: string }) {
+  return apiFetch<AuthTokensResponse>("/api/v1/auth/login", {
+    method: "POST",
+    body: input,
+    auth: false,
+  });
+}
 
-  // Prayer (ADR-002, ADR-005)
-  PRAYER_TIMES:    `${API_BASE}/prayer/times`,
-  PRAYER_TIMES_ME: `${API_BASE}/prayer/times/me`,
+export function requestPasswordReset(email: string) {
+  return apiFetch<unknown>("/api/v1/auth/request-password-reset", {
+    method: "POST",
+    body: { email },
+    auth: false,
+  });
+}
 
-  // Habits / Prayer Consistency (ADR-006)
-  HABITS_LOG:      `${API_BASE}/habits/prayers/log`,
-  HABITS_HISTORY:  `${API_BASE}/habits/prayers/status`,
-  HABITS_METRICS:  `${API_BASE}/habits/prayers/consistency`,
+export function resetPassword(input: { token: string; new_password: string }) {
+  return apiFetch<unknown>("/api/v1/auth/reset-password", {
+    method: "POST",
+    body: input,
+    auth: false,
+  });
+}
 
-  // Qur'an (ADR-007, ADR-010)
-  QURAN_SURAHS:    `${API_BASE}/quran/surahs`,
-  QURAN_AYAHS:     (surah: number) => `${API_BASE}/quran/surahs/${surah}/ayahs`,
-  QURAN_BOOKMARKS: `${API_BASE}/quran/bookmarks`,
-  QURAN_PROGRESS:  `${API_BASE}/quran/reading-progress`,
-  QURAN_WEEKLY:    `${API_BASE}/quran/reading-progress/summary/weekly`,
+/* ---------------------------------- user --------------------------------- */
 
-  // Dhikr (ADR-008)
-  DHIKR_ITEMS:     `${API_BASE}/dhikr/items`,
-  DHIKR_LOG:       `${API_BASE}/dhikr/sessions`,
-  DHIKR_SUMMARY:   `${API_BASE}/dhikr/summary`,
+export function getOnboardingStatus() {
+  return apiFetch<OnboardingStatus>("/api/v1/users/me/onboarding-status");
+}
 
-  // AI (ADR-012 Increment 4)
-  AI_CONVERSATIONS: `${API_BASE}/ai/conversations`,
-  AI_MEMORY:        `${API_BASE}/ai/memory`,
+export function getProfile() {
+  return apiFetch<UserProfile>("/api/v1/users/me/profile").catch(() =>
+    apiFetch<UserProfile>("/api/v1/users/me"),
+  );
+}
 
-  // Family (ADR-012 Increment 5)
-  FAMILIES:         `${API_BASE}/families`,
+export function updateProfile(input: Partial<UserProfile>) {
+  return apiFetch<UserProfile>("/api/v1/users/me/profile", {
+    method: "PATCH",
+    body: input,
+  });
+}
 
-  // Governance (ADR-012 Increment 6)
-  DATA_POLICY:      `${API_BASE}/governance/data-policy`,
-  MY_DATA:          `${API_BASE}/governance/my-data`,
-} as const
+/* --------------------------------- prayer -------------------------------- */
+
+function normalizePrayerTimes(payload: unknown): PrayerTimeResponse {
+  const record = (payload ?? {}) as Record<string, unknown>;
+  const source = (record.times ?? record.prayer_times ?? record) as Record<
+    string,
+    unknown
+  >;
+  const times = {} as PrayerTimes;
+  for (const name of [...PRAYER_NAMES, "sunrise"] as const) {
+    const value = source[name] ?? source[name.toUpperCase()];
+    times[name] = typeof value === "string" ? value : "";
+  }
+  const number = (value: unknown) => (typeof value === "number" ? value : 0);
+  return {
+    date: typeof record.date === "string" ? record.date : "",
+    latitude: number(record.latitude),
+    longitude: number(record.longitude),
+    method: record.method as PrayerTimeResponse["method"],
+    asr_method: record.asr_method as PrayerTimeResponse["asr_method"],
+    high_latitude_adjustment_applied:
+      record.high_latitude_adjustment_applied === true,
+    times,
+  };
+}
+
+export async function getMyPrayerTimes(date?: string) {
+  const payload = await apiFetch<unknown>("/api/v1/prayer/times/me", {
+    query: { date },
+  });
+  return normalizePrayerTimes(payload);
+}
+
+export async function getPrayerTimesForLocation(input: {
+  latitude: number;
+  longitude: number;
+  utc_offset: number;
+  date?: string;
+}) {
+  const payload = await apiFetch<unknown>("/api/v1/prayer/times", {
+    method: "POST",
+    body: input,
+    auth: false,
+  });
+  return normalizePrayerTimes(payload);
+}
+
+/* --------------------------------- habits -------------------------------- */
+
+export function logPrayer(input: {
+  prayer: PrayerName;
+  status: PrayerStatus;
+  date?: string;
+}) {
+  return apiFetch<PrayerLogEntry>("/api/v1/habits/prayers/log", {
+    method: "POST",
+    body: input,
+  });
+}
+
+/**
+ * Fetch today's prayer status from the correct endpoint.
+ * DRIFT FIX: previous version called GET /api/v1/habits/prayers/log which
+ * does not exist in openapi.json. Correct endpoint is /api/v1/habits/prayers/status.
+ */
+export async function getPrayerStatus(date: string) {
+  const payload = await apiFetch<unknown>("/api/v1/habits/prayers/status", {
+    query: { date },
+  }).catch(() => null);
+
+  const record = (payload ?? {}) as Record<string, unknown>;
+  const map = {} as Partial<Record<PrayerName, PrayerStatus>>;
+  for (const name of PRAYER_NAMES) {
+    const val = record[name];
+    if (typeof val === "string") map[name] = val as PrayerStatus;
+  }
+  return map;
+}
+
+export function getPrayerConsistency() {
+  return apiFetch<ConsistencyMetrics>("/api/v1/habits/prayers/consistency");
+}
+
+export function getDhikrSummary(date?: string) {
+  return apiFetch<DhikrDailySummaryResponse>("/api/v1/dhikr/summary", { query: { date } });
+}
+
+export function getDhikrItems(category?: DhikrCategory) {
+  return apiFetch<DhikrItemResponse[]>("/api/v1/dhikr/items", {
+    auth: false,
+    query: category ? { category } : undefined,
+  });
+}
+
+export function logDhikrSession(body: DhikrLogRequest) {
+  return apiFetch<DhikrLogResponse>("/api/v1/dhikr/sessions", {
+    method: "POST",
+    body,
+  });
+}
+
+/* --------------------------------- quran --------------------------------- */
+
+export function getWeeklyQuranSummary() {
+  return apiFetch<QuranWeeklySummaryResponse>(
+    "/api/v1/quran/reading-progress/summary/weekly",
+  );
+}
+
+export function getSurahs() {
+  return apiFetch<SurahResponse[]>("/api/v1/quran/surahs", { auth: false });
+}
+
+export function getSurahAyahs(surahNumber: number) {
+  return apiFetch<SurahAyahsResponse>(
+    `/api/v1/quran/surahs/${surahNumber}/ayahs`,
+    { auth: false },
+  );
+}
+
+export function getBookmarks() {
+  return apiFetch<BookmarkResponse[]>("/api/v1/quran/bookmarks");
+}
+
+export function addBookmark(body: BookmarkRequest) {
+  return apiFetch<BookmarkResponse>("/api/v1/quran/bookmarks", {
+    method: "POST",
+    body,
+  });
+}
+
+export function removeBookmark(surahNumber: number, ayahNumber: number) {
+  return apiFetch<null>(
+    `/api/v1/quran/bookmarks/${surahNumber}/${ayahNumber}`,
+    { method: "DELETE" },
+  );
+}
+
+export function getReadingProgress() {
+  return apiFetch<ReadingProgressResponse[]>("/api/v1/quran/reading-progress");
+}
+
+export function updateReadingProgress(body: ReadingProgressRequest) {
+  return apiFetch<ReadingProgressResponse>("/api/v1/quran/reading-progress", {
+    method: "PUT",
+    body,
+  });
+}
