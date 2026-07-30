@@ -105,6 +105,7 @@ a reproducible delivery artefact.
 
 See `docs/decision-log.md` (ADR-012) and the implementation plan at
 `../implementation_plan_phase01.md` for the full programme.
+Execution evidence is tracked in `docs/phase1_evidence_board.md`.
 
 ### Phase 1 delivery sequence
 
