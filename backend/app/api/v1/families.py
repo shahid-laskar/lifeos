@@ -34,22 +34,7 @@ from app.domain.user.entities import UserRecord
 router = APIRouter(prefix="/families", tags=["families"])
 
 
-from app.infrastructure.family_repository import (
-    InMemoryFamilyRepository,
-    InMemoryInvitationRepository,
-)
-
-# Module-level singletons so state persists across requests within one process.
-# A production deployment replaces these with SQLAlchemy-backed repositories.
-_family_repo = InMemoryFamilyRepository()
-_invitation_repo = InMemoryInvitationRepository()
-
-
-def _get_family_service() -> FamilyService:
-    return FamilyService(
-        family_repo=_family_repo,
-        invitation_repo=_invitation_repo,
-    )
+from app.api.deps import get_family_service
 
 
 def _family_to_response(f) -> FamilyResponse:
@@ -72,7 +57,7 @@ def _family_to_response(f) -> FamilyResponse:
 def create_family(
     body: CreateFamilyRequest,
     user: Annotated[UserRecord, Depends(get_current_user)],
-    service: Annotated[FamilyService, Depends(_get_family_service)],
+    service: Annotated[FamilyService, Depends(get_family_service)],
 ) -> FamilyResponse:
     family = service.create_family(name=body.name, owner_id=user.id)
     return _family_to_response(family)
@@ -81,7 +66,7 @@ def create_family(
 @router.get("", response_model=list[FamilyResponse])
 def list_families(
     user: Annotated[UserRecord, Depends(get_current_user)],
-    service: Annotated[FamilyService, Depends(_get_family_service)],
+    service: Annotated[FamilyService, Depends(get_family_service)],
 ) -> list[FamilyResponse]:
     return [_family_to_response(f) for f in service.list_families(user.id)]
 
@@ -91,7 +76,7 @@ def invite_member(
     family_id: str,
     body: InviteMemberRequest,
     user: Annotated[UserRecord, Depends(get_current_user)],
-    service: Annotated[FamilyService, Depends(_get_family_service)],
+    service: Annotated[FamilyService, Depends(get_family_service)],
 ) -> InvitationResponse:
     try:
         inv = service.invite_member(family_id, user.id, body.email)
@@ -114,7 +99,7 @@ def accept_invitation(
     family_id: str,
     body: AcceptInvitationRequest,
     user: Annotated[UserRecord, Depends(get_current_user)],
-    service: Annotated[FamilyService, Depends(_get_family_service)],
+    service: Annotated[FamilyService, Depends(get_family_service)],
 ) -> FamilyResponse:
     # body.invitation_id routes to the invitation; body.email must match.
     raise HTTPException(
@@ -128,7 +113,7 @@ def remove_member(
     family_id: str,
     member_id: str,
     user: Annotated[UserRecord, Depends(get_current_user)],
-    service: Annotated[FamilyService, Depends(_get_family_service)],
+    service: Annotated[FamilyService, Depends(get_family_service)],
 ) -> None:
     try:
         service.remove_member(family_id, user.id, member_id)
@@ -143,7 +128,7 @@ def accept_invitation_by_id(
     invitation_id: str,
     body: AcceptInvitationRequest,
     user: Annotated[UserRecord, Depends(get_current_user)],
-    service: Annotated[FamilyService, Depends(_get_family_service)],
+    service: Annotated[FamilyService, Depends(get_family_service)],
 ) -> FamilyResponse:
     try:
         family = service.accept_invitation(invitation_id, user.id, body.email)

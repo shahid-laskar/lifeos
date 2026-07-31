@@ -1,5 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { BookOpen, Home, MessageCircle, Settings, Sparkle, Users } from "lucide-react";
+import { BookOpen, Home, MessageCircle, Sparkle, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const TABS = [
@@ -7,8 +7,7 @@ const TABS = [
   { to: "/quran", label: "Qur'an", icon: BookOpen },
   { to: "/dhikr", label: "Dhikr", icon: Sparkle },
   { to: "/assistant", label: "Assistant", icon: MessageCircle },
-  { to: "/families", label: "Family", icon: Users },
-  { to: "/settings", label: "Settings", icon: Settings },
+  { to: "/profile", label: "Profile", icon: User },
 ] as const;
 
 export function BottomTabs() {

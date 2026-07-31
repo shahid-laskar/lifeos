@@ -228,3 +228,73 @@ export type DhikrLogResponse = {
   date: string;
   logged_at: string;
 };
+
+/* ---------------------------------- ai ---------------------------------- */
+
+export type AIMessage = {
+  role: "user" | "assistant";
+  content: string;
+  safety_outcome: "allowed" | "redirected" | "refused";
+  source_refs: string[];
+  created_at: string;
+};
+
+export type AIConversation = {
+  id: string;
+  title: string | null;
+  messages: AIMessage[];
+  created_at: string;
+  updated_at: string;
+};
+
+export type CreateConversationResponse = {
+  id: string;
+  created_at: string;
+};
+
+export type MessageRequest = {
+  content: string;
+  include_memory: boolean;
+};
+
+export type ConversationResponse = {
+  id: string;
+  title: string | null;
+  messages: AIMessage[];
+  created_at: string;
+  updated_at: string;
+};
+
+export type MemoryEntryResponse = {
+  id: string;
+  content: string;
+  created_at: string;
+};
+
+/* -------------------------------- family -------------------------------- */
+
+export type FamilyMember = {
+  user_id: string;
+  role: "owner" | "adult" | "dependent";
+  email?: string;
+  joined_at?: string;
+};
+
+export type FamilyInvitation = {
+  id: string;
+  family_id: string;
+  invited_email: string;
+  role: string;
+  status: "pending" | "accepted" | "revoked" | "expired";
+  expires_at: string;
+  created_at: string;
+};
+
+export type Family = {
+  id: string;
+  name: string;
+  owner_id: string;
+  members: FamilyMember[];
+  created_at: string;
+  updated_at: string;
+};

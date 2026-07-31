@@ -1,14 +1,20 @@
 import { apiFetch } from "./client";
 import type {
+  AIMessage,
   AuthTokensResponse,
   BookmarkRequest,
   BookmarkResponse,
   ConsistencyMetrics,
+  ConversationResponse,
+  CreateConversationResponse,
   DhikrCategory,
   DhikrDailySummaryResponse,
   DhikrItemResponse,
   DhikrLogRequest,
   DhikrLogResponse,
+  Family,
+  FamilyInvitation,
+  MemoryEntryResponse,
   OnboardingStatus,
   PrayerLogEntry,
   PrayerName,
@@ -229,4 +235,39 @@ export function updateReadingProgress(body: ReadingProgressRequest) {
     method: "PUT",
     body,
   });
+}
+
+/* ---------------------------------- ai ---------------------------------- */
+
+export function createConversation() {
+  return apiFetch<CreateConversationResponse>("/api/v1/ai/conversations", {
+    method: "POST",
+  });
+}
+
+export function sendAiMessage(convId: string, content: string) {
+  return apiFetch<AIMessage>(`/api/v1/ai/conversations/${convId}/messages`, {
+    method: "POST",
+    body: { content, include_memory: false },
+  });
+}
+
+export function getConversation(convId: string) {
+  return apiFetch<ConversationResponse>(`/api/v1/ai/conversations/${convId}`);
+}
+
+export function listConversations() {
+  return apiFetch<ConversationResponse[]>("/api/v1/ai/conversations");
+}
+
+export function deleteConversation(convId: string) {
+  return apiFetch<null>(`/api/v1/ai/conversations/${convId}`, { method: "DELETE" });
+}
+
+export function listMemory() {
+  return apiFetch<MemoryEntryResponse[]>("/api/v1/ai/memory");
+}
+
+export function deleteMemoryEntry(entryId: string) {
+  return apiFetch<null>(`/api/v1/ai/memory/${entryId}`, { method: "DELETE" });
 }

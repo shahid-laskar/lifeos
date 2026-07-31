@@ -54,10 +54,10 @@ def get_dhikr_service(db: Annotated[Session, Depends(get_db)]):
     return DhikrService(SqlAlchemyDhikrRepository(db))
 
 
-def _build_ai_service():
+def get_ai_service(db: Annotated[Session, Depends(get_db)]):
     from app.core.config import get_settings
     from app.domain.ai.service import AIService
-    from app.infrastructure.ai_repository import InMemoryConversationRepository, InMemoryMemoryRepository
+    from app.infrastructure.ai_repository_sqlalchemy import ConversationRepositorySQLAlchemy, MemoryRepositorySQLAlchemy
     from app.infrastructure.ai_gateway import StubAIGateway, OpenAIGateway
 
     settings = get_settings()
@@ -71,20 +71,20 @@ def _build_ai_service():
 
     return AIService(
         gateway=gateway,
-        conversation_repo=InMemoryConversationRepository(),
-        memory_repo=InMemoryMemoryRepository(),
+        conversation_repo=ConversationRepositorySQLAlchemy(db),
+        memory_repo=MemoryRepositorySQLAlchemy(db),
     )
 
 
-# Module-level singleton so conversation state persists across requests.
-_ai_service_instance = None
+def get_family_service(db: Annotated[Session, Depends(get_db)]):
+    from app.domain.family.service import FamilyService
+    from app.infrastructure.family_repository_sqlalchemy import FamilyRepositorySQLAlchemy, InvitationRepositorySQLAlchemy
 
+    return FamilyService(
+        repository=FamilyRepositorySQLAlchemy(db),
+        invitation_repository=InvitationRepositorySQLAlchemy(db)
+    )
 
-def get_ai_service():
-    global _ai_service_instance  # noqa: PLW0603
-    if _ai_service_instance is None:
-        _ai_service_instance = _build_ai_service()
-    return _ai_service_instance
 
 
 def get_current_user(

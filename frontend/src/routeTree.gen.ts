@@ -20,6 +20,7 @@ import { Route as AuthenticatedAssistantRouteImport } from './routes/_authentica
 import { Route as AuthenticatedDhikrRouteImport } from './routes/_authenticated/dhikr'
 import { Route as AuthenticatedFamiliesRouteImport } from './routes/_authenticated/families'
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
+import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedQuranRouteImport } from './routes/_authenticated/quran'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 
@@ -77,6 +78,11 @@ const AuthenticatedHomeRoute = AuthenticatedHomeRouteImport.update({
   path: '/home',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedQuranRoute = AuthenticatedQuranRouteImport.update({
   id: '/quran',
   path: '/quran',
@@ -99,6 +105,7 @@ export interface FileRoutesByFullPath {
   '/dhikr': typeof AuthenticatedDhikrRoute
   '/families': typeof AuthenticatedFamiliesRoute
   '/home': typeof AuthenticatedHomeRoute
+  '/profile': typeof AuthenticatedProfileRoute
   '/quran': typeof AuthenticatedQuranRoute
   '/settings': typeof AuthenticatedSettingsRoute
 }
@@ -113,6 +120,7 @@ export interface FileRoutesByTo {
   '/dhikr': typeof AuthenticatedDhikrRoute
   '/families': typeof AuthenticatedFamiliesRoute
   '/home': typeof AuthenticatedHomeRoute
+  '/profile': typeof AuthenticatedProfileRoute
   '/quran': typeof AuthenticatedQuranRoute
   '/settings': typeof AuthenticatedSettingsRoute
 }
@@ -129,6 +137,7 @@ export interface FileRoutesById {
   '/_authenticated/dhikr': typeof AuthenticatedDhikrRoute
   '/_authenticated/families': typeof AuthenticatedFamiliesRoute
   '/_authenticated/home': typeof AuthenticatedHomeRoute
+  '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/quran': typeof AuthenticatedQuranRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
 }
@@ -145,6 +154,7 @@ export interface FileRouteTypes {
     | '/dhikr'
     | '/families'
     | '/home'
+    | '/profile'
     | '/quran'
     | '/settings'
   fileRoutesByTo: FileRoutesByTo
@@ -159,6 +169,7 @@ export interface FileRouteTypes {
     | '/dhikr'
     | '/families'
     | '/home'
+    | '/profile'
     | '/quran'
     | '/settings'
   id:
@@ -174,6 +185,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dhikr'
     | '/_authenticated/families'
     | '/_authenticated/home'
+    | '/_authenticated/profile'
     | '/_authenticated/quran'
     | '/_authenticated/settings'
   fileRoutesById: FileRoutesById
@@ -267,6 +279,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHomeRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/profile': {
+      id: '/_authenticated/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/quran': {
       id: '/_authenticated/quran'
       path: '/quran'
@@ -289,6 +308,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDhikrRoute: typeof AuthenticatedDhikrRoute
   AuthenticatedFamiliesRoute: typeof AuthenticatedFamiliesRoute
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
+  AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedQuranRoute: typeof AuthenticatedQuranRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
 }
@@ -298,6 +318,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDhikrRoute: AuthenticatedDhikrRoute,
   AuthenticatedFamiliesRoute: AuthenticatedFamiliesRoute,
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
+  AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedQuranRoute: AuthenticatedQuranRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
 }

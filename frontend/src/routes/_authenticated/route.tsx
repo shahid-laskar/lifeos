@@ -2,6 +2,7 @@ import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { BottomTabs } from "@/components/layout/bottom-tabs";
 import { StarSpinner } from "@/components/brand/pattern";
+import { Toaster } from "@/components/ui/toaster";
 import { useIsAuthenticated } from "@/lib/auth";
 
 export const Route = createFileRoute("/_authenticated")({
@@ -31,6 +32,7 @@ function AuthenticatedLayout() {
         <Outlet />
       </div>
       <BottomTabs />
+      <Toaster />
     </div>
   );
 }

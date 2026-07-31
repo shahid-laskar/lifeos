@@ -1,10 +1,29 @@
 services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: mlos
+      POSTGRES_USER: mlos
+      POSTGRES_PASSWORD: ${MLOS_DB_PASSWORD:-mlos_dev}
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mlos"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
   backend:
     build:
       context: ./backend
+    depends_on:
+      postgres:
+        condition: service_healthy
     environment:
       MLOS_ENVIRONMENT: development
-      MLOS_DATABASE_URL: sqlite:///./data/muslim_life_os.db
+      MLOS_DATABASE_URL: postgresql://mlos:${MLOS_DB_PASSWORD:-mlos_dev}@postgres:5432/mlos
       MLOS_JWT_SECRET_KEY: ${MLOS_JWT_SECRET_KEY:?Set MLOS_JWT_SECRET_KEY before starting}
     volumes:
       - backend-data:/app/data
@@ -16,14 +35,15 @@ services:
       timeout: 3s
       retries: 5
 
-  frontend:
-    build:
-      context: ./frontend
-    ports:
-      - "8080:80"
-    depends_on:
-      backend:
-        condition: service_healthy
+  # frontend:
+  #   build:
+  #     context: ./frontend
+  #   ports:
+  #     - "8080:80"
+  #   depends_on:
+  #     backend:
+  #       condition: service_healthy
 
 volumes:
   backend-data:
+  pg-data:

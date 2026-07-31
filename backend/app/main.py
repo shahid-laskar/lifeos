@@ -26,9 +26,7 @@ settings = get_settings()
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    # Dev-only table creation. ADR-004 notes Alembic migrations are follow-up
-    # work once the schema needs controlled evolution beyond initial setup.
-    Base.metadata.create_all(bind=engine)
+    # Schema managed by Alembic migrations — run `alembic upgrade head` before starting.
     yield
 
 
