@@ -130,10 +130,19 @@ export async function getPrayerTimesForLocation(input: {
   longitude: number;
   utc_offset: number;
   date?: string;
+  method?: string;
+  asr_method?: string;
 }) {
   const payload = await apiFetch<unknown>("/api/v1/prayer/times", {
     method: "POST",
-    body: input,
+    body: {
+      latitude: input.latitude,
+      longitude: input.longitude,
+      timezone_offset_hours: input.utc_offset,
+      date: input.date,
+      method: input.method,
+      asr_method: input.asr_method,
+    },
     auth: false,
   });
   return normalizePrayerTimes(payload);

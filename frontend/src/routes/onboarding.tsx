@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { GeometricPattern, StarSpinner } from "@/components/brand/pattern";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,6 +21,10 @@ import {
   type OnboardingGoal,
 } from "@/lib/api/types";
 import { useIsAuthenticated } from "@/lib/auth";
+import {
+  searchLocations,
+  type LocationSuggestion,
+} from "@/lib/location-search";
 import { browserTimezone } from "@/lib/prayer";
 import { cn } from "@/lib/utils";
 
@@ -49,13 +53,20 @@ function OnboardingPage() {
   const navigate = useNavigate();
   const isAuthenticated = useIsAuthenticated();
   const [step, setStep] = useState(0);
-  const [lat, setLat] = useState("");
-  const [lng, setLng] = useState("");
+  const [locationLabel, setLocationLabel] = useState("");
+  const [lat, setLat] = useState<number | null>(null);
+  const [lng, setLng] = useState<number | null>(null);
+  const [timezone, setTimezone] = useState(browserTimezone());
+  const [country, setCountry] = useState<string | null>(null);
   const [locating, setLocating] = useState(false);
+  const [suggestions, setSuggestions] = useState<LocationSuggestion[]>([]);
+  const [searching, setSearching] = useState(false);
   const [method, setMethod] = useState<CalculationMethod>("MWL");
   const [asr, setAsr] = useState<AsrMethod>("STANDARD");
   const [goals, setGoals] = useState<OnboardingGoal[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [, startTransition] = useTransition();
+  const searchAbort = useRef<AbortController | null>(null);
 
   useEffect(() => {
     if (!isAuthenticated) navigate({ to: "/login", replace: true });
@@ -76,9 +87,10 @@ function OnboardingPage() {
   const save = useMutation({
     mutationFn: () =>
       updateProfile({
-        latitude: Number(lat),
-        longitude: Number(lng),
-        timezone: browserTimezone(),
+        latitude: lat!,
+        longitude: lng!,
+        timezone,
+        country,
         prayer_calculation_method: method,
         asr_method: asr,
         goals,
@@ -92,30 +104,75 @@ function OnboardingPage() {
       ),
   });
 
+  function applySuggestion(item: LocationSuggestion) {
+    setLocationLabel(item.label);
+    setLat(item.latitude);
+    setLng(item.longitude);
+    setTimezone(item.timezone || browserTimezone());
+    setCountry(item.countryCode);
+    setSuggestions([]);
+    setError(null);
+  }
+
   function detectLocation() {
     setLocating(true);
     setError(null);
     if (typeof navigator === "undefined" || !navigator.geolocation) {
       setLocating(false);
-      setError("Your browser can't share a location — enter it manually below.");
+      setError("Your browser can't share a location — search for your city below.");
       return;
     }
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        setLat(position.coords.latitude.toFixed(5));
-        setLng(position.coords.longitude.toFixed(5));
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
+        setLat(latitude);
+        setLng(longitude);
+        setTimezone(browserTimezone());
+        setLocationLabel(
+          `Current location (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`,
+        );
         setLocating(false);
       },
       () => {
         setLocating(false);
-        setError("We couldn't read your location — enter it manually below.");
+        setError("We couldn't read your location — search for your city below.");
       },
       { timeout: 10000 },
     );
   }
 
+  function runCitySearch(query: string) {
+    searchAbort.current?.abort();
+    setLocationLabel(query);
+    if (query.trim().length < 3) {
+      setSuggestions([]);
+      setSearching(false);
+      return;
+    }
+    const controller = new AbortController();
+    searchAbort.current = controller;
+    setSearching(true);
+    startTransition(() => {
+      void (async () => {
+        try {
+          const results = await searchLocations(query, controller.signal);
+          if (!controller.signal.aborted) setSuggestions(results);
+        } catch {
+          if (!controller.signal.aborted) setSuggestions([]);
+        } finally {
+          if (!controller.signal.aborted) setSearching(false);
+        }
+      })();
+    });
+  }
+
   const canContinue =
-    step === 0 ? lat !== "" && lng !== "" : step === 1 ? true : goals.length > 0;
+    step === 0
+      ? lat !== null && lng !== null
+      : step === 1
+        ? true
+        : goals.length > 0;
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-background px-5 py-10">
@@ -139,7 +196,8 @@ function OnboardingPage() {
               <div>
                 <h1 className="text-xl font-semibold">Where are you praying from?</h1>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Your location stays with your account and is used only to calculate
+                  Search your city (free OpenStreetMap lookup — no API key), or use
+                  your device location. Coordinates stay on your account only for
                   prayer times.
                 </p>
               </div>
@@ -152,26 +210,48 @@ function OnboardingPage() {
               >
                 {locating ? <StarSpinner size={18} /> : "Use my current location"}
               </Button>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2">
-                  <Label htmlFor="lat">Latitude</Label>
-                  <Input
-                    id="lat"
-                    inputMode="decimal"
-                    value={lat}
-                    onChange={(e) => setLat(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="lng">Longitude</Label>
-                  <Input
-                    id="lng"
-                    inputMode="decimal"
-                    value={lng}
-                    onChange={(e) => setLng(e.target.value)}
-                  />
-                </div>
+
+              <div className="relative space-y-2">
+                <Label htmlFor="city">City search</Label>
+                <Input
+                  id="city"
+                  placeholder="e.g. Thiruvananthapuram, Makkah, London"
+                  value={locationLabel}
+                  onChange={(e) => runCitySearch(e.target.value)}
+                  autoComplete="off"
+                />
+                {searching ? (
+                  <p className="text-xs text-muted-foreground">Searching…</p>
+                ) : null}
+                {suggestions.length > 0 ? (
+                  <ul className="absolute left-0 right-0 z-20 max-h-56 overflow-y-auto rounded-lg border border-border bg-card shadow-lg">
+                    {suggestions.map((item) => (
+                      <li key={item.id}>
+                        <button
+                          type="button"
+                          className="w-full px-3 py-2 text-left text-sm hover:bg-accent/50"
+                          onClick={() => applySuggestion(item)}
+                        >
+                          <span className="block font-medium">{item.label}</span>
+                          <span className="block text-xs text-muted-foreground">
+                            {item.timezone}
+                          </span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
               </div>
+
+              {lat !== null && lng !== null ? (
+                <p className="text-xs text-muted-foreground">
+                  Selected: {lat.toFixed(4)}°, {lng.toFixed(4)}° · {timezone}
+                </p>
+              ) : (
+                <p className="text-xs text-muted-foreground">
+                  No map API key needed. Pick a city from the suggestions list.
+                </p>
+              )}
             </div>
           ) : null}
 

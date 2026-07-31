@@ -1,5 +1,5 @@
+import { Link, createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { StarSpinner } from "@/components/brand/pattern";
 import { ErrorState } from "@/components/brand/states";
@@ -63,6 +63,7 @@ function HomePage() {
   const prayerTimes = useQuery({
     queryKey: ["prayer-times", date],
     queryFn: () => getMyPrayerTimes(date),
+    retry: 1,
   });
 
   const fallbackTimes = useQuery({
@@ -78,6 +79,9 @@ function HomePage() {
   });
 
   const times = prayerTimes.data ?? fallbackTimes.data;
+  const loading =
+    prayerTimes.isPending ||
+    (prayerTimes.isError && coords !== null && fallbackTimes.isPending);
 
   const greetingDate = new Date().toLocaleDateString(undefined, {
     weekday: "long",
@@ -89,7 +93,7 @@ function HomePage() {
     <>
       <PageHeader title="Today" subtitle={greetingDate} arabic="السَّلامُ عَلَيْكُم" />
       <div className="space-y-4 px-5 pb-8">
-        {prayerTimes.isPending ? (
+        {loading ? (
           <div className="flex justify-center py-10">
             <StarSpinner size={32} />
           </div>
@@ -98,10 +102,17 @@ function HomePage() {
         ) : (
           <ErrorState
             title="Couldn't load prayer times"
-            message="Check your connection, or set your location in Settings."
+            message="Set your city in Settings (search by name — no map API key needed), then try again."
             onRetry={() => prayerTimes.refetch()}
           />
         )}
+        {!times && !loading ? (
+          <p className="text-center text-sm">
+            <Link to="/settings" className="text-primary underline-offset-4 hover:underline">
+              Open Settings → Location
+            </Link>
+          </p>
+        ) : null}
 
         <PrayerStatusRow />
         <DhikrWidget />

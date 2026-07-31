@@ -1,10 +1,10 @@
 from typing import Annotated
 from datetime import date as date_type, datetime
-from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from fastapi import APIRouter, Depends, Query, HTTPException
 
 from app.api.deps import get_current_user, get_habit_service
+from app.core.timezones import resolve_timezone
 from app.domain.user.entities import UserRecord
 from app.domain.habit.service import HabitService
 from app.domain.habit.models import (
@@ -13,22 +13,6 @@ from app.domain.habit.models import (
     DailyPrayerStatus,
     ConsistencyMetrics
 )
-
-# Map deprecated / non-standard IANA timezone aliases to canonical names.
-_TZ_ALIASES: dict[str, str] = {
-    "Asia/Calcutta": "Asia/Kolkata",
-    "America/Buenos_Aires": "America/Argentina/Buenos_Aires",
-    "Pacific/Samoa": "Pacific/Pago_Pago",
-}
-
-def _resolve_tz(tz_name: str) -> ZoneInfo:
-    """Return a ZoneInfo for *tz_name*, resolving known deprecated aliases."""
-    canonical = _TZ_ALIASES.get(tz_name, tz_name)
-    try:
-        return ZoneInfo(canonical)
-    except ZoneInfoNotFoundError:
-        # Last-resort: UTC so the request doesn't 500
-        return ZoneInfo("UTC")
 
 router = APIRouter(prefix="/habits", tags=["habits"])
 
@@ -42,7 +26,7 @@ def log_prayer(
     if not current_user.timezone:
         raise HTTPException(status_code=400, detail="User timezone must be set to log prayers.")
         
-    tz = _resolve_tz(current_user.timezone)
+    tz = resolve_timezone(current_user.timezone)
     target_date = date or datetime.now(tz).date()
 
     record = habit_service.log_prayer(
@@ -68,7 +52,7 @@ def get_daily_status(
     if not current_user.timezone:
         raise HTTPException(status_code=400, detail="User timezone must be set to get prayer status.")
         
-    tz = _resolve_tz(current_user.timezone)
+    tz = resolve_timezone(current_user.timezone)
     target_date = date or datetime.now(tz).date()
     
     return habit_service.get_daily_status(current_user.id, target_date)
@@ -81,7 +65,7 @@ def get_consistency_metrics(
     if not current_user.timezone:
         raise HTTPException(status_code=400, detail="User timezone must be set to get metrics.")
         
-    tz = _resolve_tz(current_user.timezone)
+    tz = resolve_timezone(current_user.timezone)
     today = datetime.now(tz).date()
     
     return habit_service.get_consistency_metrics(current_user.id, today)
@@ -97,7 +81,7 @@ def log_fasting(
     date_str = body.get("date")
     if not current_user.timezone:
         raise HTTPException(status_code=400, detail="User timezone must be set.")
-    tz = _resolve_tz(current_user.timezone)
+    tz = resolve_timezone(current_user.timezone)
     target_date = date_type.fromisoformat(date_str) if date_str else datetime.now(tz).date()
     
     return habit_service.log_fasting(current_user.id, target_date, fasting_type)
@@ -111,7 +95,7 @@ def get_fasting_status(
 ):
     if not current_user.timezone:
         raise HTTPException(status_code=400, detail="User timezone must be set.")
-    tz = _resolve_tz(current_user.timezone)
+    tz = resolve_timezone(current_user.timezone)
     target_date = date or datetime.now(tz).date()
     return habit_service.get_fasting_status(current_user.id, target_date)
 

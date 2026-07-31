@@ -8,11 +8,11 @@ shapes the response.
 """
 from datetime import date as date_type, datetime
 from typing import Annotated
-from zoneinfo import ZoneInfo
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 
 from app.api.deps import get_current_user
+from app.core.timezones import resolve_user_timezone
 from app.domain.user.entities import UserRecord
 from app.domain.prayer.models import PrayerTimeRequest, PrayerTimeResponse
 from app.domain.prayer.service import calculate_prayer_times
@@ -56,18 +56,26 @@ def get_my_prayer_times(
     date: date_type | None = Query(None, description="Date to calculate times for. Defaults to today in user's timezone."),
 ) -> PrayerTimeResponse:
     """Calculate prayer times for the current authenticated user based on their profile settings."""
-    if current_user.latitude is None or current_user.longitude is None or current_user.timezone is None:
+    if current_user.latitude is None or current_user.longitude is None:
         raise HTTPException(
             status_code=400,
-            detail="User profile is incomplete. Latitude, longitude, and timezone must be set to calculate prayer times.",
+            detail={
+                "message": "Location is not set on your profile.",
+                "suggested_action": "Search for your city in Settings or complete onboarding.",
+            },
         )
-    
-    tz = ZoneInfo(current_user.timezone)
+
+    tz = resolve_user_timezone(
+        current_user.timezone,
+        latitude=current_user.latitude,
+        longitude=current_user.longitude,
+    )
     target_date = date or datetime.now(tz).date()
-    
+
     # Calculate timezone offset in hours for the specific date
     dt = datetime(target_date.year, target_date.month, target_date.day, tzinfo=tz)
-    offset_hours = dt.utcoffset().total_seconds() / 3600.0
+    offset = dt.utcoffset()
+    offset_hours = (offset.total_seconds() / 3600.0) if offset else 0.0
 
     request = PrayerTimeRequest(
         latitude=current_user.latitude,
@@ -77,7 +85,7 @@ def get_my_prayer_times(
         method=current_user.prayer_calculation_method or PrayerTimeRequest.model_fields["method"].default,
         asr_method=current_user.asr_method or PrayerTimeRequest.model_fields["asr_method"].default,
     )
-    
+
     try:
         return calculate_prayer_times(request)
     except ValueError as exc:

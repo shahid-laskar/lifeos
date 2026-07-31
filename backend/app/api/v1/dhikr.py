@@ -11,11 +11,11 @@ No AI involvement (ADR-008, Article 8).
 """
 from typing import Annotated
 from datetime import date as date_type, datetime
-from zoneinfo import ZoneInfo
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from app.api.deps import get_current_user, get_dhikr_service
+from app.core.timezones import resolve_user_timezone
 from app.domain.user.entities import UserRecord
 from app.domain.dhikr.service import (
     DhikrItemNotFoundError,
@@ -93,7 +93,11 @@ def log_session(
     if not current_user.timezone:
         raise HTTPException(status_code=400, detail="User timezone must be set to log dhikr sessions.")
         
-    tz = ZoneInfo(current_user.timezone)
+    tz = resolve_user_timezone(
+        current_user.timezone,
+        latitude=current_user.latitude,
+        longitude=current_user.longitude,
+    )
     target_date = date or datetime.now(tz).date()
 
     try:
@@ -126,7 +130,11 @@ def get_daily_summary(
     if not current_user.timezone:
         raise HTTPException(status_code=400, detail="User timezone must be set to get dhikr summary.")
         
-    tz = ZoneInfo(current_user.timezone)
+    tz = resolve_user_timezone(
+        current_user.timezone,
+        latitude=current_user.latitude,
+        longitude=current_user.longitude,
+    )
     target_date = date or datetime.now(tz).date()
 
     return dhikr_service.get_daily_summary(current_user.id, target_date)

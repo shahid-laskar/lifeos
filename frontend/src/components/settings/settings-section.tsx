@@ -1,8 +1,10 @@
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { MapPin, Calculator, Sun, Moon, Monitor, Loader2, Check, User, Globe, ExternalLink } from "lucide-react";
+import { MapPin, Calculator, Sun, Moon, Monitor, Loader2, User, ExternalLink } from "lucide-react";
 import { getProfile, updateProfile } from "@/lib/api/endpoints";
 import { CALCULATION_METHODS, type CalculationMethod, type AsrMethod } from "@/lib/api/types";
+import { searchLocations, type LocationSuggestion } from "@/lib/location-search";
+import { browserTimezone } from "@/lib/prayer";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -22,16 +24,21 @@ export function SettingsSection() {
 
   const [preferredLanguage, setPreferredLanguage] = useState("en");
   const [searchQuery, setSearchQuery] = useState("");
-  const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [suggestions, setSuggestions] = useState<LocationSuggestion[]>([]);
   const [isLocationLoading, setIsLocationLoading] = useState(false);
   const [locationError, setLocationError] = useState("");
   const [currentTheme, setCurrentTheme] = useState<Theme>("system");
+  const [, startTransition] = useTransition();
+  const searchAbort = useRef<AbortController | null>(null);
 
   useEffect(() => {
     if (profile) {
       setPreferredLanguage(profile.preferred_language || "en");
-      if (profile.timezone || profile.country) {
-        setSearchQuery([profile.country, profile.timezone].filter(Boolean).join(" / "));
+      if (profile.country || profile.timezone) {
+        // Prefer a human-readable placeholder; timezone is IANA under the hood.
+        setSearchQuery(
+          [profile.country, profile.timezone].filter(Boolean).join(" · "),
+        );
       }
     }
     setCurrentTheme(getStoredTheme());
@@ -41,6 +48,7 @@ export function SettingsSection() {
     mutationFn: (data: Partial<typeof profile>) => updateProfile(data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["profile"] });
+      queryClient.invalidateQueries({ queryKey: ["prayer-times"] });
       const previous = profile;
       toast({
         title: "Settings saved",
@@ -80,30 +88,52 @@ export function SettingsSection() {
     updateMutation.mutate({ asr_method: method });
   };
 
-  const searchLocation = async (query: string) => {
-    if (query.length < 3) {
+  const runLocationSearch = (query: string) => {
+    searchAbort.current?.abort();
+    if (query.trim().length < 3) {
       setSuggestions([]);
+      setLocationError("");
+      setIsLocationLoading(false);
       return;
     }
+    const controller = new AbortController();
+    searchAbort.current = controller;
     setIsLocationLoading(true);
     setLocationError("");
-    try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=5`
-      );
-      const data = await response.json();
-      if (data && Array.isArray(data) && data.length > 0) {
-        setSuggestions(data);
-      } else {
-        setSuggestions([]);
-        setLocationError("No results found for this location.");
-      }
-    } catch {
-      setSuggestions([]);
-      setLocationError("Failed to search location.");
-    } finally {
-      setIsLocationLoading(false);
-    }
+    startTransition(() => {
+      void (async () => {
+        try {
+          const results = await searchLocations(query, controller.signal);
+          if (controller.signal.aborted) return;
+          setSuggestions(results);
+          if (results.length === 0) {
+            setLocationError("No results found for this location.");
+          }
+        } catch (error) {
+          if (controller.signal.aborted) return;
+          setSuggestions([]);
+          setLocationError(
+            error instanceof Error
+              ? error.message
+              : "Failed to search location.",
+          );
+        } finally {
+          if (!controller.signal.aborted) setIsLocationLoading(false);
+        }
+      })();
+    });
+  };
+
+  const selectLocation = (item: LocationSuggestion) => {
+    setSearchQuery(item.label);
+    setSuggestions([]);
+    updateMutation.mutate({
+      latitude: item.latitude,
+      longitude: item.longitude,
+      country: item.countryCode,
+      // Always persist a real IANA timezone — never the city display name.
+      timezone: item.timezone || browserTimezone(),
+    });
   };
 
   const handleThemeChange = (newTheme: Theme) => {
@@ -121,7 +151,6 @@ export function SettingsSection() {
 
   return (
     <div className="space-y-6">
-      {/* Profile Section */}
       <div className="rounded-xl border border-border bg-card p-5">
         <div className="mb-4 flex items-center gap-2">
           <User className="h-5 w-5 text-primary" />
@@ -150,7 +179,6 @@ export function SettingsSection() {
         </div>
       </div>
 
-      {/* Location Settings */}
       <div className="rounded-xl border border-border bg-card p-5">
         <div className="mb-4 flex items-center gap-2">
           <MapPin className="h-5 w-5 text-primary" />
@@ -159,14 +187,17 @@ export function SettingsSection() {
         <div className="space-y-3">
           <div>
             <Label htmlFor="location">City / Location Search</Label>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Uses free OpenStreetMap search — no API key required.
+            </p>
             <div className="relative">
               <Input
                 id="location"
-                placeholder="Type city name (e.g. London, Makkah, Karachi)..."
+                placeholder="Type city name (e.g. London, Makkah, Thiruvananthapuram)..."
                 value={searchQuery}
                 onChange={(e) => {
                   setSearchQuery(e.target.value);
-                  searchLocation(e.target.value);
+                  runLocationSearch(e.target.value);
                 }}
                 className="mt-1.5 w-full"
               />
@@ -179,44 +210,37 @@ export function SettingsSection() {
               {suggestions.length > 0 && !isLocationLoading && (
                 <div className="absolute left-0 right-0 mt-1 z-20 max-h-60 overflow-y-auto border border-border rounded-lg bg-card shadow-lg">
                   <ul className="divide-y divide-border">
-                    {suggestions.map((item, index) => (
-                      <li
-                        key={index}
-                        onClick={() => {
-                          const lat = parseFloat(item.lat);
-                          const lon = parseFloat(item.lon);
-                          const country = item.address?.country_code?.toUpperCase() || null;
-                          setSearchQuery(item.display_name);
-                          setSuggestions([]);
-                          updateMutation.mutate({
-                            latitude: lat,
-                            longitude: lon,
-                            country: country,
-                            timezone: item.display_name.split(",")[0],
-                          });
-                        }}
-                        className="px-3 py-2 cursor-pointer hover:bg-accent/50 transition-colors"
-                      >
-                        <div className="font-medium text-sm text-foreground">{item.display_name}</div>
-                        <div className="text-xs text-muted-foreground">
-                          Lat: {item.lat}, Lon: {item.lon}
-                        </div>
+                    {suggestions.map((item) => (
+                      <li key={item.id}>
+                        <button
+                          type="button"
+                          onClick={() => selectLocation(item)}
+                          className="w-full px-3 py-2 text-left hover:bg-accent/50 transition-colors"
+                        >
+                          <div className="font-medium text-sm text-foreground">
+                            {item.label}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {item.timezone} · {item.latitude.toFixed(4)},{" "}
+                            {item.longitude.toFixed(4)}
+                          </div>
+                        </button>
                       </li>
                     ))}
                   </ul>
                 </div>
               )}
             </div>
-            {profile?.latitude && profile?.longitude && (
+            {profile?.latitude != null && profile?.longitude != null && (
               <p className="mt-1.5 text-xs text-muted-foreground">
-                Current coordinates: {profile.latitude.toFixed(4)}°, {profile.longitude.toFixed(4)}°
+                Current: {profile.latitude.toFixed(4)}°, {profile.longitude.toFixed(4)}°
+                {profile.timezone ? ` · ${profile.timezone}` : ""}
               </p>
             )}
           </div>
         </div>
       </div>
 
-      {/* Prayer Calculation Settings */}
       <div className="rounded-xl border border-border bg-card p-5">
         <div className="mb-4 flex items-center gap-2">
           <Calculator className="h-5 w-5 text-primary" />
@@ -262,7 +286,6 @@ export function SettingsSection() {
         </div>
       </div>
 
-      {/* Appearance Settings */}
       <div className="rounded-xl border border-border bg-card p-5">
         <div className="mb-4 flex items-center gap-2">
           <Sun className="h-5 w-5 text-primary" />
@@ -308,7 +331,6 @@ export function SettingsSection() {
         </div>
       </div>
 
-      {/* Family & Account Section */}
       <div className="rounded-xl border border-border bg-card p-5 space-y-4">
         <div className="flex items-center justify-between">
           <div>
