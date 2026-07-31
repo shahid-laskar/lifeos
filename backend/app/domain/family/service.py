@@ -74,10 +74,42 @@ class FamilyService:
     def list_families(self, user_id: str) -> list[Family]:
         return self._families.list_for_user(user_id)
 
+    def delete_family(self, family_id: str, requesting_user_id: str) -> None:
+        family = self._families.get_by_id(family_id)
+        if family is None:
+            raise FamilyNotFoundError(family_id)
+        if family.owner_id != requesting_user_id:
+            raise FamilyPermissionError("Only the family owner can delete the family.")
+        self._families.delete(family_id)
+
+    def list_invitations(self, family_id: str, requesting_user_id: str) -> list[FamilyInvitation]:
+        family = self._families.get_by_id(family_id)
+        if family is None:
+            raise FamilyNotFoundError(family_id)
+        if family.owner_id != requesting_user_id:
+            raise FamilyPermissionError("Only the family owner can view invitations.")
+        return self._invitations.list_for_family(family_id)
+
+    def revoke_invitation(self, family_id: str, invitation_id: str, requesting_user_id: str) -> None:
+        family = self._families.get_by_id(family_id)
+        if family is None:
+            raise FamilyNotFoundError(family_id)
+        if family.owner_id != requesting_user_id:
+            raise FamilyPermissionError("Only the family owner can revoke invitations.")
+        
+        invitation = self._invitations.get_by_id(invitation_id)
+        if invitation is None:
+            raise InvitationNotFoundError(invitation_id)
+        if invitation.family_id != family_id:
+            raise InvitationNotFoundError(invitation_id)
+        
+        invitation.status = InvitationStatus.REVOKED
+        self._invitations.save(invitation)
+
     # ── Invitations ──────────────────────────────────────────────────────────
 
     def invite_member(
-        self, family_id: str, requesting_user_id: str, invited_email: str
+        self, family_id: str, requesting_user_id: str, invited_email: str, role: MemberRole = MemberRole.ADULT
     ) -> FamilyInvitation:
         family = self._families.get_by_id(family_id)
         if family is None:
@@ -90,6 +122,7 @@ class FamilyService:
             family_id=family_id,
             invited_email=invited_email,
             invited_by_user_id=requesting_user_id,
+            role=role,
             expires_at=datetime.now(timezone.utc) + timedelta(days=INVITATION_EXPIRY_DAYS),
         )
         self._invitations.save(invitation)

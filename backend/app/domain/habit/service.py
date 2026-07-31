@@ -79,3 +79,10 @@ class HabitService:
             days_completed_last_30=completed_days,
             total_prayers_logged_last_30=total_prayers
         )
+
+    def log_fasting(self, user_id: str, date: date_type, fasting_type: str) -> dict:
+        return self._repository.log_fasting(user_id, date, fasting_type)
+
+    def get_fasting_status(self, user_id: str, date: date_type) -> dict:
+        return self._repository.get_fasting_status(user_id, date)
+

@@ -81,8 +81,8 @@ def get_family_service(db: Annotated[Session, Depends(get_db)]):
     from app.infrastructure.family_repository_sqlalchemy import FamilyRepositorySQLAlchemy, InvitationRepositorySQLAlchemy
 
     return FamilyService(
-        repository=FamilyRepositorySQLAlchemy(db),
-        invitation_repository=InvitationRepositorySQLAlchemy(db)
+        family_repo=FamilyRepositorySQLAlchemy(db),
+        invitation_repo=InvitationRepositorySQLAlchemy(db),
     )
 
 

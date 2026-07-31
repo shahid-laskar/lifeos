@@ -79,7 +79,9 @@ def invite_member(
     service: Annotated[FamilyService, Depends(get_family_service)],
 ) -> InvitationResponse:
     try:
-        inv = service.invite_member(family_id, user.id, body.email)
+        from app.domain.family.entities import MemberRole
+        role = MemberRole(body.role) if body.role else MemberRole.ADULT
+        inv = service.invite_member(family_id, user.id, body.email, role)
     except FamilyNotFoundError as exc:
         raise HTTPException(status_code=404, detail="Family not found.") from exc
     except FamilyPermissionError as exc:
@@ -119,6 +121,77 @@ def remove_member(
         service.remove_member(family_id, user.id, member_id)
     except FamilyNotFoundError as exc:
         raise HTTPException(status_code=404, detail="Family not found.") from exc
+    except FamilyPermissionError as exc:
+        raise HTTPException(status_code=403, detail=str(exc)) from exc
+
+
+@router.get("/{family_id}", response_model=FamilyResponse)
+def get_family(
+    family_id: str,
+    user: Annotated[UserRecord, Depends(get_current_user)],
+    service: Annotated[FamilyService, Depends(get_family_service)],
+) -> FamilyResponse:
+    try:
+        family = service.get_family(family_id, user.id)
+    except FamilyNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="Family not found.") from exc
+    except FamilyPermissionError as exc:
+        raise HTTPException(status_code=403, detail=str(exc)) from exc
+    return _family_to_response(family)
+
+
+@router.delete("/{family_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_family(
+    family_id: str,
+    user: Annotated[UserRecord, Depends(get_current_user)],
+    service: Annotated[FamilyService, Depends(get_family_service)],
+) -> None:
+    try:
+        service.delete_family(family_id, user.id)
+    except FamilyNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="Family not found.") from exc
+    except FamilyPermissionError as exc:
+        raise HTTPException(status_code=403, detail=str(exc)) from exc
+
+
+@router.get("/{family_id}/invitations", response_model=list[InvitationResponse])
+def list_invitations(
+    family_id: str,
+    user: Annotated[UserRecord, Depends(get_current_user)],
+    service: Annotated[FamilyService, Depends(get_family_service)],
+) -> list[InvitationResponse]:
+    try:
+        invitations = service.list_invitations(family_id, user.id)
+    except FamilyNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="Family not found.") from exc
+    except FamilyPermissionError as exc:
+        raise HTTPException(status_code=403, detail=str(exc)) from exc
+    return [
+        InvitationResponse(
+            id=inv.id,
+            family_id=inv.family_id,
+            invited_email=inv.invited_email,
+            status=inv.status.value,
+            created_at=inv.created_at,
+            expires_at=inv.expires_at,
+        )
+        for inv in invitations
+    ]
+
+
+@router.delete("/{family_id}/invitations/{invitation_id}", status_code=status.HTTP_204_NO_CONTENT)
+def revoke_invitation(
+    family_id: str,
+    invitation_id: str,
+    user: Annotated[UserRecord, Depends(get_current_user)],
+    service: Annotated[FamilyService, Depends(get_family_service)],
+) -> None:
+    try:
+        service.revoke_invitation(family_id, invitation_id, user.id)
+    except FamilyNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="Family not found.") from exc
+    except InvitationNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="Invitation not found.") from exc
     except FamilyPermissionError as exc:
         raise HTTPException(status_code=403, detail=str(exc)) from exc
 

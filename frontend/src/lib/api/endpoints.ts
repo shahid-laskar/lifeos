@@ -76,9 +76,7 @@ export function getOnboardingStatus() {
 }
 
 export function getProfile() {
-  return apiFetch<UserProfile>("/api/v1/users/me/profile").catch(() =>
-    apiFetch<UserProfile>("/api/v1/users/me"),
-  );
+  return apiFetch<UserProfile>("/api/v1/users/me");
 }
 
 export function updateProfile(input: Partial<UserProfile>) {
@@ -270,4 +268,68 @@ export function listMemory() {
 
 export function deleteMemoryEntry(entryId: string) {
   return apiFetch<null>(`/api/v1/ai/memory/${entryId}`, { method: "DELETE" });
+}
+
+/* -------------------------------- family -------------------------------- */
+
+export function listMyFamilies() {
+  return apiFetch<Family[]>("/api/v1/families");
+}
+
+export function createFamily(name: string) {
+  return apiFetch<Family>("/api/v1/families", { method: "POST", body: { name } });
+}
+
+export function getFamily(familyId: string) {
+  return apiFetch<Family>(`/api/v1/families/${familyId}`);
+}
+
+export function inviteMember(familyId: string, email: string, role: string) {
+  return apiFetch<FamilyInvitation>(`/api/v1/families/${familyId}/invitations`, {
+    method: "POST",
+    body: { invited_email: email, role },
+  });
+}
+
+export function listInvitations(familyId: string) {
+  return apiFetch<FamilyInvitation[]>(`/api/v1/families/${familyId}/invitations`);
+}
+
+export function acceptInvitation(invitationId: string, email: string) {
+  return apiFetch<unknown>(`/api/v1/families/invitations/${invitationId}/accept`, {
+    method: "POST",
+    body: { email },
+  });
+}
+
+export function removeMember(familyId: string, memberId: string) {
+  return apiFetch<null>(`/api/v1/families/${familyId}/members/${memberId}`, {
+    method: "DELETE",
+  });
+}
+
+export function deleteFamily(familyId: string) {
+  return apiFetch<null>(`/api/v1/families/${familyId}`, { method: "DELETE" });
+}
+
+export function revokeInvitation(familyId: string, invitationId: string) {
+  return apiFetch<null>(`/api/v1/families/${familyId}/invitations/${invitationId}`, {
+    method: "DELETE",
+  });
+}
+
+/* ------------------------------- fasting -------------------------------- */
+
+export function logFasting(body: { date?: string; type: string }) {
+  return apiFetch<{ id: string; date: string; type: string }>("/api/v1/habits/fasting/log", {
+    method: "POST",
+    body,
+  });
+}
+
+export function getFastingStatus(date?: string) {
+  return apiFetch<{ date: string; fasting: boolean; type: string | null }>(
+    "/api/v1/habits/fasting/status",
+    { query: { date } },
+  );
 }

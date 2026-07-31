@@ -12,7 +12,9 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", env_prefix="MLOS_")
+    model_config = SettingsConfigDict(env_file=".env", env_prefix="MLOS_", extra="ignore")
+
+    db_password: str = ""
 
     app_name: str = "Muslim Life OS API"
     environment: str = "development"

@@ -1,6 +1,6 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { MapPin, Calculator, Sun, Moon, Loader2, Search, X } from "lucide-react";
+import { MapPin, Calculator, Sun, Moon, Monitor, Loader2, Check, User, Globe, ExternalLink } from "lucide-react";
 import { getProfile, updateProfile } from "@/lib/api/endpoints";
 import { CALCULATION_METHODS, type CalculationMethod, type AsrMethod } from "@/lib/api/types";
 import { Label } from "@/components/ui/label";
@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import { applyTheme, getStoredTheme, type Theme } from "@/lib/theme";
+import { Link } from "@tanstack/react-router";
 
 export function SettingsSection() {
   const { data: profile, isLoading } = useQuery({
@@ -18,40 +20,42 @@ export function SettingsSection() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const [location, setLocation] = useState("");
+  const [preferredLanguage, setPreferredLanguage] = useState("en");
   const [searchQuery, setSearchQuery] = useState("");
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [isLocationLoading, setIsLocationLoading] = useState(false);
   const [locationError, setLocationError] = useState("");
-  const [latitude, setLatitude] = useState<number | null>(null);
-  const [longitude, setLongitude] = useState<number | null>(null);
-  const [calculationMethod, setCalculationMethod] = useState<CalculationMethod | "">("");
-  const [asrMethod, setAsrMethod] = useState<AsrMethod | "">("");
-  const [theme, setTheme] = useState<"light" | "dark">("light");
-  const [isSaving, setIsSaving] = useState(false);
+  const [currentTheme, setCurrentTheme] = useState<Theme>("system");
 
   useEffect(() => {
     if (profile) {
-      setLocation(profile.timezone || "");
-      setCalculationMethod(profile.prayer_calculation_method || "");
-      setAsrMethod(profile.asr_method || "");
-      
-      // Load theme from localStorage
-      const savedTheme = localStorage.getItem("theme") as "light" | "dark" | null;
-      if (savedTheme) {
-        setTheme(savedTheme);
-        document.documentElement.classList.toggle("dark", savedTheme === "dark");
+      setPreferredLanguage(profile.preferred_language || "en");
+      if (profile.timezone || profile.country) {
+        setSearchQuery([profile.country, profile.timezone].filter(Boolean).join(" / "));
       }
     }
+    setCurrentTheme(getStoredTheme());
   }, [profile]);
 
   const updateMutation = useMutation({
     mutationFn: (data: Partial<typeof profile>) => updateProfile(data),
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["profile"] });
+      const previous = profile;
       toast({
         title: "Settings saved",
         description: "Your preferences have been updated.",
+        action: previous ? (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              updateMutation.mutate(previous);
+            }}
+          >
+            Undo
+          </Button>
+        ) : undefined,
       });
     },
     onError: () => {
@@ -63,60 +67,48 @@ export function SettingsSection() {
     },
   });
 
-  const handleSave = async () => {
-    setIsSaving(true);
-    try {
-      await updateMutation.mutateAsync({
-        timezone: location,
-        prayer_calculation_method: calculationMethod || undefined,
-        asr_method: asrMethod || undefined,
-      });
-    } finally {
-      setIsSaving(false);
-    }
+  const handleLanguageChange = (lang: string) => {
+    setPreferredLanguage(lang);
+    updateMutation.mutate({ preferred_language: lang });
   };
 
-  const debounce = (fn: Function, delay: number) => {
-  let timeoutId: ReturnType<typeof setTimeout>;
-  return (...args: any[]) => {
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => fn(...args), delay);
+  const handleCalculationMethodChange = (method: CalculationMethod) => {
+    updateMutation.mutate({ prayer_calculation_method: method });
   };
-};
 
-const searchLocation = async (query: string) => {
-  if (query.length < 3) {
-    setSuggestions([]);
-    return;
-  }
-  setIsLocationLoading(true);
-  setLocationError("");
-  try {
-    const response = await fetch(
-      `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=5`
-    );
-    const data = await response.json();
-    if (data && Array.isArray(data)) {
-      setSuggestions(data);
-    } else {
+  const handleAsrMethodChange = (method: AsrMethod) => {
+    updateMutation.mutate({ asr_method: method });
+  };
+
+  const searchLocation = async (query: string) => {
+    if (query.length < 3) {
       setSuggestions([]);
-      setLocationError("No results found for this city");
+      return;
     }
-  } catch (error) {
-    setSuggestions([]);
-    setLocationError("Failed to search location");
-  } finally {
-    setIsLocationLoading(false);
-  }
-};
+    setIsLocationLoading(true);
+    setLocationError("");
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=5`
+      );
+      const data = await response.json();
+      if (data && Array.isArray(data) && data.length > 0) {
+        setSuggestions(data);
+      } else {
+        setSuggestions([]);
+        setLocationError("No results found for this location.");
+      }
+    } catch {
+      setSuggestions([]);
+      setLocationError("Failed to search location.");
+    } finally {
+      setIsLocationLoading(false);
+    }
+  };
 
-const handleSearchLocation = debounce(searchLocation, 300);
-
-const handleThemeToggle = () => {
-    const newTheme = theme === "light" ? "dark" : "light";
-    setTheme(newTheme);
-    localStorage.setItem("theme", newTheme);
-    document.documentElement.classList.toggle("dark", newTheme === "dark");
+  const handleThemeChange = (newTheme: Theme) => {
+    setCurrentTheme(newTheme);
+    applyTheme(newTheme);
   };
 
   if (isLoading) {
@@ -129,6 +121,35 @@ const handleThemeToggle = () => {
 
   return (
     <div className="space-y-6">
+      {/* Profile Section */}
+      <div className="rounded-xl border border-border bg-card p-5">
+        <div className="mb-4 flex items-center gap-2">
+          <User className="h-5 w-5 text-primary" />
+          <h3 className="font-semibold">Profile</h3>
+        </div>
+        <div className="space-y-3">
+          <div>
+            <Label htmlFor="email">Email</Label>
+            <Input id="email" value={profile?.email || ""} disabled className="mt-1.5 bg-muted" />
+          </div>
+          <div>
+            <Label htmlFor="language">Preferred Language</Label>
+            <Select value={preferredLanguage} onValueChange={handleLanguageChange}>
+              <SelectTrigger id="language" className="mt-1.5">
+                <SelectValue placeholder="Select language" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="en">English</SelectItem>
+                <SelectItem value="ar">العربية (Arabic)</SelectItem>
+                <SelectItem value="ur">اردو (Urdu)</SelectItem>
+                <SelectItem value="bn">বাংলা (Bengali)</SelectItem>
+                <SelectItem value="id">Bahasa Indonesia</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      </div>
+
       {/* Location Settings */}
       <div className="rounded-xl border border-border bg-card p-5">
         <div className="mb-4 flex items-center gap-2">
@@ -137,43 +158,48 @@ const handleThemeToggle = () => {
         </div>
         <div className="space-y-3">
           <div>
-            <Label htmlFor="location">City / Timezone</Label>
+            <Label htmlFor="location">City / Location Search</Label>
             <div className="relative">
               <Input
                 id="location"
-                placeholder="Search city..."
+                placeholder="Type city name (e.g. London, Makkah, Karachi)..."
                 value={searchQuery}
                 onChange={(e) => {
                   setSearchQuery(e.target.value);
-                  handleSearchLocation(e.target.value);
+                  searchLocation(e.target.value);
                 }}
                 className="mt-1.5 w-full"
               />
               {isLocationLoading && (
-                <Loader2 className="absolute right-2 top-[50%] -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />
+                <Loader2 className="absolute right-3 top-[50%] -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />
               )}
               {locationError && (
-                <p className="mt-1 text-sm text-destructive">{locationError}</p>
+                <p className="mt-1 text-xs text-destructive">{locationError}</p>
               )}
               {suggestions.length > 0 && !isLocationLoading && (
-                <div className="absolute left-0 right-0 mt-1 z-10 max-h-60 overflow-y-auto border border-border rounded bg-card shadow-lg">
+                <div className="absolute left-0 right-0 mt-1 z-20 max-h-60 overflow-y-auto border border-border rounded-lg bg-card shadow-lg">
                   <ul className="divide-y divide-border">
-                    {suggestions.map((suggestion, index) => (
+                    {suggestions.map((item, index) => (
                       <li
                         key={index}
                         onClick={() => {
-                          setLocation(suggestion.display_name);
-                          setSearchQuery(suggestion.display_name);
+                          const lat = parseFloat(item.lat);
+                          const lon = parseFloat(item.lon);
+                          const country = item.address?.country_code?.toUpperCase() || null;
+                          setSearchQuery(item.display_name);
                           setSuggestions([]);
-                          // Update hidden coordinates
-                          setLatitude(parseFloat(suggestion.lat));
-                          setLongitude(parseFloat(suggestion.lon));
+                          updateMutation.mutate({
+                            latitude: lat,
+                            longitude: lon,
+                            country: country,
+                            timezone: item.display_name.split(",")[0],
+                          });
                         }}
-                        className="px-3 py-2 cursor-hover hover:bg-accent/50"
+                        className="px-3 py-2 cursor-pointer hover:bg-accent/50 transition-colors"
                       >
-                        <div className="font-medium">{suggestion.display_name}</div>
+                        <div className="font-medium text-sm text-foreground">{item.display_name}</div>
                         <div className="text-xs text-muted-foreground">
-                          {suggestion.lat}, {suggestion.lon}
+                          Lat: {item.lat}, Lon: {item.lon}
                         </div>
                       </li>
                     ))}
@@ -181,6 +207,11 @@ const handleThemeToggle = () => {
                 </div>
               )}
             </div>
+            {profile?.latitude && profile?.longitude && (
+              <p className="mt-1.5 text-xs text-muted-foreground">
+                Current coordinates: {profile.latitude.toFixed(4)}°, {profile.longitude.toFixed(4)}°
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -189,14 +220,17 @@ const handleThemeToggle = () => {
       <div className="rounded-xl border border-border bg-card p-5">
         <div className="mb-4 flex items-center gap-2">
           <Calculator className="h-5 w-5 text-primary" />
-          <h3 className="font-semibold">Prayer Times</h3>
+          <h3 className="font-semibold">Prayer Times Calculation</h3>
         </div>
-        <div className="space-y-3">
+        <div className="space-y-4">
           <div>
             <Label htmlFor="calculation-method">Calculation Method</Label>
-            <Select value={calculationMethod} onValueChange={(v) => setCalculationMethod(v as CalculationMethod)}>
+            <Select
+              value={profile?.prayer_calculation_method || ""}
+              onValueChange={(v) => handleCalculationMethodChange(v as CalculationMethod)}
+            >
               <SelectTrigger id="calculation-method" className="mt-1.5">
-                <SelectValue placeholder="Select method" />
+                <SelectValue placeholder="Select calculation method" />
               </SelectTrigger>
               <SelectContent>
                 {CALCULATION_METHODS.map((method) => (
@@ -206,64 +240,103 @@ const handleThemeToggle = () => {
                 ))}
               </SelectContent>
             </Select>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Determines Fajr & Isha twilight angles based on your region's scholarly authority.
+            </p>
           </div>
           <div>
-            <Label htmlFor="asr-method">Asr Method</Label>
-            <Select value={asrMethod} onValueChange={(v) => setAsrMethod(v as AsrMethod)}>
+            <Label htmlFor="asr-method">Asr Juristic Method</Label>
+            <Select
+              value={profile?.asr_method || "STANDARD"}
+              onValueChange={(v) => handleAsrMethodChange(v as AsrMethod)}
+            >
               <SelectTrigger id="asr-method" className="mt-1.5">
                 <SelectValue placeholder="Select Asr method" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="STANDARD">Standard (Shafi'i, Maliki, Hanbali)</SelectItem>
-                <SelectItem value="HANAFI">Hanafi</SelectItem>
+                <SelectItem value="STANDARD">Standard (Shafi'i, Maliki, Hanbali - shadow ratio 1:1)</SelectItem>
+                <SelectItem value="HANAFI">Hanafi (shadow ratio 2:1)</SelectItem>
               </SelectContent>
             </Select>
           </div>
         </div>
       </div>
 
-      {/* Theme Settings */}
+      {/* Appearance Settings */}
       <div className="rounded-xl border border-border bg-card p-5">
         <div className="mb-4 flex items-center gap-2">
-          {theme === "light" ? <Sun className="h-5 w-5 text-primary" /> : <Moon className="h-5 w-5 text-primary" />}
+          <Sun className="h-5 w-5 text-primary" />
           <h3 className="font-semibold">Appearance</h3>
         </div>
-        <div className="space-y-3">
-          <Button
-            variant="outline"
-            className="w-full justify-start"
-            onClick={handleThemeToggle}
+        <div className="grid grid-cols-3 gap-3">
+          <button
+            type="button"
+            onClick={() => handleThemeChange("light")}
+            className={`flex flex-col items-center justify-center gap-2 rounded-lg border p-3 text-xs font-medium transition-all ${
+              currentTheme === "light"
+                ? "border-primary bg-primary/10 text-primary"
+                : "border-border hover:bg-accent text-muted-foreground"
+            }`}
           >
-            {theme === "light" ? (
-              <>
-                <Moon className="mr-2 h-4 w-4" />
-                Switch to Dark Mode
-              </>
-            ) : (
-              <>
-                <Sun className="mr-2 h-4 w-4" />
-                Switch to Light Mode
-              </>
-            )}
-          </Button>
+            <Sun className="h-5 w-5" />
+            <span>Light</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => handleThemeChange("dark")}
+            className={`flex flex-col items-center justify-center gap-2 rounded-lg border p-3 text-xs font-medium transition-all ${
+              currentTheme === "dark"
+                ? "border-primary bg-primary/10 text-primary"
+                : "border-border hover:bg-accent text-muted-foreground"
+            }`}
+          >
+            <Moon className="h-5 w-5" />
+            <span>Dark</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => handleThemeChange("system")}
+            className={`flex flex-col items-center justify-center gap-2 rounded-lg border p-3 text-xs font-medium transition-all ${
+              currentTheme === "system"
+                ? "border-primary bg-primary/10 text-primary"
+                : "border-border hover:bg-accent text-muted-foreground"
+            }`}
+          >
+            <Monitor className="h-5 w-5" />
+            <span>System</span>
+          </button>
         </div>
       </div>
 
-      {/* Save Button */}
-      <Button
-        onClick={handleSave}
-        disabled={isSaving}
-        className="w-full"
-      >
-        {isSaving ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Saving...
-          </>
-        ) : (
-          "Save Settings"
-        )}
-      </Button>
+      {/* Family & Account Section */}
+      <div className="rounded-xl border border-border bg-card p-5 space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h4 className="font-medium text-sm">Family Circle</h4>
+            <p className="text-xs text-muted-foreground">Manage household members and invitations</p>
+          </div>
+          <Link
+            to="/families"
+            className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+          >
+            Manage Family <ExternalLink className="h-3 w-3" />
+          </Link>
+        </div>
+        <div className="border-t border-border pt-4 flex items-center justify-between">
+          <div>
+            <h4 className="font-medium text-sm">Data & Privacy</h4>
+            <p className="text-xs text-muted-foreground">Download your complete data export</p>
+          </div>
+          <a
+            href="/api/v1/governance/my-data"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+          >
+            Export Data <ExternalLink className="h-3 w-3" />
+          </a>
+        </div>
+      </div>
     </div>
   );
 }

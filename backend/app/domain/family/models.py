@@ -27,6 +27,7 @@ class FamilyResponse(BaseModel):
 
 class InviteMemberRequest(BaseModel):
     email: str = Field(..., min_length=5, max_length=320)
+    role: str = "adult"
 
 
 class InvitationResponse(BaseModel):

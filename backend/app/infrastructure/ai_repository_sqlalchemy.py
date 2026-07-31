@@ -1,13 +1,14 @@
 """SQLAlchemy implementation of the AI Repositories."""
 from __future__ import annotations
 
+import uuid
 from typing import cast
 import json
 
 from sqlalchemy import select, delete
 from sqlalchemy.orm import Session
 
-from app.domain.ai.entities import Conversation, Message, MessageRole, SafetyOutcome, MemoryEntry
+from app.domain.ai.entities import Conversation, ConversationMessage, MessageRole, SafetyOutcome, MemoryEntry
 from app.infrastructure.orm_models import AIConversationORM, AIMessageORM, AIMemoryORM
 
 class ConversationRepositorySQLAlchemy:
@@ -33,7 +34,7 @@ class ConversationRepositorySQLAlchemy:
         self._session.execute(delete(AIMessageORM).where(AIMessageORM.conversation_id == conversation.id))
         for msg in conversation.messages:
             self._session.add(AIMessageORM(
-                id=msg.id,
+                id=str(uuid.uuid4()),
                 conversation_id=conversation.id,
                 role=msg.role.value,
                 content=msg.content,
@@ -43,9 +44,9 @@ class ConversationRepositorySQLAlchemy:
             ))
         self._session.commit()
 
-    def get_by_id(self, conversation_id: str) -> Conversation | None:
+    def get_by_id(self, conversation_id: str, user_id: str) -> Conversation | None:
         orm_conv = self._session.get(AIConversationORM, conversation_id)
-        if not orm_conv:
+        if not orm_conv or orm_conv.user_id != user_id:
             return None
             
         orm_msgs = self._session.scalars(
@@ -53,12 +54,11 @@ class ConversationRepositorySQLAlchemy:
         ).all()
         
         messages = [
-            Message(
-                id=m.id,
+            ConversationMessage(
                 role=MessageRole(m.role),
                 content=m.content,
                 safety_outcome=SafetyOutcome(m.safety_outcome),
-                source_refs=m.source_refs,
+                source_refs=m.source_refs or [],
                 created_at=m.created_at
             ) for m in orm_msgs
         ]
@@ -75,11 +75,11 @@ class ConversationRepositorySQLAlchemy:
     def list_for_user(self, user_id: str) -> list[Conversation]:
         stmt = select(AIConversationORM).where(AIConversationORM.user_id == user_id).order_by(AIConversationORM.updated_at.desc())
         orm_convs = self._session.scalars(stmt).all()
-        return [cast(Conversation, self.get_by_id(c.id)) for c in orm_convs]
+        return [cast(Conversation, self.get_by_id(c.id, user_id)) for c in orm_convs]
 
-    def delete(self, conversation_id: str) -> bool:
+    def delete(self, conversation_id: str, user_id: str) -> bool:
         orm_conv = self._session.get(AIConversationORM, conversation_id)
-        if not orm_conv:
+        if not orm_conv or orm_conv.user_id != user_id:
             return False
             
         self._session.execute(delete(AIMessageORM).where(AIMessageORM.conversation_id == conversation_id))
@@ -106,9 +106,9 @@ class MemoryRepositorySQLAlchemy:
             orm_entry.content = entry.content
         self._session.commit()
 
-    def get_by_id(self, entry_id: str) -> MemoryEntry | None:
+    def get_by_id(self, entry_id: str, user_id: str) -> MemoryEntry | None:
         orm_entry = self._session.get(AIMemoryORM, entry_id)
-        if not orm_entry:
+        if not orm_entry or orm_entry.user_id != user_id:
             return None
         return MemoryEntry(
             id=orm_entry.id,
@@ -124,9 +124,9 @@ class MemoryRepositorySQLAlchemy:
             for e in self._session.scalars(stmt).all()
         ]
 
-    def delete(self, entry_id: str) -> bool:
+    def delete(self, entry_id: str, user_id: str) -> bool:
         orm_entry = self._session.get(AIMemoryORM, entry_id)
-        if not orm_entry:
+        if not orm_entry or orm_entry.user_id != user_id:
             return False
         self._session.delete(orm_entry)
         self._session.commit()

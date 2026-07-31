@@ -3,6 +3,8 @@ from __future__ import annotations
 
 from typing import cast
 
+from datetime import datetime, timezone
+
 from sqlalchemy import select, delete
 from sqlalchemy.orm import Session
 
@@ -38,6 +40,13 @@ class FamilyRepositorySQLAlchemy:
             ))
         self._session.commit()
 
+    def _to_utc(self, dt: datetime | None) -> datetime | None:
+        if dt is None:
+            return None
+        if dt.tzinfo is None:
+            return dt.replace(tzinfo=timezone.utc)
+        return dt
+
     def get_by_id(self, family_id: str) -> Family | None:
         orm_family = self._session.get(FamilyORM, family_id)
         if not orm_family:
@@ -51,8 +60,8 @@ class FamilyRepositorySQLAlchemy:
             name=orm_family.name,
             owner_id=orm_family.owner_id,
             members=members,
-            created_at=orm_family.created_at,
-            updated_at=orm_family.updated_at
+            created_at=self._to_utc(orm_family.created_at),
+            updated_at=self._to_utc(orm_family.updated_at)
         )
 
     def list_for_user(self, user_id: str) -> list[Family]:
@@ -76,6 +85,13 @@ class InvitationRepositorySQLAlchemy:
     def __init__(self, session: Session) -> None:
         self._session = session
 
+    def _to_utc(self, dt: datetime | None) -> datetime | None:
+        if dt is None:
+            return None
+        if dt.tzinfo is None:
+            return dt.replace(tzinfo=timezone.utc)
+        return dt
+
     def save(self, invitation: FamilyInvitation) -> None:
         orm_inv = self._session.get(FamilyInvitationORM, invitation.id)
         if not orm_inv:
@@ -85,7 +101,6 @@ class InvitationRepositorySQLAlchemy:
                 invited_email=invitation.invited_email,
                 invited_by_user_id=invitation.invited_by_user_id,
                 role=invitation.role.value,
-                hashed_token=invitation.hashed_token,
                 status=invitation.status.value,
                 expires_at=invitation.expires_at,
                 created_at=invitation.created_at
@@ -120,8 +135,7 @@ class InvitationRepositorySQLAlchemy:
             invited_email=orm_inv.invited_email,
             invited_by_user_id=orm_inv.invited_by_user_id,
             role=MemberRole(orm_inv.role),
-            hashed_token=orm_inv.hashed_token,
             status=InvitationStatus(orm_inv.status),
-            expires_at=orm_inv.expires_at,
-            created_at=orm_inv.created_at
+            expires_at=self._to_utc(orm_inv.expires_at),
+            created_at=self._to_utc(orm_inv.created_at)
         )

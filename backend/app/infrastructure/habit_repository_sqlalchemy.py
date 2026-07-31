@@ -73,3 +73,39 @@ class SqlAlchemyHabitRepository:
             .first()
         )
         return _to_record(row) if row else None
+
+    def log_fasting(self, user_id: str, date: date_type, fasting_type: str) -> dict:
+        from app.infrastructure.orm_models import FastingLogORM
+        import uuid
+        from datetime import datetime, timezone
+
+        row = (
+            self._session.query(FastingLogORM)
+            .filter(and_(FastingLogORM.user_id == user_id, FastingLogORM.date == date))
+            .first()
+        )
+        if not row:
+            row = FastingLogORM(
+                id=str(uuid.uuid4()),
+                user_id=user_id,
+                date=date,
+                type=fasting_type,
+                created_at=datetime.now(timezone.utc),
+            )
+            self._session.add(row)
+        else:
+            row.type = fasting_type
+        self._session.commit()
+        return {"id": row.id, "date": str(row.date), "type": row.type}
+
+    def get_fasting_status(self, user_id: str, date: date_type) -> dict:
+        from app.infrastructure.orm_models import FastingLogORM
+
+        row = (
+            self._session.query(FastingLogORM)
+            .filter(and_(FastingLogORM.user_id == user_id, FastingLogORM.date == date))
+            .first()
+        )
+        if not row:
+            return {"date": str(date), "fasting": False, "type": None}
+        return {"date": str(row.date), "fasting": row.type != "none", "type": row.type}

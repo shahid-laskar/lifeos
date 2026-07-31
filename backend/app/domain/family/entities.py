@@ -41,6 +41,7 @@ class FamilyInvitation:
     family_id: str
     invited_email: str
     invited_by_user_id: str
+    role: MemberRole = MemberRole.ADULT
     status: InvitationStatus = InvitationStatus.PENDING
     created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     expires_at: datetime | None = None
