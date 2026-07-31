@@ -106,6 +106,17 @@ def get_ai_service(db: Annotated[Session, Depends(get_db)]):
     )
 
 
+def get_hadith_service(db: Annotated[Session, Depends(get_db)]):
+    from app.domain.hadith.service import HadithService
+    from app.infrastructure.hadith_repository_sqlalchemy import (
+        HadithBookmarkRepositorySQLAlchemy,
+    )
+
+    return HadithService(
+        bookmark_repo=HadithBookmarkRepositorySQLAlchemy(db),
+    )
+
+
 def get_family_service(db: Annotated[Session, Depends(get_db)]):
     from app.domain.family.service import FamilyService
     from app.infrastructure.family_repository_sqlalchemy import FamilyRepositorySQLAlchemy, InvitationRepositorySQLAlchemy

@@ -74,3 +74,65 @@ def test_search_can_filter_by_collection():
 def test_unknown_collection_404():
     client = TestClient(app)
     assert client.get("/api/v1/hadith/collections/unknown").status_code == 404
+
+
+def _register_and_login(client: TestClient, email: str) -> str:
+    resp = client.post(
+        "/api/v1/auth/register",
+        json={"email": email, "password": "pass-word-123", "terms_accepted": True},
+    )
+    assert resp.status_code == 201
+    return resp.json()["access_token"]
+
+
+def test_bookmarks_require_auth():
+    client = TestClient(app)
+    assert client.get("/api/v1/hadith/bookmarks").status_code == 401
+
+
+def test_add_list_remove_bookmark():
+    client = TestClient(app)
+    token = _register_and_login(client, "hadith-bm@example.com")
+    headers = {"Authorization": f"Bearer {token}"}
+    hadith_id = client.get(
+        "/api/v1/hadith/collections/bukhari/chapters/1"
+    ).json()[0]["id"]
+
+    add = client.post(
+        "/api/v1/hadith/bookmarks",
+        json={"hadith_id": hadith_id, "note": "Intentions"},
+        headers=headers,
+    )
+    assert add.status_code == 201
+    assert add.json()["hadith_id"] == hadith_id
+    assert add.json()["hadith"]["id"] == hadith_id
+
+    listed = client.get("/api/v1/hadith/bookmarks", headers=headers)
+    assert listed.status_code == 200
+    assert len(listed.json()) == 1
+
+    # Idempotent re-add
+    again = client.post(
+        "/api/v1/hadith/bookmarks",
+        json={"hadith_id": hadith_id},
+        headers=headers,
+    )
+    assert again.status_code == 201
+    assert len(client.get("/api/v1/hadith/bookmarks", headers=headers).json()) == 1
+
+    removed = client.delete(
+        f"/api/v1/hadith/bookmarks/{hadith_id}", headers=headers
+    )
+    assert removed.status_code == 204
+    assert client.get("/api/v1/hadith/bookmarks", headers=headers).json() == []
+
+
+def test_bookmark_unknown_hadith_404():
+    client = TestClient(app)
+    token = _register_and_login(client, "hadith-bm2@example.com")
+    resp = client.post(
+        "/api/v1/hadith/bookmarks",
+        json={"hadith_id": "bukhari-999999"},
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert resp.status_code == 404

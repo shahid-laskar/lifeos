@@ -156,3 +156,17 @@ class FastingLogORM(Base):
     type: Mapped[str] = mapped_column(String(16), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
 
+
+class HadithBookmarkORM(Base):
+    """User bookmark on a catalogue hadith id (e.g. bukhari-1)."""
+
+    __tablename__ = "hadith_bookmarks"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    user_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("users.id"), nullable=False, index=True
+    )
+    hadith_id: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    note: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
