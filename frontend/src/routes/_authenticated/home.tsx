@@ -8,6 +8,7 @@ import {
   DhikrWidget,
   WeeklyQuranCard,
   DuasWidget,
+  HadithWidget,
 } from "@/components/home/summary-cards";
 import { PrayerStatusRow } from "@/components/home/prayer-status-row";
 import { PrayerTimesStrip } from "@/components/home/prayer-times-strip";
@@ -105,6 +106,7 @@ function HomePage() {
         <PrayerStatusRow />
         <DhikrWidget />
         <DuasWidget />
+        <HadithWidget />
         <WeeklyQuranCard />
         <ConsistencyCard />
       </div>

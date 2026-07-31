@@ -20,6 +20,7 @@ import { Route as AuthenticatedAssistantRouteImport } from './routes/_authentica
 import { Route as AuthenticatedDhikrRouteImport } from './routes/_authenticated/dhikr'
 import { Route as AuthenticatedDuasRouteImport } from './routes/_authenticated/duas'
 import { Route as AuthenticatedFamiliesRouteImport } from './routes/_authenticated/families'
+import { Route as AuthenticatedHadithRouteImport } from './routes/_authenticated/hadith'
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedQuranRouteImport } from './routes/_authenticated/quran'
@@ -79,6 +80,11 @@ const AuthenticatedFamiliesRoute = AuthenticatedFamiliesRouteImport.update({
   path: '/families',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedHadithRoute = AuthenticatedHadithRouteImport.update({
+  id: '/hadith',
+  path: '/hadith',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedHomeRoute = AuthenticatedHomeRouteImport.update({
   id: '/home',
   path: '/home',
@@ -111,6 +117,7 @@ export interface FileRoutesByFullPath {
   '/dhikr': typeof AuthenticatedDhikrRoute
   '/duas': typeof AuthenticatedDuasRoute
   '/families': typeof AuthenticatedFamiliesRoute
+  '/hadith': typeof AuthenticatedHadithRoute
   '/home': typeof AuthenticatedHomeRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/quran': typeof AuthenticatedQuranRoute
@@ -127,6 +134,7 @@ export interface FileRoutesByTo {
   '/dhikr': typeof AuthenticatedDhikrRoute
   '/duas': typeof AuthenticatedDuasRoute
   '/families': typeof AuthenticatedFamiliesRoute
+  '/hadith': typeof AuthenticatedHadithRoute
   '/home': typeof AuthenticatedHomeRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/quran': typeof AuthenticatedQuranRoute
@@ -145,6 +153,7 @@ export interface FileRoutesById {
   '/_authenticated/dhikr': typeof AuthenticatedDhikrRoute
   '/_authenticated/duas': typeof AuthenticatedDuasRoute
   '/_authenticated/families': typeof AuthenticatedFamiliesRoute
+  '/_authenticated/hadith': typeof AuthenticatedHadithRoute
   '/_authenticated/home': typeof AuthenticatedHomeRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/quran': typeof AuthenticatedQuranRoute
@@ -163,6 +172,7 @@ export interface FileRouteTypes {
     | '/dhikr'
     | '/duas'
     | '/families'
+    | '/hadith'
     | '/home'
     | '/profile'
     | '/quran'
@@ -179,6 +189,7 @@ export interface FileRouteTypes {
     | '/dhikr'
     | '/duas'
     | '/families'
+    | '/hadith'
     | '/home'
     | '/profile'
     | '/quran'
@@ -196,6 +207,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dhikr'
     | '/_authenticated/duas'
     | '/_authenticated/families'
+    | '/_authenticated/hadith'
     | '/_authenticated/home'
     | '/_authenticated/profile'
     | '/_authenticated/quran'
@@ -291,6 +303,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFamiliesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/hadith': {
+      id: '/_authenticated/hadith'
+      path: '/hadith'
+      fullPath: '/hadith'
+      preLoaderRoute: typeof AuthenticatedHadithRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/home': {
       id: '/_authenticated/home'
       path: '/home'
@@ -327,6 +346,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDhikrRoute: typeof AuthenticatedDhikrRoute
   AuthenticatedDuasRoute: typeof AuthenticatedDuasRoute
   AuthenticatedFamiliesRoute: typeof AuthenticatedFamiliesRoute
+  AuthenticatedHadithRoute: typeof AuthenticatedHadithRoute
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedQuranRoute: typeof AuthenticatedQuranRoute
@@ -338,6 +358,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDhikrRoute: AuthenticatedDhikrRoute,
   AuthenticatedDuasRoute: AuthenticatedDuasRoute,
   AuthenticatedFamiliesRoute: AuthenticatedFamiliesRoute,
+  AuthenticatedHadithRoute: AuthenticatedHadithRoute,
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedQuranRoute: AuthenticatedQuranRoute,

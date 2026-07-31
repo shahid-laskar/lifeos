@@ -15,6 +15,11 @@ import type {
   DuaItemResponse,
   Family,
   FamilyInvitation,
+  HadithBookmarkResponse,
+  HadithChapterResponse,
+  HadithCollectionResponse,
+  HadithItemResponse,
+  HadithSearchResponse,
   MemoryEntryResponse,
   OnboardingStatus,
   PrayerLogEntry,
@@ -344,5 +349,58 @@ export function getDuaCategories() {
 export function getDuas(category?: string) {
   return apiFetch<DuaItemResponse[]>("/api/v1/duas", {
     query: category ? { category } : undefined,
+  });
+}
+
+/* -------------------------------- hadith --------------------------------- */
+
+export function getHadithCollections() {
+  return apiFetch<HadithCollectionResponse[]>("/api/v1/hadith/collections");
+}
+
+export function getHadithChapters(slug: string) {
+  return apiFetch<HadithChapterResponse[]>(
+    `/api/v1/hadith/collections/${slug}/chapters`,
+  );
+}
+
+export function getHadithChapterItems(slug: string, chapterId: number) {
+  return apiFetch<HadithItemResponse[]>(
+    `/api/v1/hadith/collections/${slug}/chapters/${chapterId}`,
+  );
+}
+
+export function getHadith(hadithId: string) {
+  return apiFetch<HadithItemResponse>(`/api/v1/hadith/${hadithId}`);
+}
+
+export function searchHadiths(input: {
+  q: string;
+  collection?: string;
+  limit?: number;
+}) {
+  return apiFetch<HadithSearchResponse>("/api/v1/hadith/search", {
+    query: {
+      q: input.q,
+      collection: input.collection,
+      limit: input.limit,
+    },
+  });
+}
+
+export function listHadithBookmarks() {
+  return apiFetch<HadithBookmarkResponse[]>("/api/v1/hadith/bookmarks");
+}
+
+export function addHadithBookmark(hadithId: string, note?: string) {
+  return apiFetch<HadithBookmarkResponse>("/api/v1/hadith/bookmarks", {
+    method: "POST",
+    body: { hadith_id: hadithId, note },
+  });
+}
+
+export function removeHadithBookmark(hadithId: string) {
+  return apiFetch<void>(`/api/v1/hadith/bookmarks/${hadithId}`, {
+    method: "DELETE",
   });
 }

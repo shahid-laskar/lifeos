@@ -311,3 +311,51 @@ export type DuaItemResponse = {
   reference: string;
   when_to_recite: string | null;
 };
+
+/* -------------------------------- hadith --------------------------------- */
+
+export type HadithCollectionResponse = {
+  slug: string;
+  name_english: string;
+  name_arabic: string;
+  author_english: string;
+  author_arabic: string;
+  hadith_count: number;
+  chapter_count: number;
+};
+
+export type HadithChapterResponse = {
+  collection_slug: string;
+  chapter_id: number;
+  name_english: string;
+  name_arabic: string;
+  hadith_count: number;
+};
+
+export type HadithItemResponse = {
+  id: string;
+  collection_slug: string;
+  collection_name: string;
+  chapter_id: number;
+  chapter_name_english: string;
+  chapter_name_arabic: string;
+  hadith_number: number;
+  arabic_text: string;
+  narrator: string;
+  translation: string;
+  grade: string;
+};
+
+export type HadithSearchResponse = {
+  query: string;
+  total: number;
+  results: HadithItemResponse[];
+};
+
+export type HadithBookmarkResponse = {
+  id: string;
+  hadith_id: string;
+  note: string | null;
+  created_at: string;
+  hadith: HadithItemResponse | null;
+};
