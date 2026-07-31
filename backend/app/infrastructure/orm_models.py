@@ -136,7 +136,8 @@ class AIMessageORM(Base):
     conversation_id: Mapped[str] = mapped_column(String(36), ForeignKey("ai_conversations.id"), nullable=False, index=True)
     role: Mapped[str] = mapped_column(String(16), nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)
-    safety_outcome: Mapped[str] = mapped_column(String(16), nullable=False, default="allowed")
+    safety_outcome: Mapped[str] = mapped_column(String(16), nullable=False, default="safe")
+    confidence: Mapped[str] = mapped_column(String(16), nullable=False, default="unknown")
     source_refs: Mapped[list] = mapped_column(JSON, default=list, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
 

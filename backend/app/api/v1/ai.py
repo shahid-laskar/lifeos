@@ -35,6 +35,7 @@ def _msg_to_response(msg) -> MessageResponse:
         role=msg.role.value,
         content=msg.content,
         safety_outcome=msg.safety_outcome.value,
+        confidence=msg.confidence.value,
         source_refs=msg.source_refs,
         created_at=msg.created_at,
     )

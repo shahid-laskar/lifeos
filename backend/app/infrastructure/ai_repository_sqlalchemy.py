@@ -8,7 +8,14 @@ import json
 from sqlalchemy import select, delete
 from sqlalchemy.orm import Session
 
-from app.domain.ai.entities import Conversation, ConversationMessage, MessageRole, SafetyOutcome, MemoryEntry
+from app.domain.ai.entities import (
+    ConfidenceLevel,
+    Conversation,
+    ConversationMessage,
+    MemoryEntry,
+    MessageRole,
+    SafetyOutcome,
+)
 from app.infrastructure.orm_models import AIConversationORM, AIMessageORM, AIMemoryORM
 
 class ConversationRepositorySQLAlchemy:
@@ -39,6 +46,7 @@ class ConversationRepositorySQLAlchemy:
                 role=msg.role.value,
                 content=msg.content,
                 safety_outcome=msg.safety_outcome.value,
+                confidence=msg.confidence.value,
                 source_refs=msg.source_refs,
                 created_at=msg.created_at
             ))
@@ -58,6 +66,7 @@ class ConversationRepositorySQLAlchemy:
                 role=MessageRole(m.role),
                 content=m.content,
                 safety_outcome=SafetyOutcome(m.safety_outcome),
+                confidence=ConfidenceLevel(m.confidence or "unknown"),
                 source_refs=m.source_refs or [],
                 created_at=m.created_at
             ) for m in orm_msgs

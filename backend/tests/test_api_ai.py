@@ -80,8 +80,11 @@ def test_send_message_returns_assistant_response(client):
     data = resp.json()
     assert data["role"] == "assistant"
     assert data["safety_outcome"] == "safe"
+    assert data["confidence"] in ("high", "medium", "low", "unknown")
+    assert isinstance(data["source_refs"], list)
     assert isinstance(data["content"], str)
     assert len(data["content"]) > 0
+    assert "<!--mlos" not in data["content"]
 
 
 def test_refusal_for_fatwa_request(client):
@@ -98,6 +101,7 @@ def test_refusal_for_fatwa_request(client):
     assert resp.status_code == 200
     data = resp.json()
     assert data["safety_outcome"] == "refused"
+    assert data["confidence"] == "unknown"
     assert "scholar" in data["content"].lower() or "ruling" in data["content"].lower()
 
 

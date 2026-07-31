@@ -25,6 +25,10 @@ services:
       MLOS_ENVIRONMENT: development
       MLOS_DATABASE_URL: postgresql://mlos:${MLOS_DB_PASSWORD:-mlos_dev}@postgres:5432/mlos
       MLOS_JWT_SECRET_KEY: ${MLOS_JWT_SECRET_KEY:?Set MLOS_JWT_SECRET_KEY before starting}
+      MLOS_AI_PROVIDER: ${MLOS_AI_PROVIDER:-}
+      MLOS_OPENAI_API_KEY: ${MLOS_OPENAI_API_KEY:-}
+      MLOS_OPENAI_BASE_URL: ${MLOS_OPENAI_BASE_URL:-}
+      MLOS_AI_MODEL: ${MLOS_AI_MODEL:-}
     volumes:
       - backend-data:/app/data
     ports:

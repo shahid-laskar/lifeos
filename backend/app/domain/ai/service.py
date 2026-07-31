@@ -25,9 +25,11 @@ from app.domain.ai.entities import (
     MessageRole,
     SafetyOutcome,
 )
+from app.domain.ai.entities import ConfidenceLevel
 from app.domain.ai.prompts import (
     CURRENT_SYSTEM_PROMPT,
     REFUSAL_RESPONSE,
+    parse_assistant_response,
     should_refuse,
 )
 
@@ -42,10 +44,17 @@ class AIService:
         gateway: AIGateway,
         conversation_repo: ConversationRepository,
         memory_repo: MemoryRepository,
+        *,
+        model: str = "gpt-4o-mini",
+        max_tokens: int = 800,
+        temperature: float = 0.4,
     ) -> None:
         self._gateway = gateway
         self._conversations = conversation_repo
         self._memory = memory_repo
+        self._model = model
+        self._max_tokens = max_tokens
+        self._temperature = temperature
 
     # ── Conversations ────────────────────────────────────────────────────────
 
@@ -81,6 +90,7 @@ class AIService:
                 role=MessageRole.ASSISTANT,
                 content=REFUSAL_RESPONSE,
                 safety_outcome=SafetyOutcome.REFUSED,
+                confidence=ConfidenceLevel.UNKNOWN,
             )
         else:
             assistant_message = self._call_gateway(
@@ -120,15 +130,18 @@ class AIService:
 
         raw_response = self._gateway.complete(
             messages,
-            model="gpt-4o-mini",
-            max_tokens=800,
-            temperature=0.4,
+            model=self._model,
+            max_tokens=self._max_tokens,
+            temperature=self._temperature,
         )
+        parsed = parse_assistant_response(raw_response)
 
         return ConversationMessage(
             role=MessageRole.ASSISTANT,
-            content=raw_response,
+            content=parsed.content,
             safety_outcome=SafetyOutcome.SAFE,
+            confidence=parsed.confidence,
+            source_refs=parsed.source_refs,
         )
 
     def get_conversation(self, conversation_id: str, user_id: str) -> Conversation:

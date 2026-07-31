@@ -31,11 +31,16 @@ class Settings(BaseSettings):
     allowed_origins: str = ""
 
     # --- AI Gateway (ADR-012, 039_AI_Principles.md) ---
-    # Set to "openai" to enable real AI responses. Leave empty for the
-    # development stub (no network calls, no API key required).
+    # Set to "openai" or "openrouter" to enable real AI responses.
+    # Leave empty for the development stub (no network calls, no API key).
+    # OpenRouter is OpenAI-compatible: use MLOS_OPENAI_API_KEY with your
+    # OpenRouter key and optionally override MLOS_OPENAI_BASE_URL / MLOS_AI_MODEL.
     ai_provider: str = ""
     openai_api_key: str = ""
     openai_base_url: str = ""
+    ai_model: str = "gpt-4o-mini"
+    ai_max_tokens: int = 800
+    ai_temperature: float = 0.4
 
     # --- Database (ADR-004: SQLite for development) ---
     database_url: str = "sqlite:///./muslim_life_os.db"

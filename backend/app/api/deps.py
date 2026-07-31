@@ -58,13 +58,37 @@ def get_ai_service(db: Annotated[Session, Depends(get_db)]):
     from app.core.config import get_settings
     from app.domain.ai.service import AIService
     from app.infrastructure.ai_repository_sqlalchemy import ConversationRepositorySQLAlchemy, MemoryRepositorySQLAlchemy
-    from app.infrastructure.ai_gateway import StubAIGateway, OpenAIGateway
+    from app.infrastructure.ai_gateway import (
+        DEFAULT_OPENROUTER_MODEL,
+        OPENROUTER_BASE_URL,
+        OpenAIGateway,
+        StubAIGateway,
+    )
 
     settings = get_settings()
-    if settings.ai_provider == "openai" and settings.openai_api_key:
+    provider = settings.ai_provider.strip().lower()
+    api_key = settings.openai_api_key.strip()
+
+    model = settings.ai_model.strip() or "gpt-4o-mini"
+    gateway: object
+
+    if provider in ("openai", "openrouter") and api_key:
+        base_url = settings.openai_base_url.strip() or None
+        default_headers: dict[str, str] | None = None
+        if provider == "openrouter":
+            if not base_url:
+                base_url = OPENROUTER_BASE_URL
+            if not settings.ai_model.strip():
+                model = DEFAULT_OPENROUTER_MODEL
+            # OpenRouter optionally uses these headers for rankings/attribution.
+            default_headers = {
+                "HTTP-Referer": "https://muslimlifeos.local",
+                "X-Title": "Muslim Life OS",
+            }
         gateway = OpenAIGateway(
-            api_key=settings.openai_api_key,
-            base_url=settings.openai_base_url or None,
+            api_key=api_key,
+            base_url=base_url,
+            default_headers=default_headers,
         )
     else:
         gateway = StubAIGateway()
@@ -73,6 +97,9 @@ def get_ai_service(db: Annotated[Session, Depends(get_db)]):
         gateway=gateway,
         conversation_repo=ConversationRepositorySQLAlchemy(db),
         memory_repo=MemoryRepositorySQLAlchemy(db),
+        model=model,
+        max_tokens=settings.ai_max_tokens,
+        temperature=settings.ai_temperature,
     )
 
 

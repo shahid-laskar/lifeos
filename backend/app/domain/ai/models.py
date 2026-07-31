@@ -21,6 +21,7 @@ class MessageResponse(BaseModel):
     role: Literal["user", "assistant"]
     content: str
     safety_outcome: Literal["safe", "refused", "flagged"]
+    confidence: Literal["high", "medium", "low", "unknown"]
     source_refs: list[str]
     created_at: datetime
 

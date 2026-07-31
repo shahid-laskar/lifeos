@@ -29,12 +29,22 @@ class SafetyOutcome(str, Enum):
     FLAGGED = "flagged"
 
 
+class ConfidenceLevel(str, Enum):
+    """Per 008_Islamic_Knowledge_Framework.md confidence labelling."""
+
+    HIGH = "high"
+    MEDIUM = "medium"
+    LOW = "low"
+    UNKNOWN = "unknown"
+
+
 @dataclass(frozen=True)
 class ConversationMessage:
     role: MessageRole
     content: str
     created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     safety_outcome: SafetyOutcome = SafetyOutcome.SAFE
+    confidence: ConfidenceLevel = ConfidenceLevel.UNKNOWN
     source_refs: list[str] = field(default_factory=list)
 
 

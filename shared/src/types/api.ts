@@ -64,6 +64,7 @@ export interface ConversationMessage {
   role: 'user' | 'assistant'
   content: string
   safety_outcome: 'safe' | 'refused' | 'flagged'
+  confidence: 'high' | 'medium' | 'low' | 'unknown'
   source_refs: string[]
   created_at: string
 }

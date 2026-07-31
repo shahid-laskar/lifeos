@@ -26,10 +26,18 @@ interface MessageBubbleProps {
   message: AIMessage;
 }
 
+const CONFIDENCE_LABEL: Record<AIMessage["confidence"], string> = {
+  high: "High confidence",
+  medium: "Medium confidence",
+  low: "Low confidence — verify further",
+  unknown: "Confidence unknown",
+};
+
 function MessageBubble({ message }: MessageBubbleProps) {
   const isUser = message.role === "user";
-  const isRedirected = message.safety_outcome === "redirected";
   const isRefused = message.safety_outcome === "refused";
+  const isFlagged = message.safety_outcome === "flagged";
+  const confidence = message.confidence ?? "unknown";
 
   return (
     <div
@@ -51,29 +59,41 @@ function MessageBubble({ message }: MessageBubbleProps) {
             : "bg-card border rounded-bl-none"
         )}
       >
-        <p className="text-sm leading-relaxed">{message.content}</p>
-        
-        {(isRedirected || isRefused) && (
+        <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+
+        {(isRefused || isFlagged) && (
           <div className="mt-2 flex items-center gap-2 text-xs text-amber-600 dark:text-amber-400">
             <AlertTriangle className="h-3 w-3" />
             <span>
-              {isRedirected
-                ? "This question was redirected to general guidance"
-                : "This question could not be answered"}
+              {isRefused
+                ? "This question could not be answered as a religious ruling"
+                : "This response was flagged for review"}
             </span>
           </div>
         )}
-        
-        {message.source_refs.length > 0 && !isUser && (
-          <div className="mt-2 flex flex-wrap gap-1">
-            {message.source_refs.map((ref, idx) => (
-              <span
-                key={idx}
-                className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground"
-              >
-                {ref}
-              </span>
-            ))}
+
+        {!isUser && (
+          <div className="mt-2 flex flex-wrap items-center gap-1.5">
+            <span
+              className={cn(
+                "inline-flex items-center px-2 py-0.5 text-xs text-muted-foreground",
+                confidence === "high" && "text-emerald-700 dark:text-emerald-400",
+                confidence === "medium" && "text-sky-700 dark:text-sky-400",
+                confidence === "low" && "text-amber-700 dark:text-amber-400",
+              )}
+              title="Educational confidence per Islamic Knowledge Framework"
+            >
+              {CONFIDENCE_LABEL[confidence]}
+            </span>
+            {message.source_refs.length > 0 &&
+              message.source_refs.map((ref, idx) => (
+                <span
+                  key={idx}
+                  className="inline-flex items-center bg-muted px-2 py-0.5 text-xs text-muted-foreground"
+                >
+                  {ref}
+                </span>
+              ))}
           </div>
         )}
       </div>
