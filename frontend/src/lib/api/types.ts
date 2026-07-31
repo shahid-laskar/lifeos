@@ -298,3 +298,15 @@ export type Family = {
   created_at: string;
   updated_at: string;
 };
+
+/* --------------------------------- duas ---------------------------------- */
+
+export type DuaItemResponse = {
+  id: string;
+  category: string;
+  arabic_text: string;
+  transliteration: string;
+  translation: string;
+  reference: string;
+  when_to_recite: string | null;
+};

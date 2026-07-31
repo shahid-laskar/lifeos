@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { GeometricPattern, StarSpinner } from "@/components/brand/pattern";
 import { ErrorState } from "@/components/brand/states";
+import { Link } from "@tanstack/react-router";
 import {
   getDhikrSummary,
   getPrayerConsistency,
@@ -132,6 +133,29 @@ export function ConsistencyCard() {
           </p>
         </>
       )}
+    </Card>
+  );
+}
+
+export function DuasWidget() {
+  return (
+    <Card title="Du'as" pattern>
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-sm text-muted-foreground mt-1">
+            Supplications for every occasion
+          </p>
+          <Link
+            to="/duas"
+            className="mt-4 inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90"
+          >
+            Explore Du'as
+          </Link>
+        </div>
+        <p className="arabic ms-auto text-3xl text-gold opacity-80" lang="ar" dir="rtl">
+          دُعَاء
+        </p>
+      </div>
     </Card>
   );
 }

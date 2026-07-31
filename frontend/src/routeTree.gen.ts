@@ -18,6 +18,7 @@ import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedAssistantRouteImport } from './routes/_authenticated/assistant'
 import { Route as AuthenticatedDhikrRouteImport } from './routes/_authenticated/dhikr'
+import { Route as AuthenticatedDuasRouteImport } from './routes/_authenticated/duas'
 import { Route as AuthenticatedFamiliesRouteImport } from './routes/_authenticated/families'
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
@@ -68,6 +69,11 @@ const AuthenticatedDhikrRoute = AuthenticatedDhikrRouteImport.update({
   path: '/dhikr',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedDuasRoute = AuthenticatedDuasRouteImport.update({
+  id: '/duas',
+  path: '/duas',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedFamiliesRoute = AuthenticatedFamiliesRouteImport.update({
   id: '/families',
   path: '/families',
@@ -103,6 +109,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/assistant': typeof AuthenticatedAssistantRoute
   '/dhikr': typeof AuthenticatedDhikrRoute
+  '/duas': typeof AuthenticatedDuasRoute
   '/families': typeof AuthenticatedFamiliesRoute
   '/home': typeof AuthenticatedHomeRoute
   '/profile': typeof AuthenticatedProfileRoute
@@ -118,6 +125,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/assistant': typeof AuthenticatedAssistantRoute
   '/dhikr': typeof AuthenticatedDhikrRoute
+  '/duas': typeof AuthenticatedDuasRoute
   '/families': typeof AuthenticatedFamiliesRoute
   '/home': typeof AuthenticatedHomeRoute
   '/profile': typeof AuthenticatedProfileRoute
@@ -135,6 +143,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/assistant': typeof AuthenticatedAssistantRoute
   '/_authenticated/dhikr': typeof AuthenticatedDhikrRoute
+  '/_authenticated/duas': typeof AuthenticatedDuasRoute
   '/_authenticated/families': typeof AuthenticatedFamiliesRoute
   '/_authenticated/home': typeof AuthenticatedHomeRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
@@ -152,6 +161,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/assistant'
     | '/dhikr'
+    | '/duas'
     | '/families'
     | '/home'
     | '/profile'
@@ -167,6 +177,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/assistant'
     | '/dhikr'
+    | '/duas'
     | '/families'
     | '/home'
     | '/profile'
@@ -183,6 +194,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/_authenticated/assistant'
     | '/_authenticated/dhikr'
+    | '/_authenticated/duas'
     | '/_authenticated/families'
     | '/_authenticated/home'
     | '/_authenticated/profile'
@@ -265,6 +277,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDhikrRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/duas': {
+      id: '/_authenticated/duas'
+      path: '/duas'
+      fullPath: '/duas'
+      preLoaderRoute: typeof AuthenticatedDuasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/families': {
       id: '/_authenticated/families'
       path: '/families'
@@ -306,6 +325,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAssistantRoute: typeof AuthenticatedAssistantRoute
   AuthenticatedDhikrRoute: typeof AuthenticatedDhikrRoute
+  AuthenticatedDuasRoute: typeof AuthenticatedDuasRoute
   AuthenticatedFamiliesRoute: typeof AuthenticatedFamiliesRoute
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
@@ -316,6 +336,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAssistantRoute: AuthenticatedAssistantRoute,
   AuthenticatedDhikrRoute: AuthenticatedDhikrRoute,
+  AuthenticatedDuasRoute: AuthenticatedDuasRoute,
   AuthenticatedFamiliesRoute: AuthenticatedFamiliesRoute,
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,

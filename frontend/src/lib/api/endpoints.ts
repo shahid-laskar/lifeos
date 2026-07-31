@@ -12,6 +12,7 @@ import type {
   DhikrItemResponse,
   DhikrLogRequest,
   DhikrLogResponse,
+  DuaItemResponse,
   Family,
   FamilyInvitation,
   MemoryEntryResponse,
@@ -332,4 +333,16 @@ export function getFastingStatus(date?: string) {
     "/api/v1/habits/fasting/status",
     { query: { date } },
   );
+}
+
+/* --------------------------------- duas ---------------------------------- */
+
+export function getDuaCategories() {
+  return apiFetch<string[]>("/api/v1/duas/categories");
+}
+
+export function getDuas(category?: string) {
+  return apiFetch<DuaItemResponse[]>("/api/v1/duas", {
+    query: category ? { category } : undefined,
+  });
 }
