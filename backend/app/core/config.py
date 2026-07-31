@@ -38,7 +38,9 @@ class Settings(BaseSettings):
     ai_provider: str = ""
     openai_api_key: str = ""
     openai_base_url: str = ""
-    ai_model: str = "gpt-4o-mini"
+    # Default is a generic chat model; OpenRouter overrides to openrouter/free
+    # when MLOS_AI_PROVIDER=openrouter and this is left empty.
+    ai_model: str = ""
     ai_max_tokens: int = 800
     ai_temperature: float = 0.4
 

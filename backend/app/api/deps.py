@@ -68,9 +68,10 @@ def get_ai_service(db: Annotated[Session, Depends(get_db)]):
     settings = get_settings()
     provider = settings.ai_provider.strip().lower()
     api_key = settings.openai_api_key.strip()
+    configured_model = settings.ai_model.strip()
 
-    model = settings.ai_model.strip() or "gpt-4o-mini"
     gateway: object
+    model: str
 
     if provider in ("openai", "openrouter") and api_key:
         base_url = settings.openai_base_url.strip() or None
@@ -78,13 +79,14 @@ def get_ai_service(db: Annotated[Session, Depends(get_db)]):
         if provider == "openrouter":
             if not base_url:
                 base_url = OPENROUTER_BASE_URL
-            if not settings.ai_model.strip():
-                model = DEFAULT_OPENROUTER_MODEL
+            model = configured_model or DEFAULT_OPENROUTER_MODEL
             # OpenRouter optionally uses these headers for rankings/attribution.
             default_headers = {
                 "HTTP-Referer": "https://muslimlifeos.local",
                 "X-Title": "Muslim Life OS",
             }
+        else:
+            model = configured_model or "gpt-4o-mini"
         gateway = OpenAIGateway(
             api_key=api_key,
             base_url=base_url,
@@ -92,6 +94,7 @@ def get_ai_service(db: Annotated[Session, Depends(get_db)]):
         )
     else:
         gateway = StubAIGateway()
+        model = configured_model or "stub"
 
     return AIService(
         gateway=gateway,

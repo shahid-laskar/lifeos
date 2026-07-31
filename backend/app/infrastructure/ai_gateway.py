@@ -21,7 +21,9 @@ logger = logging.getLogger("mlos.ai")
 # Default OpenRouter base URL when MLOS_AI_PROVIDER=openrouter and no
 # explicit MLOS_OPENAI_BASE_URL is set.
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
-DEFAULT_OPENROUTER_MODEL = "openai/gpt-4o-mini"
+# Free Models Router — picks an available :free model automatically.
+# See https://openrouter.ai/openrouter/free
+DEFAULT_OPENROUTER_MODEL = "openrouter/free"
 
 
 class StubAIGateway:
