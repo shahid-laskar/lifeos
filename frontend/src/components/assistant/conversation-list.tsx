@@ -35,25 +35,19 @@ export function ConversationList({
   return (
     <div className="flex h-full flex-col">
       <div className="border-b border-border p-4">
-        <Button
-          onClick={onNewConversation}
-          className="w-full"
-          size="default"
-        >
+        <Button onClick={onNewConversation} className="w-full" size="default">
           <Plus className="mr-2 h-4 w-4" />
           New Conversation
         </Button>
       </div>
-      
+
       <div className="flex-1 overflow-y-auto">
         {isLoading ? (
           <div className="flex items-center justify-center py-8">
             <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
           </div>
         ) : conversations.length === 0 ? (
-          <div className="p-4 text-center text-sm text-muted-foreground">
-            No conversations yet
-          </div>
+          <div className="p-4 text-center text-sm text-muted-foreground">No conversations yet</div>
         ) : (
           <ul className="divide-y divide-border">
             {conversations.map((conv) => (
@@ -62,13 +56,14 @@ export function ConversationList({
                 onClick={() => onSelectConversation(conv.id)}
                 className={cn(
                   "flex cursor-pointer items-center gap-3 px-4 py-3 transition-colors hover:bg-accent",
-                  currentConversationId === conv.id && "bg-accent"
+                  currentConversationId === conv.id && "bg-accent",
                 )}
               >
                 <MessageSquare className="h-4 w-4 shrink-0 text-muted-foreground" />
                 <div className="flex-1 min-w-0">
                   <p className="truncate text-sm font-medium">
-                    {conv.title || `Conversation from ${new Date(conv.created_at).toLocaleDateString()}`}
+                    {conv.title ||
+                      `Conversation from ${new Date(conv.created_at).toLocaleDateString()}`}
                   </p>
                   <p className="text-xs text-muted-foreground">
                     {new Date(conv.updated_at).toLocaleDateString()}

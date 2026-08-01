@@ -6,7 +6,13 @@ import { type FamilyInvitation } from "@/lib/api/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 
 interface InviteSectionProps {
@@ -133,7 +139,11 @@ export function InviteSection({ familyId, invitations, isOwner }: InviteSectionP
               className="h-7 gap-1 text-xs"
               onClick={() => copyInviteLink(createdInvitation.id)}
             >
-              {copied ? <Check className="h-3 w-3 text-emerald-600" /> : <Copy className="h-3 w-3" />}
+              {copied ? (
+                <Check className="h-3 w-3 text-emerald-600" />
+              ) : (
+                <Copy className="h-3 w-3" />
+              )}
               {copied ? "Copied" : "Copy Link"}
             </Button>
           </div>

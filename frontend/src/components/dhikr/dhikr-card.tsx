@@ -19,8 +19,7 @@ export function DhikrCard({ item }: { item: DhikrItemResponse }) {
   const atTarget = count >= item.recommended_count;
 
   const logMutation = useMutation({
-    mutationFn: () =>
-      logDhikrSession({ dhikr_item_id: item.id, count }),
+    mutationFn: () => logDhikrSession({ dhikr_item_id: item.id, count }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["dhikr-summary"] });
       setCount(0);
@@ -28,10 +27,7 @@ export function DhikrCard({ item }: { item: DhikrItemResponse }) {
   });
 
   return (
-    <article
-      id={`dhikr-${item.id}`}
-      className="rounded-2xl border border-border bg-card p-5"
-    >
+    <article id={`dhikr-${item.id}`} className="rounded-2xl border border-border bg-card p-5">
       {/* Arabic text — RTL, Amiri, ≥28px per CONSTITUTION.md */}
       <p
         lang="ar"
@@ -42,9 +38,7 @@ export function DhikrCard({ item }: { item: DhikrItemResponse }) {
       </p>
 
       {/* Transliteration */}
-      <p className="mb-1 text-sm italic text-muted-foreground">
-        {item.transliteration}
-      </p>
+      <p className="mb-1 text-sm italic text-muted-foreground">{item.transliteration}</p>
 
       {/* Meaning */}
       <p className="mb-1 text-sm text-foreground">{item.meaning}</p>
@@ -75,9 +69,7 @@ export function DhikrCard({ item }: { item: DhikrItemResponse }) {
           >
             {count}
           </span>
-          <span className="text-[10px] text-muted-foreground">
-            / {item.recommended_count}
-          </span>
+          <span className="text-[10px] text-muted-foreground">/ {item.recommended_count}</span>
         </button>
 
         {/* Right side: reset + log */}
@@ -105,10 +97,7 @@ export function DhikrCard({ item }: { item: DhikrItemResponse }) {
 
       {/* Success feedback — calm, no banner, no confetti */}
       {logMutation.isSuccess ? (
-        <p
-          role="status"
-          className="mt-3 text-center text-xs text-muted-foreground"
-        >
+        <p role="status" className="mt-3 text-center text-xs text-muted-foreground">
           Session recorded.
         </p>
       ) : null}

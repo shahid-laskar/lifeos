@@ -4,7 +4,13 @@ import { PageHeader } from "@/components/layout/page-header";
 import { ConversationThread } from "@/components/assistant/conversation-thread";
 import { MessageInput } from "@/components/assistant/message-input";
 import { ConversationList } from "@/components/assistant/conversation-list";
-import { listConversations, createConversation, sendAiMessage, deleteConversation, type ConversationResponse } from "@/lib/api/endpoints";
+import {
+  listConversations,
+  createConversation,
+  sendAiMessage,
+  deleteConversation,
+  type ConversationResponse,
+} from "@/lib/api/endpoints";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/components/ui/use-toast";
 import { Menu, X } from "lucide-react";
@@ -21,7 +27,7 @@ export const Route = createFileRoute("/_authenticated/assistant")({
       },
       { property: "og:title", content: "Assistant — Muslim Life OS" },
       {
-        property: "og:description", 
+        property: "og:description",
         content: "Ask questions and reflect with a careful, safety-aware assistant.",
       },
     ],
@@ -41,7 +47,7 @@ function AssistantPage() {
     queryFn: listConversations,
   });
 
-  const currentConversation = conversations?.find(c => c.id === currentConversationId);
+  const currentConversation = conversations?.find((c) => c.id === currentConversationId);
 
   const createMutation = useMutation({
     mutationFn: createConversation,

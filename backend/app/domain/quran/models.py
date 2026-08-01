@@ -7,7 +7,7 @@ validation and serialisation.
 """
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import date as date_type, datetime
 
 from pydantic import BaseModel, Field
 
@@ -66,7 +66,6 @@ class ReadingProgressResponse(BaseModel):
 
 
 class QuranWeeklySummaryResponse(BaseModel):
-from datetime import date as date_type
     surahs_read_last_7_days: int
     active_days_last_7_days: int
 

@@ -41,11 +41,7 @@ function DhikrPage() {
 
   return (
     <>
-      <PageHeader
-        title="Dhikr"
-        arabic="ذِكْر"
-        subtitle="Remembrance, unhurried"
-      />
+      <PageHeader title="Dhikr" arabic="ذِكْر" subtitle="Remembrance, unhurried" />
 
       {/* Category tab bar */}
       <div

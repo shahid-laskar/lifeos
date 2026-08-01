@@ -33,29 +33,26 @@ function PrayerJournalPage() {
   });
 
   const logMutation = useMutation({
-    mutationFn: () => logPrayerJournal({
-      prayer_name: selectedPrayer,
-      date: todayISO(),
-      khushoo_rating: khushoo,
-      notes,
-      distractions
-    }),
+    mutationFn: () =>
+      logPrayerJournal({
+        prayer_name: selectedPrayer,
+        date: todayISO(),
+        khushoo_rating: khushoo,
+        notes,
+        distractions,
+      }),
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["prayer-journal"] });
       queryClient.invalidateQueries({ queryKey: ["prayer-insights"] });
       setNotes("");
       setDistractions("");
       setKhushoo(3);
-    }
+    },
   });
 
   return (
     <>
-      <PageHeader
-        title="Prayer Journal"
-        subtitle="Reflect on your khushoo"
-        arabic="خُشُوع"
-      />
+      <PageHeader title="Prayer Journal" subtitle="Reflect on your khushoo" arabic="خُشُوع" />
 
       <div className="mx-5 mb-6 flex rounded-xl border border-border bg-muted/50 p-1">
         <button
@@ -85,19 +82,25 @@ function PrayerJournalPage() {
               <h3 className="mb-4 font-semibold text-lg">New Reflection</h3>
               <div className="space-y-4">
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-muted-foreground">Prayer</label>
+                  <label className="mb-2 block text-sm font-medium text-muted-foreground">
+                    Prayer
+                  </label>
                   <select
                     value={selectedPrayer}
-                    onChange={(e) => setSelectedPrayer(e.target.value as any)}
+                    onChange={(e) => setSelectedPrayer(e.target.value as PrayerName)}
                     className="w-full rounded-md border border-input bg-background p-2 text-sm"
                   >
                     {PRAYER_NAMES.map((name) => (
-                      <option key={name} value={name}>{name.charAt(0).toUpperCase() + name.slice(1)}</option>
+                      <option key={name} value={name}>
+                        {name.charAt(0).toUpperCase() + name.slice(1)}
+                      </option>
                     ))}
                   </select>
                 </div>
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-muted-foreground">Khushoo Rating (1-5)</label>
+                  <label className="mb-2 block text-sm font-medium text-muted-foreground">
+                    Khushoo Rating (1-5)
+                  </label>
                   <input
                     type="range"
                     min="1"
@@ -109,7 +112,9 @@ function PrayerJournalPage() {
                   <div className="text-center text-sm font-bold text-gold">{khushoo}</div>
                 </div>
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-muted-foreground">Notes (optional)</label>
+                  <label className="mb-2 block text-sm font-medium text-muted-foreground">
+                    Notes (optional)
+                  </label>
                   <textarea
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
@@ -119,7 +124,9 @@ function PrayerJournalPage() {
                   />
                 </div>
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-muted-foreground">Distractions (optional)</label>
+                  <label className="mb-2 block text-sm font-medium text-muted-foreground">
+                    Distractions (optional)
+                  </label>
                   <textarea
                     value={distractions}
                     onChange={(e) => setDistractions(e.target.value)}
@@ -143,23 +150,40 @@ function PrayerJournalPage() {
               {journalQuery.isPending ? (
                 <LoadingBlock label="Loading journal..." />
               ) : journalQuery.isError ? (
-                <ErrorState title="Error" message="Could not load journal." onRetry={() => journalQuery.refetch()} />
+                <ErrorState
+                  title="Error"
+                  message="Could not load journal."
+                  onRetry={() => journalQuery.refetch()}
+                />
               ) : (
                 <div className="space-y-3">
                   {journalQuery.data?.length === 0 ? (
-                    <p className="text-sm text-muted-foreground text-center">No journal entries yet.</p>
+                    <p className="text-sm text-muted-foreground text-center">
+                      No journal entries yet.
+                    </p>
                   ) : (
                     journalQuery.data?.map((entry) => (
-                      <div key={entry.id} className="rounded-xl border border-border bg-card p-4 shadow-sm">
+                      <div
+                        key={entry.id}
+                        className="rounded-xl border border-border bg-card p-4 shadow-sm"
+                      >
                         <div className="flex justify-between items-start mb-2">
                           <span className="font-semibold capitalize">{entry.prayer_name}</span>
                           <span className="text-xs text-muted-foreground">{entry.date}</span>
                         </div>
                         <div className="text-sm">
-                          <span className="font-medium text-gold">Khushoo: {entry.khushoo_rating}/5</span>
+                          <span className="font-medium text-gold">
+                            Khushoo: {entry.khushoo_rating}/5
+                          </span>
                         </div>
-                        {entry.notes && <p className="mt-2 text-sm text-muted-foreground">"{entry.notes}"</p>}
-                        {entry.distractions && <p className="mt-1 text-xs text-muted-foreground">Distractions: {entry.distractions}</p>}
+                        {entry.notes && (
+                          <p className="mt-2 text-sm text-muted-foreground">"{entry.notes}"</p>
+                        )}
+                        {entry.distractions && (
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            Distractions: {entry.distractions}
+                          </p>
+                        )}
                       </div>
                     ))
                   )}
@@ -174,20 +198,28 @@ function PrayerJournalPage() {
             {insightsQuery.isPending ? (
               <LoadingBlock label="Loading insights..." />
             ) : insightsQuery.isError ? (
-              <ErrorState title="Error" message="Could not load insights." onRetry={() => insightsQuery.refetch()} />
+              <ErrorState
+                title="Error"
+                message="Could not load insights."
+                onRetry={() => insightsQuery.refetch()}
+              />
             ) : (
               <>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="rounded-xl border border-border bg-card p-4 text-center shadow-sm">
                     <p className="text-xs text-muted-foreground mb-1">Weekly Quality</p>
-                    <p className="text-2xl font-bold text-gold">{insightsQuery.data?.weekly_quality.toFixed(1) || "N/A"}</p>
+                    <p className="text-2xl font-bold text-gold">
+                      {insightsQuery.data?.weekly_quality.toFixed(1) || "N/A"}
+                    </p>
                   </div>
                   <div className="rounded-xl border border-border bg-card p-4 text-center shadow-sm">
                     <p className="text-xs text-muted-foreground mb-1">Monthly Quality</p>
-                    <p className="text-2xl font-bold text-gold">{insightsQuery.data?.monthly_quality.toFixed(1) || "N/A"}</p>
+                    <p className="text-2xl font-bold text-gold">
+                      {insightsQuery.data?.monthly_quality.toFixed(1) || "N/A"}
+                    </p>
                   </div>
                 </div>
-                
+
                 {insightsQuery.data?.insights && insightsQuery.data.insights.length > 0 && (
                   <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
                     <h3 className="mb-4 font-semibold flex items-center gap-2">

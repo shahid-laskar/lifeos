@@ -4,7 +4,7 @@ from datetime import date as date_type
 from sqlalchemy.orm import Session
 from sqlalchemy import and_
 
-from app.domain.habit.entities import PrayerLogRecord, PrayerName, PrayerStatus
+from app.domain.habit.entities import PrayerLogRecord, PrayerName, PrayerStatus, PrayerJournalRecord
 from app.infrastructure.orm_models import PrayerLogORM
 
 def _to_record(row: PrayerLogORM) -> PrayerLogRecord:
@@ -109,3 +109,79 @@ class SqlAlchemyHabitRepository:
         if not row:
             return {"date": str(date), "fasting": False, "type": None}
         return {"date": str(row.date), "fasting": row.type != "none", "type": row.type}
+
+    def log_prayer_journal(self, record: PrayerJournalRecord) -> PrayerJournalRecord:
+        from app.infrastructure.orm_models import PrayerJournalORM
+        row = self._session.get(PrayerJournalORM, record.id)
+        if row is None:
+            row = PrayerJournalORM()
+            self._session.add(row)
+        
+        row.id = record.id
+        row.user_id = record.user_id
+        row.date = record.date
+        row.prayer_name = record.prayer_name.value
+        row.khushoo_rating = record.khushoo_rating
+        row.notes = record.notes
+        row.distractions = record.distractions
+        row.created_at = record.created_at
+        row.updated_at = record.updated_at
+        
+        self._session.commit()
+        self._session.refresh(row)
+        return record
+
+    def get_prayer_journal(self, user_id: str, date: date_type, prayer_name: PrayerName) -> PrayerJournalRecord | None:
+        from app.infrastructure.orm_models import PrayerJournalORM
+        row = (
+            self._session.query(PrayerJournalORM)
+            .filter(
+                and_(
+                    PrayerJournalORM.user_id == user_id,
+                    PrayerJournalORM.date == date,
+                    PrayerJournalORM.prayer_name == prayer_name.value,
+                )
+            )
+            .first()
+        )
+        if not row:
+            return None
+        return PrayerJournalRecord(
+            id=row.id,
+            user_id=row.user_id,
+            date=row.date,
+            prayer_name=PrayerName(row.prayer_name),
+            khushoo_rating=row.khushoo_rating,
+            notes=row.notes,
+            distractions=row.distractions,
+            created_at=row.created_at,
+            updated_at=row.updated_at,
+        )
+
+    def get_prayer_journals_for_date_range(self, user_id: str, start_date: date_type, end_date: date_type) -> list[PrayerJournalRecord]:
+        from app.infrastructure.orm_models import PrayerJournalORM
+        rows = (
+            self._session.query(PrayerJournalORM)
+            .filter(
+                and_(
+                    PrayerJournalORM.user_id == user_id,
+                    PrayerJournalORM.date >= start_date,
+                    PrayerJournalORM.date <= end_date,
+                )
+            )
+            .all()
+        )
+        return [
+            PrayerJournalRecord(
+                id=row.id,
+                user_id=row.user_id,
+                date=row.date,
+                prayer_name=PrayerName(row.prayer_name),
+                khushoo_rating=row.khushoo_rating,
+                notes=row.notes,
+                distractions=row.distractions,
+                created_at=row.created_at,
+                updated_at=row.updated_at,
+            ) for row in rows
+        ]
+

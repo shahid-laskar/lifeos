@@ -1,12 +1,6 @@
 export type PrayerName = "fajr" | "dhuhr" | "asr" | "maghrib" | "isha";
 
-export const PRAYER_NAMES: PrayerName[] = [
-  "fajr",
-  "dhuhr",
-  "asr",
-  "maghrib",
-  "isha",
-];
+export const PRAYER_NAMES: PrayerName[] = ["fajr", "dhuhr", "asr", "maghrib", "isha"];
 
 export const PRAYER_LABELS: Record<PrayerName, { latin: string; arabic: string }> = {
   fajr: { latin: "Fajr", arabic: "الفجر" },
@@ -30,13 +24,7 @@ export type PrayerTimeResponse = {
   high_latitude_adjustment_applied?: boolean;
 };
 
-export type CalculationMethod =
-  | "MWL"
-  | "ISNA"
-  | "EGYPTIAN"
-  | "UMM_AL_QURA"
-  | "KARACHI"
-  | "TEHRAN";
+export type CalculationMethod = "MWL" | "ISNA" | "EGYPTIAN" | "UMM_AL_QURA" | "KARACHI" | "TEHRAN";
 
 export const CALCULATION_METHODS: { value: CalculationMethod; label: string }[] = [
   { value: "MWL", label: "Muslim World League" },
@@ -68,10 +56,26 @@ export const ONBOARDING_GOALS: {
   { value: "read_quran_daily", label: "Read Qur'an daily", note: "A gentle portion each day" },
   { value: "memorise_quran", label: "Memorise Qur'an", note: "Build hifz slowly and steadily" },
   { value: "learn_arabic", label: "Learn Arabic", note: "Understand the words you recite" },
-  { value: "improve_productivity", label: "Improve productivity", note: "Order your days with intention" },
-  { value: "build_healthier_habits", label: "Build healthier habits", note: "Care for the body you were given" },
-  { value: "strengthen_family_organisation", label: "Strengthen family life", note: "Share the journey at home" },
-  { value: "manage_community_activities", label: "Manage community activities", note: "Organise with your jamaah" },
+  {
+    value: "improve_productivity",
+    label: "Improve productivity",
+    note: "Order your days with intention",
+  },
+  {
+    value: "build_healthier_habits",
+    label: "Build healthier habits",
+    note: "Care for the body you were given",
+  },
+  {
+    value: "strengthen_family_organisation",
+    label: "Strengthen family life",
+    note: "Share the journey at home",
+  },
+  {
+    value: "manage_community_activities",
+    label: "Manage community activities",
+    note: "Organise with your jamaah",
+  },
 ];
 
 export type UserProfile = {

@@ -50,13 +50,15 @@ export function MessageInput({ onSend, disabled, isLoading }: MessageInputProps)
             "w-full resize-none rounded-lg border border-input bg-background px-3 py-2 text-sm",
             "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
             "disabled:cursor-not-allowed disabled:opacity-50",
-            "min-h-[48px] max-h-[200px]"
+            "min-h-[48px] max-h-[200px]",
           )}
           rows={1}
         />
         <div className="mt-1 flex justify-between text-xs text-muted-foreground">
           <span>Press Enter to send, Shift+Enter for new line</span>
-          <span>{content.length}/{maxLength}</span>
+          <span>
+            {content.length}/{maxLength}
+          </span>
         </div>
       </div>
       <Button

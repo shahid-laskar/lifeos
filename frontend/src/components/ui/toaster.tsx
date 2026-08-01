@@ -19,9 +19,7 @@ export function Toaster() {
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1">
               <h4 className="font-semibold">{toast.title}</h4>
-              {toast.description && (
-                <p className="mt-1 text-sm opacity-90">{toast.description}</p>
-              )}
+              {toast.description && <p className="mt-1 text-sm opacity-90">{toast.description}</p>}
             </div>
             <Button
               variant="ghost"

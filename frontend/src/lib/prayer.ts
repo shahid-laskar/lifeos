@@ -82,7 +82,5 @@ export function formatCountdown(ms: number): string {
   const minutes = Math.floor((total % 3600) / 60);
   const seconds = total % 60;
   const pad = (n: number) => String(n).padStart(2, "0");
-  return hours > 0
-    ? `${hours}:${pad(minutes)}:${pad(seconds)}`
-    : `${pad(minutes)}:${pad(seconds)}`;
+  return hours > 0 ? `${hours}:${pad(minutes)}:${pad(seconds)}` : `${pad(minutes)}:${pad(seconds)}`;
 }

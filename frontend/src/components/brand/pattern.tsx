@@ -18,18 +18,8 @@ export function GeometricPattern({
       style={{ opacity }}
     >
       <defs>
-        <pattern
-          id="mlos-star-8"
-          width="72"
-          height="72"
-          patternUnits="userSpaceOnUse"
-        >
-          <g
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1"
-            strokeLinejoin="round"
-          >
+        <pattern id="mlos-star-8" width="72" height="72" patternUnits="userSpaceOnUse">
+          <g fill="none" stroke="currentColor" strokeWidth="1" strokeLinejoin="round">
             <polygon points="36,6 44,20 60,16 56,32 70,40 56,48 60,64 44,60 36,74 28,60 12,64 16,48 2,40 16,32 12,16 28,20" />
             <polygon points="36,18 42,28 54,28 48,38 54,50 42,50 36,60 30,50 18,50 24,38 18,28 30,28" />
           </g>
@@ -56,12 +46,7 @@ export function StarSpinner({
       aria-label={label}
       className={cn("inline-flex items-center justify-center", className)}
     >
-      <svg
-        width={size}
-        height={size}
-        viewBox="0 0 40 40"
-        className="star-spin text-primary"
-      >
+      <svg width={size} height={size} viewBox="0 0 40 40" className="star-spin text-primary">
         <polygon
           points="20,2 25,12 36,10 33,21 40,29 29,32 27,38 20,33 13,38 11,32 0,29 7,21 4,10 15,12"
           fill="none"

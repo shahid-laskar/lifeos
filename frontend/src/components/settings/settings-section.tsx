@@ -1,13 +1,19 @@
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { MapPin, Calculator, Sun, Moon, Monitor, Loader2, User, ExternalLink } from "lucide-react";
-import { getProfile, updateProfile } from "@/lib/api/endpoints";
+import { getProfile, updateProfile, type UserProfile } from "@/lib/api/endpoints";
 import { CALCULATION_METHODS, type CalculationMethod, type AsrMethod } from "@/lib/api/types";
 import { searchLocations, type LocationSuggestion } from "@/lib/location-search";
 import { browserTimezone } from "@/lib/prayer";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { applyTheme, getStoredTheme, type Theme } from "@/lib/theme";
@@ -36,16 +42,14 @@ export function SettingsSection() {
       setPreferredLanguage(profile.preferred_language || "en");
       if (profile.country || profile.timezone) {
         // Prefer a human-readable placeholder; timezone is IANA under the hood.
-        setSearchQuery(
-          [profile.country, profile.timezone].filter(Boolean).join(" · "),
-        );
+        setSearchQuery([profile.country, profile.timezone].filter(Boolean).join(" · "));
       }
     }
     setCurrentTheme(getStoredTheme());
   }, [profile]);
 
   const updateMutation = useMutation({
-    mutationFn: (data: Partial<typeof profile>) => updateProfile(data),
+    mutationFn: (data: Partial<UserProfile>) => updateProfile(data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["profile"] });
       queryClient.invalidateQueries({ queryKey: ["prayer-times"] });
@@ -112,11 +116,7 @@ export function SettingsSection() {
         } catch (error) {
           if (controller.signal.aborted) return;
           setSuggestions([]);
-          setLocationError(
-            error instanceof Error
-              ? error.message
-              : "Failed to search location.",
-          );
+          setLocationError(error instanceof Error ? error.message : "Failed to search location.");
         } finally {
           if (!controller.signal.aborted) setIsLocationLoading(false);
         }
@@ -204,9 +204,7 @@ export function SettingsSection() {
               {isLocationLoading && (
                 <Loader2 className="absolute right-3 top-[50%] -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />
               )}
-              {locationError && (
-                <p className="mt-1 text-xs text-destructive">{locationError}</p>
-              )}
+              {locationError && <p className="mt-1 text-xs text-destructive">{locationError}</p>}
               {suggestions.length > 0 && !isLocationLoading && (
                 <div className="absolute left-0 right-0 mt-1 z-20 max-h-60 overflow-y-auto border border-border rounded-lg bg-card shadow-lg">
                   <ul className="divide-y divide-border">
@@ -217,9 +215,7 @@ export function SettingsSection() {
                           onClick={() => selectLocation(item)}
                           className="w-full px-3 py-2 text-left hover:bg-accent/50 transition-colors"
                         >
-                          <div className="font-medium text-sm text-foreground">
-                            {item.label}
-                          </div>
+                          <div className="font-medium text-sm text-foreground">{item.label}</div>
                           <div className="text-xs text-muted-foreground">
                             {item.timezone} · {item.latitude.toFixed(4)},{" "}
                             {item.longitude.toFixed(4)}
@@ -278,7 +274,9 @@ export function SettingsSection() {
                 <SelectValue placeholder="Select Asr method" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="STANDARD">Standard (Shafi'i, Maliki, Hanbali - shadow ratio 1:1)</SelectItem>
+                <SelectItem value="STANDARD">
+                  Standard (Shafi'i, Maliki, Hanbali - shadow ratio 1:1)
+                </SelectItem>
                 <SelectItem value="HANAFI">Hanafi (shadow ratio 2:1)</SelectItem>
               </SelectContent>
             </Select>
@@ -335,7 +333,9 @@ export function SettingsSection() {
         <div className="flex items-center justify-between">
           <div>
             <h4 className="font-medium text-sm">Family Circle</h4>
-            <p className="text-xs text-muted-foreground">Manage household members and invitations</p>
+            <p className="text-xs text-muted-foreground">
+              Manage household members and invitations
+            </p>
           </div>
           <Link
             to="/families"

@@ -23,14 +23,12 @@ export const Route = createFileRoute("/register")({
       { title: "Create your account — Muslim Life OS" },
       {
         name: "description",
-        content:
-          "Start a calm, unhurried practice: prayer times, Qur'an, dhikr and reflection.",
+        content: "Start a calm, unhurried practice: prayer times, Qur'an, dhikr and reflection.",
       },
       { property: "og:title", content: "Create your account — Muslim Life OS" },
       {
         property: "og:description",
-        content:
-          "Start a calm, unhurried practice: prayer times, Qur'an, dhikr and reflection.",
+        content: "Start a calm, unhurried practice: prayer times, Qur'an, dhikr and reflection.",
       },
     ],
   }),
@@ -74,9 +72,7 @@ function RegisterPage() {
       navigate({ to: "/onboarding", replace: true });
     } catch (err) {
       setError(
-        err instanceof Error
-          ? err.message
-          : "We couldn't create your account. Please try again.",
+        err instanceof Error ? err.message : "We couldn't create your account. Please try again.",
       );
     } finally {
       setPending(false);

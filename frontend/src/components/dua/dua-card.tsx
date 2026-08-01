@@ -14,18 +14,15 @@ export function DuaCard({ item }: DuaCardProps) {
       </div>
 
       <div className="space-y-3">
-        <p className="text-sm font-medium italic text-muted-foreground">
-          {item.transliteration}
-        </p>
-        <p className="text-base text-foreground/90">
-          "{item.translation}"
-        </p>
+        <p className="text-sm font-medium italic text-muted-foreground">{item.transliteration}</p>
+        <p className="text-base text-foreground/90">"{item.translation}"</p>
       </div>
 
       <div className="mt-5 border-t pt-4 text-xs text-muted-foreground space-y-1">
         {item.when_to_recite && (
           <p>
-            <span className="font-medium text-foreground/70">When to recite:</span> {item.when_to_recite}
+            <span className="font-medium text-foreground/70">When to recite:</span>{" "}
+            {item.when_to_recite}
           </p>
         )}
         <p>

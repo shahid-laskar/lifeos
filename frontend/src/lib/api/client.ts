@@ -1,10 +1,4 @@
-import {
-  clearTokens,
-  getAccessToken,
-  getTokens,
-  setTokens,
-  type Tokens,
-} from "./tokens";
+import { clearTokens, getAccessToken, getTokens, setTokens, type Tokens } from "./tokens";
 
 export const API_BASE_URL: string =
   (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, "") ?? "";
@@ -108,10 +102,7 @@ async function refreshTokens(): Promise<Tokens | null> {
   return refreshPromise;
 }
 
-export async function apiFetch<T>(
-  path: string,
-  options: RequestOptions = {},
-): Promise<T> {
+export async function apiFetch<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const { method = "GET", body, query, auth = true, signal } = options;
 
   const send = async (token: string | null) => {

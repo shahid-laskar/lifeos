@@ -4,6 +4,7 @@ export type ToastProps = {
   title: string;
   description?: string;
   variant?: "default" | "destructive";
+  action?: React.ReactNode;
 };
 
 let toastCount = 0;
@@ -14,9 +15,9 @@ export function useToast() {
   const toast = useCallback(({ title, description, variant = "default" }: ToastProps) => {
     const id = ++toastCount;
     const newToast = { id, title, description, variant };
-    
+
     setToasts((prev) => [...prev, newToast]);
-    
+
     // Auto-dismiss after 10 seconds (per design policy for undo toasts)
     setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id));

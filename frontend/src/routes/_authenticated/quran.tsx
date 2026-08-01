@@ -46,10 +46,7 @@ function QuranPage() {
   if (openSurah) {
     return (
       <div className="fixed inset-0 z-50 flex flex-col bg-background">
-        <AyahReader
-          surah={openSurah}
-          onBack={() => setOpenSurah(null)}
-        />
+        <AyahReader surah={openSurah} onBack={() => setOpenSurah(null)} />
       </div>
     );
   }
@@ -57,11 +54,7 @@ function QuranPage() {
   // ── Main Qur'an screen ────────────────────────────────────────────────────
   return (
     <>
-      <PageHeader
-        title="Qur'an"
-        arabic="القُرْآن"
-        subtitle="Read at your own pace"
-      />
+      <PageHeader title="Qur'an" arabic="القُرْآن" subtitle="Read at your own pace" />
 
       {/* Tab bar */}
       <div

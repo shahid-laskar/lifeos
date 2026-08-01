@@ -17,22 +17,14 @@ export function AuthShell({
       <div className="relative w-full max-w-md overflow-hidden rounded-2xl border border-border bg-card p-7 text-card-foreground shadow-sm">
         <GeometricPattern className="text-primary" opacity={0.05} />
         <div className="relative">
-          <p className="arabic text-center text-2xl text-gold">
-            بِسْمِ اللهِ
-          </p>
-          <h1 className="mt-4 text-center text-2xl font-semibold tracking-tight">
-            {title}
-          </h1>
+          <p className="arabic text-center text-2xl text-gold">بِسْمِ اللهِ</p>
+          <h1 className="mt-4 text-center text-2xl font-semibold tracking-tight">{title}</h1>
           {subtitle ? (
-            <p className="mt-2 text-center text-sm text-muted-foreground">
-              {subtitle}
-            </p>
+            <p className="mt-2 text-center text-sm text-muted-foreground">{subtitle}</p>
           ) : null}
           <div className="mt-7">{children}</div>
           {footer ? (
-            <div className="mt-6 text-center text-sm text-muted-foreground">
-              {footer}
-            </div>
+            <div className="mt-6 text-center text-sm text-muted-foreground">{footer}</div>
           ) : null}
         </div>
       </div>

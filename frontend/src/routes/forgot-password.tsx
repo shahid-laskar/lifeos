@@ -63,8 +63,8 @@ function ForgotPasswordPage() {
       {sent ? (
         <div className="space-y-4">
           <FormNotice>
-            If an account exists for that email, a reset link is on its way. Please
-            check your inbox.
+            If an account exists for that email, a reset link is on its way. Please check your
+            inbox.
           </FormNotice>
           <Button asChild variant="outline" className="w-full">
             <Link to="/login">Back to sign in</Link>

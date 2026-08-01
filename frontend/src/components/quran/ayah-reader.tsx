@@ -20,10 +20,7 @@ import type { SurahResponse } from "@/lib/api/types";
  * inactivity. Complies with CONSTITUTION.md: we debounce reading-progress
  * updates at 2 s, not on every scroll event.
  */
-function useDebounce<T extends unknown[]>(
-  fn: (...args: T) => void,
-  delay: number,
-) {
+function useDebounce<T extends unknown[]>(fn: (...args: T) => void, delay: number) {
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   return useCallback(
     (...args: T) => {
@@ -41,6 +38,8 @@ function AyahCard({
   isBookmarked,
   onBookmark,
   onUnbookmark,
+  isMemorised,
+  onMemorise,
 }: {
   numberInSurah: number;
   text: string;
@@ -79,11 +78,7 @@ function AyahCard({
               ? `Remove bookmark from ayah ${numberInSurah}`
               : `Bookmark ayah ${numberInSurah}`
           }
-          onClick={() =>
-            isBookmarked
-              ? onUnbookmark(numberInSurah)
-              : onBookmark(numberInSurah)
-          }
+          onClick={() => (isBookmarked ? onUnbookmark(numberInSurah) : onBookmark(numberInSurah))}
           className="flex size-9 items-center justify-center rounded-full transition-colors hover:bg-gold/10"
         >
           {isBookmarked ? (
@@ -113,7 +108,6 @@ function AyahCard({
             <Circle className="size-5 text-muted-foreground" />
           )}
         </button>
-        </div>
       </div>
 
       {/* Arabic text — RTL, Amiri, ≥28px as per CONSTITUTION.md */}
@@ -141,7 +135,11 @@ function AyahCard({
           {tafsirQuery.isPending ? (
             <LoadingBlock label="Loading tafsir..." />
           ) : tafsirQuery.isError ? (
-            <ErrorState title="Error" message="Couldn't load tafsir." onRetry={() => tafsirQuery.refetch()} />
+            <ErrorState
+              title="Error"
+              message="Couldn't load tafsir."
+              onRetry={() => tafsirQuery.refetch()}
+            />
           ) : (
             <div className="text-sm leading-relaxed text-muted-foreground whitespace-pre-wrap">
               {tafsirQuery.data?.text || "No tafsir found for this ayah."}
@@ -153,13 +151,7 @@ function AyahCard({
   );
 }
 
-export function AyahReader({
-  surah,
-  onBack,
-}: {
-  surah: SurahResponse;
-  onBack: () => void;
-}) {
+export function AyahReader({ surah, onBack }: { surah: SurahResponse; onBack: () => void }) {
   const queryClient = useQueryClient();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -202,15 +194,12 @@ export function AyahReader({
   const addBookmarkMutation = useMutation({
     mutationFn: (ayahNumber: number) =>
       addBookmark({ surah_number: surah.number, ayah_number: ayahNumber }),
-    onSettled: () =>
-      queryClient.invalidateQueries({ queryKey: ["bookmarks"] }),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ["bookmarks"] }),
   });
 
   const removeBookmarkMutation = useMutation({
-    mutationFn: (ayahNumber: number) =>
-      removeBookmark(surah.number, ayahNumber),
-    onSettled: () =>
-      queryClient.invalidateQueries({ queryKey: ["bookmarks"] }),
+    mutationFn: (ayahNumber: number) => removeBookmark(surah.number, ayahNumber),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ["bookmarks"] }),
   });
 
   const memoriseMutation = useMutation({
@@ -218,7 +207,7 @@ export function AyahReader({
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["hifdh-progress"] });
       queryClient.invalidateQueries({ queryKey: ["hifdh-review"] });
-    }
+    },
   });
 
   // Scroll-debounced reading progress update (2 s debounce per spec)

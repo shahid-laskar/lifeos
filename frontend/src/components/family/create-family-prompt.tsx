@@ -44,7 +44,8 @@ export function CreateFamilyPrompt() {
       </div>
       <h3 className="mt-4 text-lg font-semibold text-foreground">Create a Family Circle</h3>
       <p className="mt-1 text-sm text-muted-foreground max-w-sm mx-auto">
-        Share household context cleanly and respectfully without tracking each other's private worship.
+        Share household context cleanly and respectfully without tracking each other's private
+        worship.
       </p>
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-4 max-w-sm mx-auto text-left">

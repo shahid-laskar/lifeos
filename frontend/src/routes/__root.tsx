@@ -88,10 +88,26 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:title", content: "Muslim Life OS — a calm companion for daily worship" },
       { name: "twitter:title", content: "Muslim Life OS — a calm companion for daily worship" },
-      { property: "og:description", content: "Prayer times, Qur'an reading, dhikr and gentle reflection in one unhurried place." },
-      { name: "twitter:description", content: "Prayer times, Qur'an reading, dhikr and gentle reflection in one unhurried place." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/aad64578-8e65-4adf-b024-437e044f0098/id-preview-1b3acc1f--48653340-dd8c-4e52-b4af-9d31a02f6a7a.lovable.app-1785391685771.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/aad64578-8e65-4adf-b024-437e044f0098/id-preview-1b3acc1f--48653340-dd8c-4e52-b4af-9d31a02f6a7a.lovable.app-1785391685771.png" },
+      {
+        property: "og:description",
+        content:
+          "Prayer times, Qur'an reading, dhikr and gentle reflection in one unhurried place.",
+      },
+      {
+        name: "twitter:description",
+        content:
+          "Prayer times, Qur'an reading, dhikr and gentle reflection in one unhurried place.",
+      },
+      {
+        property: "og:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/aad64578-8e65-4adf-b024-437e044f0098/id-preview-1b3acc1f--48653340-dd8c-4e52-b4af-9d31a02f6a7a.lovable.app-1785391685771.png",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/aad64578-8e65-4adf-b024-437e044f0098/id-preview-1b3acc1f--48653340-dd8c-4e52-b4af-9d31a02f6a7a.lovable.app-1785391685771.png",
+      },
     ],
     links: [
       { rel: "stylesheet", href: appCss },

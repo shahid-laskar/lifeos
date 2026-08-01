@@ -7,7 +7,13 @@ import { getHifdhProgress, getHifdhTodayReview, markAyahMemorised } from "@/lib/
 import type { SurahResponse } from "@/lib/api/types";
 import { cn } from "@/lib/utils";
 
-export function HifdhTab({ surahs, onNavigateToSurah }: { surahs: SurahResponse[], onNavigateToSurah: (s: SurahResponse) => void }) {
+export function HifdhTab({
+  surahs,
+  onNavigateToSurah,
+}: {
+  surahs: SurahResponse[];
+  onNavigateToSurah: (s: SurahResponse) => void;
+}) {
   const queryClient = useQueryClient();
 
   const progressQuery = useQuery({
@@ -21,7 +27,7 @@ export function HifdhTab({ surahs, onNavigateToSurah }: { surahs: SurahResponse[
   });
 
   const markMutation = useMutation({
-    mutationFn: ({ surahNumber, ayahNumber }: { surahNumber: number, ayahNumber: number }) =>
+    mutationFn: ({ surahNumber, ayahNumber }: { surahNumber: number; ayahNumber: number }) =>
       markAyahMemorised(surahNumber, ayahNumber),
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["hifdh-progress"] });
@@ -35,10 +41,10 @@ export function HifdhTab({ surahs, onNavigateToSurah }: { surahs: SurahResponse[
 
   if (progressQuery.isError) {
     return (
-      <ErrorState 
-        title="Could not load Hifdh data" 
-        message="Check your connection and try again." 
-        onRetry={() => progressQuery.refetch()} 
+      <ErrorState
+        title="Could not load Hifdh data"
+        message="Check your connection and try again."
+        onRetry={() => progressQuery.refetch()}
       />
     );
   }
@@ -59,13 +65,19 @@ export function HifdhTab({ surahs, onNavigateToSurah }: { surahs: SurahResponse[
           {reviewItems.map((item, idx) => {
             const surah = surahs.find((s) => s.number === item.surah_number);
             return (
-              <div key={idx} className="flex items-center justify-between rounded-xl bg-card p-4 border border-border shadow-sm cursor-pointer hover:bg-muted transition-colors" onClick={() => surah && onNavigateToSurah(surah)}>
+              <div
+                key={idx}
+                className="flex items-center justify-between rounded-xl bg-card p-4 border border-border shadow-sm cursor-pointer hover:bg-muted transition-colors"
+                onClick={() => surah && onNavigateToSurah(surah)}
+              >
                 <div className="flex items-center gap-4">
                   <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-gold/10 text-gold">
                     <Clock className="size-5" />
                   </div>
                   <div>
-                    <p className="font-semibold">{surah?.transliterated_name || `Surah ${item.surah_number}`}</p>
+                    <p className="font-semibold">
+                      {surah?.transliterated_name || `Surah ${item.surah_number}`}
+                    </p>
                     <p className="text-xs text-muted-foreground">Ayah {item.ayah_number}</p>
                   </div>
                 </div>
@@ -79,11 +91,11 @@ export function HifdhTab({ surahs, onNavigateToSurah }: { surahs: SurahResponse[
       <h2 className="mb-4 text-xl font-semibold">My Progress</h2>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         {surahs.slice(0, 10).map((surah) => {
-          const p = progressList.find(x => x.surah_number === surah.number);
+          const p = progressList.find((x) => x.surah_number === surah.number);
           const percent = p ? p.completion_percentage : 0;
           return (
-            <div 
-              key={surah.number} 
+            <div
+              key={surah.number}
               className="flex flex-col justify-between rounded-xl border border-border bg-card p-3 shadow-sm cursor-pointer hover:bg-muted transition-colors"
               onClick={() => onNavigateToSurah(surah)}
             >

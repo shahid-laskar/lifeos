@@ -62,13 +62,10 @@ export function PrayerStatusRow() {
               <button
                 type="button"
                 aria-label={`${PRAYER_LABELS[name].latin}: ${status ?? "not logged"}`}
-                onClick={() =>
-                  mutation.mutate({ prayer: name, status: nextStatus(status) })
-                }
+                onClick={() => mutation.mutate({ prayer: name, status: nextStatus(status) })}
                 className={cn(
                   "flex size-12 items-center justify-center rounded-full border transition-colors",
-                  status === "completed" &&
-                    "border-primary bg-primary text-primary-foreground",
+                  status === "completed" && "border-primary bg-primary text-primary-foreground",
                   status === "missed" &&
                     "border-muted-foreground/40 bg-muted text-muted-foreground",
                   status === "excused" && "border-gold bg-gold/20 text-gold-foreground",
@@ -79,9 +76,7 @@ export function PrayerStatusRow() {
                 {status === "missed" ? <X className="size-5" /> : null}
                 {status === "excused" ? <Minus className="size-5" /> : null}
               </button>
-              <span className="text-[11px] text-muted-foreground">
-                {PRAYER_LABELS[name].latin}
-              </span>
+              <span className="text-[11px] text-muted-foreground">{PRAYER_LABELS[name].latin}</span>
             </li>
           );
         })}
@@ -90,8 +85,8 @@ export function PrayerStatusRow() {
         <p className="text-xs leading-relaxed text-muted-foreground flex-1 pr-4">
           Tap to cycle through completed, missed and excused.
         </p>
-        <Link 
-          to="/prayer-journal" 
+        <Link
+          to="/prayer-journal"
           className="flex items-center gap-2 text-xs font-medium text-primary hover:underline"
         >
           <Book className="size-3" />

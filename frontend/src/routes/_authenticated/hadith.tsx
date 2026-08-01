@@ -65,8 +65,7 @@ function HadithPage() {
     staleTime: 60 * 60 * 1000,
   });
 
-  const activeChapterId =
-    chapterId ?? chaptersQuery.data?.[0]?.chapter_id ?? null;
+  const activeChapterId = chapterId ?? chaptersQuery.data?.[0]?.chapter_id ?? null;
 
   const hadithsQuery = useQuery({
     queryKey: ["hadith-chapter", collectionSlug, activeChapterId],
@@ -113,9 +112,7 @@ function HadithPage() {
     },
   });
 
-  const selectedCollection = collectionsQuery.data?.find(
-    (c) => c.slug === collectionSlug,
-  );
+  const selectedCollection = collectionsQuery.data?.find((c) => c.slug === collectionSlug);
 
   return (
     <>
@@ -187,16 +184,12 @@ function HadithPage() {
 
           {selectedCollection ? (
             <div className="space-y-1">
-              <p
-                dir="rtl"
-                lang="ar"
-                className="arabic text-right text-lg text-gold"
-              >
+              <p dir="rtl" lang="ar" className="arabic text-right text-lg text-gold">
                 {selectedCollection.name_arabic}
               </p>
               <p className="text-sm text-muted-foreground">
-                {selectedCollection.author_english} ·{" "}
-                {selectedCollection.hadith_count} hadiths in this library slice
+                {selectedCollection.author_english} · {selectedCollection.hadith_count} hadiths in
+                this library slice
               </p>
             </div>
           ) : null}
@@ -249,8 +242,7 @@ function HadithPage() {
                   item={item}
                   bookmarked={bookmarkedIds.has(item.id)}
                   bookmarkPending={
-                    bookmarkMutation.isPending &&
-                    bookmarkMutation.variables?.id === item.id
+                    bookmarkMutation.isPending && bookmarkMutation.variables?.id === item.id
                   }
                   onToggleBookmark={(hadith) => bookmarkMutation.mutate(hadith)}
                 />
@@ -303,8 +295,7 @@ function HadithPage() {
             <>
               <p className="text-sm text-muted-foreground">
                 {searchQueryResult.data?.total ?? 0} result
-                {(searchQueryResult.data?.total ?? 0) === 1 ? "" : "s"} for “
-                {submittedQuery}”
+                {(searchQueryResult.data?.total ?? 0) === 1 ? "" : "s"} for “{submittedQuery}”
               </p>
               <div className="space-y-4">
                 {searchQueryResult.data?.results.map((item) => (
@@ -313,12 +304,9 @@ function HadithPage() {
                     item={item}
                     bookmarked={bookmarkedIds.has(item.id)}
                     bookmarkPending={
-                      bookmarkMutation.isPending &&
-                      bookmarkMutation.variables?.id === item.id
+                      bookmarkMutation.isPending && bookmarkMutation.variables?.id === item.id
                     }
-                    onToggleBookmark={(hadith) =>
-                      bookmarkMutation.mutate(hadith)
-                    }
+                    onToggleBookmark={(hadith) => bookmarkMutation.mutate(hadith)}
                   />
                 ))}
               </div>
@@ -353,9 +341,7 @@ function HadithPage() {
                       bookmarkMutation.isPending &&
                       bookmarkMutation.variables?.id === bookmark.hadith_id
                     }
-                    onToggleBookmark={(hadith) =>
-                      bookmarkMutation.mutate(hadith)
-                    }
+                    onToggleBookmark={(hadith) => bookmarkMutation.mutate(hadith)}
                   />
                 ) : null,
               )}

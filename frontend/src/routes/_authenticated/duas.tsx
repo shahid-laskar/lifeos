@@ -45,11 +45,7 @@ function DuasPage() {
 
   return (
     <>
-      <PageHeader
-        title="Du'as"
-        arabic="دُعَاء"
-        subtitle="Supplications for every occasion"
-      />
+      <PageHeader title="Du'as" arabic="دُعَاء" subtitle="Supplications for every occasion" />
 
       {/* Category tab bar */}
       <div

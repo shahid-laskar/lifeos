@@ -80,19 +80,12 @@ function ResetPasswordPage() {
       }
     >
       {done ? (
-        <FormNotice>
-          Your password has been updated. Taking you to sign in…
-        </FormNotice>
+        <FormNotice>Your password has been updated. Taking you to sign in…</FormNotice>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="token">Reset token</Label>
-            <Input
-              id="token"
-              required
-              value={token}
-              onChange={(e) => setToken(e.target.value)}
-            />
+            <Input id="token" required value={token} onChange={(e) => setToken(e.target.value)} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="new-password">New password</Label>

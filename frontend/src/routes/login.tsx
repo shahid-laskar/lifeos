@@ -48,11 +48,7 @@ function LoginPage() {
       signIn(tokens);
       navigate({ to: "/home", replace: true });
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "We couldn't sign you in. Please try again.",
-      );
+      setError(err instanceof Error ? err.message : "We couldn't sign you in. Please try again.");
     } finally {
       setPending(false);
     }
@@ -65,7 +61,10 @@ function LoginPage() {
       footer={
         <>
           New here?{" "}
-          <Link to="/register" className="font-medium text-primary underline-offset-4 hover:underline">
+          <Link
+            to="/register"
+            className="font-medium text-primary underline-offset-4 hover:underline"
+          >
             Create an account
           </Link>
         </>

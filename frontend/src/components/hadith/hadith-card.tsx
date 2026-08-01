@@ -23,9 +23,7 @@ export function HadithCard({
           <p className="text-xs font-medium text-muted-foreground">
             {item.collection_name} · Hadith {item.hadith_number}
           </p>
-          <p className="text-sm text-foreground/80">
-            {item.chapter_name_english}
-          </p>
+          <p className="text-sm text-foreground/80">{item.chapter_name_english}</p>
         </div>
         <div className="flex items-center gap-2">
           <span
@@ -67,14 +65,10 @@ export function HadithCard({
       </p>
 
       {item.narrator ? (
-        <p className="mb-2 text-sm font-medium text-muted-foreground">
-          {item.narrator}
-        </p>
+        <p className="mb-2 text-sm font-medium text-muted-foreground">{item.narrator}</p>
       ) : null}
 
-      <p className="text-base leading-relaxed text-foreground/90">
-        {item.translation}
-      </p>
+      <p className="text-base leading-relaxed text-foreground/90">{item.translation}</p>
 
       {item.chapter_name_arabic ? (
         <p

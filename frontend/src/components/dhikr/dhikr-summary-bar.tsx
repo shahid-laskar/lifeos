@@ -48,9 +48,7 @@ export function DhikrSummaryBar() {
           ))}
         </div>
         <div className="shrink-0 text-right">
-          <span className="text-base font-semibold tabular-nums text-foreground">
-            {total}
-          </span>
+          <span className="text-base font-semibold tabular-nums text-foreground">{total}</span>
           <p className="text-[10px] text-muted-foreground">Total</p>
         </div>
       </div>

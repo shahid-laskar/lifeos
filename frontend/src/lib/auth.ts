@@ -9,11 +9,7 @@ import {
 } from "./api/tokens";
 
 export function useTokens() {
-  return useSyncExternalStore(
-    subscribeTokens,
-    getTokensSnapshot,
-    getServerTokensSnapshot,
-  );
+  return useSyncExternalStore(subscribeTokens, getTokensSnapshot, getServerTokensSnapshot);
 }
 
 export function useIsAuthenticated() {

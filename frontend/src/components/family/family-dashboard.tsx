@@ -1,6 +1,14 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Users, UserMinus, ShieldAlert, LogOut, Trash2, Shield, HeartHandshake } from "lucide-react";
+import {
+  Users,
+  UserMinus,
+  ShieldAlert,
+  LogOut,
+  Trash2,
+  Shield,
+  HeartHandshake,
+} from "lucide-react";
 import { removeMember, deleteFamily, listInvitations } from "@/lib/api/endpoints";
 import { type Family } from "@/lib/api/types";
 import { InviteSection } from "./invite-section";
@@ -84,7 +92,8 @@ export function FamilyDashboard({ family, currentUserId }: FamilyDashboardProps)
             </span>
             <h2 className="mt-2 text-xl font-bold text-foreground">{family.name}</h2>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Created {new Date(family.created_at).toLocaleDateString()} • {family.members.length} member(s)
+              Created {new Date(family.created_at).toLocaleDateString()} • {family.members.length}{" "}
+              member(s)
             </p>
           </div>
         </div>
@@ -93,7 +102,8 @@ export function FamilyDashboard({ family, currentUserId }: FamilyDashboardProps)
         <div className="mt-4 rounded-lg bg-accent/40 border border-border p-3 text-xs text-muted-foreground flex items-start gap-2">
           <HeartHandshake className="h-4 w-4 text-primary shrink-0 mt-0.5" />
           <span>
-            Family privacy is enforced: member worship logs, Qur'an reading, and dhikr counts remain private to each individual (Article 6).
+            Family privacy is enforced: member worship logs, Qur'an reading, and dhikr counts remain
+            private to each individual (Article 6).
           </span>
         </div>
       </div>
@@ -140,7 +150,11 @@ export function FamilyDashboard({ family, currentUserId }: FamilyDashboardProps)
                         size="sm"
                         className="text-destructive hover:text-destructive hover:bg-destructive/10 h-8"
                       >
-                        {isSelf ? <LogOut className="h-4 w-4 mr-1" /> : <UserMinus className="h-4 w-4 mr-1" />}
+                        {isSelf ? (
+                          <LogOut className="h-4 w-4 mr-1" />
+                        ) : (
+                          <UserMinus className="h-4 w-4 mr-1" />
+                        )}
                         {isSelf ? "Leave" : "Remove"}
                       </Button>
                     </AlertDialogTrigger>
@@ -196,7 +210,8 @@ export function FamilyDashboard({ family, currentUserId }: FamilyDashboardProps)
                 <AlertDialogHeader>
                   <AlertDialogTitle>Disband Family Circle?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    This is an irreversible structural change. All family members will lose access to this family group.
+                    This is an irreversible structural change. All family members will lose access
+                    to this family group.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>

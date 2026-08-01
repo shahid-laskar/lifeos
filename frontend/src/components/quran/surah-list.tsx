@@ -13,9 +13,7 @@ function RevelationBadge({ type }: { type: string }) {
     <span
       className={cn(
         "rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide",
-        isMeccan
-          ? "bg-gold/15 text-gold-foreground"
-          : "bg-sage/20 text-sage-foreground",
+        isMeccan ? "bg-gold/15 text-gold-foreground" : "bg-sage/20 text-sage-foreground",
       )}
     >
       {type}
@@ -33,14 +31,7 @@ function ProgressDot({ fraction }: { fraction: number }) {
       className="relative flex size-5 shrink-0 items-center justify-center"
     >
       <svg viewBox="0 0 20 20" className="absolute inset-0 size-full -rotate-90">
-        <circle
-          cx="10"
-          cy="10"
-          r="8"
-          fill="none"
-          stroke="var(--color-muted)"
-          strokeWidth="2"
-        />
+        <circle cx="10" cy="10" r="8" fill="none" stroke="var(--color-muted)" strokeWidth="2" />
         <circle
           cx="10"
           cy="10"
@@ -57,11 +48,7 @@ function ProgressDot({ fraction }: { fraction: number }) {
   );
 }
 
-export function SurahList({
-  onSelect,
-}: {
-  onSelect: (surah: SurahResponse) => void;
-}) {
+export function SurahList({ onSelect }: { onSelect: (surah: SurahResponse) => void }) {
   const [search, setSearch] = useState("");
 
   const surahsQuery = useQuery({

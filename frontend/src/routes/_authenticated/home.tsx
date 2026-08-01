@@ -23,14 +23,12 @@ export const Route = createFileRoute("/_authenticated/home")({
       { title: "Today — Muslim Life OS" },
       {
         name: "description",
-        content:
-          "Your prayer times, prayer log, dhikr totals and Qur'an reading for today.",
+        content: "Your prayer times, prayer log, dhikr totals and Qur'an reading for today.",
       },
       { property: "og:title", content: "Today — Muslim Life OS" },
       {
         property: "og:description",
-        content:
-          "Your prayer times, prayer log, dhikr totals and Qur'an reading for today.",
+        content: "Your prayer times, prayer log, dhikr totals and Qur'an reading for today.",
       },
     ],
   }),
@@ -80,8 +78,7 @@ function HomePage() {
 
   const times = prayerTimes.data ?? fallbackTimes.data;
   const loading =
-    prayerTimes.isPending ||
-    (prayerTimes.isError && coords !== null && fallbackTimes.isPending);
+    prayerTimes.isPending || (prayerTimes.isError && coords !== null && fallbackTimes.isPending);
 
   const greetingDate = new Date().toLocaleDateString(undefined, {
     weekday: "long",

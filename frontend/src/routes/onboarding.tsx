@@ -21,10 +21,7 @@ import {
   type OnboardingGoal,
 } from "@/lib/api/types";
 import { useIsAuthenticated } from "@/lib/auth";
-import {
-  searchLocations,
-  type LocationSuggestion,
-} from "@/lib/location-search";
+import { searchLocations, type LocationSuggestion } from "@/lib/location-search";
 import { browserTimezone } from "@/lib/prayer";
 import { cn } from "@/lib/utils";
 
@@ -98,9 +95,7 @@ function OnboardingPage() {
     onSuccess: () => navigate({ to: "/home", replace: true }),
     onError: (err: unknown) =>
       setError(
-        err instanceof Error
-          ? err.message
-          : "We couldn't save that just now. Please try again.",
+        err instanceof Error ? err.message : "We couldn't save that just now. Please try again.",
       ),
   });
 
@@ -129,9 +124,7 @@ function OnboardingPage() {
         setLat(latitude);
         setLng(longitude);
         setTimezone(browserTimezone());
-        setLocationLabel(
-          `Current location (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`,
-        );
+        setLocationLabel(`Current location (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`);
         setLocating(false);
       },
       () => {
@@ -168,11 +161,7 @@ function OnboardingPage() {
   }
 
   const canContinue =
-    step === 0
-      ? lat !== null && lng !== null
-      : step === 1
-        ? true
-        : goals.length > 0;
+    step === 0 ? lat !== null && lng !== null : step === 1 ? true : goals.length > 0;
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-background px-5 py-10">
@@ -183,10 +172,7 @@ function OnboardingPage() {
             {[0, 1, 2].map((index) => (
               <span
                 key={index}
-                className={cn(
-                  "h-1.5 w-10 rounded-full",
-                  index <= step ? "bg-gold" : "bg-border",
-                )}
+                className={cn("h-1.5 w-10 rounded-full", index <= step ? "bg-gold" : "bg-border")}
               />
             ))}
           </div>
@@ -196,9 +182,8 @@ function OnboardingPage() {
               <div>
                 <h1 className="text-xl font-semibold">Where are you praying from?</h1>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Search your city (free OpenStreetMap lookup — no API key), or use
-                  your device location. Coordinates stay on your account only for
-                  prayer times.
+                  Search your city (free OpenStreetMap lookup — no API key), or use your device
+                  location. Coordinates stay on your account only for prayer times.
                 </p>
               </div>
               <Button
@@ -220,9 +205,7 @@ function OnboardingPage() {
                   onChange={(e) => runCitySearch(e.target.value)}
                   autoComplete="off"
                 />
-                {searching ? (
-                  <p className="text-xs text-muted-foreground">Searching…</p>
-                ) : null}
+                {searching ? <p className="text-xs text-muted-foreground">Searching…</p> : null}
                 {suggestions.length > 0 ? (
                   <ul className="absolute left-0 right-0 z-20 max-h-56 overflow-y-auto rounded-lg border border-border bg-card shadow-lg">
                     {suggestions.map((item) => (
@@ -283,10 +266,7 @@ function OnboardingPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="asr">Asr method</Label>
-                <Select
-                  value={asr}
-                  onValueChange={(value) => setAsr(value as AsrMethod)}
-                >
+                <Select value={asr} onValueChange={(value) => setAsr(value as AsrMethod)}>
                   <SelectTrigger id="asr">
                     <SelectValue />
                   </SelectTrigger>
@@ -296,9 +276,8 @@ function OnboardingPage() {
                   </SelectContent>
                 </Select>
                 <p className="text-xs leading-relaxed text-muted-foreground">
-                  Standard places Asr when an object's shadow equals its own length;
-                  Hanafi waits until the shadow is twice that length, so Asr comes
-                  later in the afternoon.
+                  Standard places Asr when an object's shadow equals its own length; Hanafi waits
+                  until the shadow is twice that length, so Asr comes later in the afternoon.
                 </p>
               </div>
             </div>
@@ -336,9 +315,7 @@ function OnboardingPage() {
                         <span className="block text-sm font-medium text-foreground">
                           {goal.label}
                         </span>
-                        <span className="block text-xs text-muted-foreground">
-                          {goal.note}
-                        </span>
+                        <span className="block text-xs text-muted-foreground">{goal.note}</span>
                       </button>
                     </li>
                   );
@@ -370,13 +347,7 @@ function OnboardingPage() {
               disabled={!canContinue || save.isPending}
               onClick={() => (step < 2 ? setStep((s) => s + 1) : save.mutate())}
             >
-              {save.isPending ? (
-                <StarSpinner size={18} />
-              ) : step < 2 ? (
-                "Continue"
-              ) : (
-                "Finish setup"
-              )}
+              {save.isPending ? <StarSpinner size={18} /> : step < 2 ? "Continue" : "Finish setup"}
             </Button>
           </div>
         </div>

@@ -28,8 +28,7 @@ export function PrayerTimesStrip({ times }: { times: PrayerTimes }) {
               {PRAYER_LABELS[upcoming.name].arabic}
             </p>
             <p className="text-lg font-medium">
-              {PRAYER_LABELS[upcoming.name].latin} ·{" "}
-              {formatPrayerTime(times[upcoming.name])}
+              {PRAYER_LABELS[upcoming.name].latin} · {formatPrayerTime(times[upcoming.name])}
             </p>
             <p className="mt-2 font-mono text-2xl tabular-nums">
               {formatCountdown(upcoming.msRemaining)}

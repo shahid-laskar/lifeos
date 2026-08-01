@@ -3,10 +3,8 @@ from __future__ import annotations
 import uuid
 from datetime import date as date_type, datetime, timedelta, timezone
 
-from app.domain.habit.entities import PrayerLogRecord, PrayerName, PrayerStatus
-, PrayerJournalRecord
-from app.domain.habit.models import ConsistencyMetrics, DailyPrayerStatus
-, PrayerInsightsResponse
+from app.domain.habit.entities import PrayerLogRecord, PrayerName, PrayerStatus, PrayerJournalRecord
+from app.domain.habit.models import ConsistencyMetrics, DailyPrayerStatus, PrayerInsightsResponse
 from app.domain.habit.repository import HabitRepository
 
 

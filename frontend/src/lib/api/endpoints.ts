@@ -1,3 +1,4 @@
+export * from "./types";
 import { apiFetch } from "./client";
 import type {
   AIMessage,
@@ -101,10 +102,7 @@ export function updateProfile(input: Partial<UserProfile>) {
 
 function normalizePrayerTimes(payload: unknown): PrayerTimeResponse {
   const record = (payload ?? {}) as Record<string, unknown>;
-  const source = (record.times ?? record.prayer_times ?? record) as Record<
-    string,
-    unknown
-  >;
+  const source = (record.times ?? record.prayer_times ?? record) as Record<string, unknown>;
   const times = {} as PrayerTimes;
   for (const name of [...PRAYER_NAMES, "sunrise"] as const) {
     const value = source[name] ?? source[name.toUpperCase()];
@@ -117,8 +115,7 @@ function normalizePrayerTimes(payload: unknown): PrayerTimeResponse {
     longitude: number(record.longitude),
     method: record.method as PrayerTimeResponse["method"],
     asr_method: record.asr_method as PrayerTimeResponse["asr_method"],
-    high_latitude_adjustment_applied:
-      record.high_latitude_adjustment_applied === true,
+    high_latitude_adjustment_applied: record.high_latitude_adjustment_applied === true,
     times,
   };
 }
@@ -155,11 +152,7 @@ export async function getPrayerTimesForLocation(input: {
 
 /* --------------------------------- habits -------------------------------- */
 
-export function logPrayer(input: {
-  prayer: PrayerName;
-  status: PrayerStatus;
-  date?: string;
-}) {
+export function logPrayer(input: { prayer: PrayerName; status: PrayerStatus; date?: string }) {
   return apiFetch<PrayerLogEntry>("/api/v1/habits/prayers/log", {
     method: "POST",
     body: input,
@@ -193,7 +186,13 @@ export function getPrayerJournal() {
   return apiFetch<PrayerJournalEntry[]>("/api/v1/habits/prayers/journal");
 }
 
-export function logPrayerJournal(body: { prayer_name: string; date: string; khushoo_rating: number; notes: string; distractions: string }) {
+export function logPrayerJournal(body: {
+  prayer_name: string;
+  date: string;
+  khushoo_rating: number;
+  notes: string;
+  distractions: string;
+}) {
   return apiFetch<PrayerJournalEntry>("/api/v1/habits/prayers/journal", { method: "POST", body });
 }
 
@@ -222,9 +221,7 @@ export function logDhikrSession(body: DhikrLogRequest) {
 /* --------------------------------- quran --------------------------------- */
 
 export function getWeeklyQuranSummary() {
-  return apiFetch<QuranWeeklySummaryResponse>(
-    "/api/v1/quran/reading-progress/summary/weekly",
-  );
+  return apiFetch<QuranWeeklySummaryResponse>("/api/v1/quran/reading-progress/summary/weekly");
 }
 
 export function getSurahs() {
@@ -232,10 +229,7 @@ export function getSurahs() {
 }
 
 export function getSurahAyahs(surahNumber: number) {
-  return apiFetch<SurahAyahsResponse>(
-    `/api/v1/quran/surahs/${surahNumber}/ayahs`,
-    { auth: false },
-  );
+  return apiFetch<SurahAyahsResponse>(`/api/v1/quran/surahs/${surahNumber}/ayahs`, { auth: false });
 }
 
 export function getBookmarks() {
@@ -250,10 +244,9 @@ export function addBookmark(body: BookmarkRequest) {
 }
 
 export function removeBookmark(surahNumber: number, ayahNumber: number) {
-  return apiFetch<null>(
-    `/api/v1/quran/bookmarks/${surahNumber}/${ayahNumber}`,
-    { method: "DELETE" },
-  );
+  return apiFetch<null>(`/api/v1/quran/bookmarks/${surahNumber}/${ayahNumber}`, {
+    method: "DELETE",
+  });
 }
 
 export function getReadingProgress() {
@@ -270,7 +263,7 @@ export function updateReadingProgress(body: ReadingProgressRequest) {
 export function getAyahTafsir(surahNumber: number, ayahNumber: number, source?: string) {
   return apiFetch<TafsirResponse>(
     `/api/v1/quran/surahs/${surahNumber}/ayahs/${ayahNumber}/tafsir`,
-    { query: source ? { source } : undefined }
+    { query: source ? { source } : undefined },
   );
 }
 
@@ -407,26 +400,18 @@ export function getHadithCollections() {
 }
 
 export function getHadithChapters(slug: string) {
-  return apiFetch<HadithChapterResponse[]>(
-    `/api/v1/hadith/collections/${slug}/chapters`,
-  );
+  return apiFetch<HadithChapterResponse[]>(`/api/v1/hadith/collections/${slug}/chapters`);
 }
 
 export function getHadithChapterItems(slug: string, chapterId: number) {
-  return apiFetch<HadithItemResponse[]>(
-    `/api/v1/hadith/collections/${slug}/chapters/${chapterId}`,
-  );
+  return apiFetch<HadithItemResponse[]>(`/api/v1/hadith/collections/${slug}/chapters/${chapterId}`);
 }
 
 export function getHadith(hadithId: string) {
   return apiFetch<HadithItemResponse>(`/api/v1/hadith/${hadithId}`);
 }
 
-export function searchHadiths(input: {
-  q: string;
-  collection?: string;
-  limit?: number;
-}) {
+export function searchHadiths(input: { q: string; collection?: string; limit?: number }) {
   return apiFetch<HadithSearchResponse>("/api/v1/hadith/search", {
     query: {
       q: input.q,

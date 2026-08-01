@@ -20,10 +20,8 @@ export function BookmarksTab({
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (b: BookmarkResponse) =>
-      removeBookmark(b.surah_number, b.ayah_number),
-    onSettled: () =>
-      queryClient.invalidateQueries({ queryKey: ["bookmarks"] }),
+    mutationFn: (b: BookmarkResponse) => removeBookmark(b.surah_number, b.ayah_number),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ["bookmarks"] }),
   });
 
   // Build lookup map for surah names
@@ -53,10 +51,7 @@ export function BookmarksTab({
       {data.map((bookmark) => {
         const surah = surahMap.get(bookmark.surah_number);
         return (
-          <li
-            key={bookmark.id}
-            className="flex items-start gap-3 px-5 py-4"
-          >
+          <li key={bookmark.id} className="flex items-start gap-3 px-5 py-4">
             {/* Gold ribbon */}
             <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-gold/15">
               <span className="text-gold text-sm">🔖</span>
@@ -70,16 +65,11 @@ export function BookmarksTab({
               onClick={() => surah && onNavigateToSurah(surah)}
             >
               <p className="text-sm font-medium text-foreground">
-                {surah?.transliterated_name ?? `Surah ${bookmark.surah_number}`}
-                {" "}
-                <span className="text-muted-foreground">
-                  · Ayah {bookmark.ayah_number}
-                </span>
+                {surah?.transliterated_name ?? `Surah ${bookmark.surah_number}`}{" "}
+                <span className="text-muted-foreground">· Ayah {bookmark.ayah_number}</span>
               </p>
               {bookmark.note ? (
-                <p className="mt-0.5 text-xs text-muted-foreground">
-                  {bookmark.note}
-                </p>
+                <p className="mt-0.5 text-xs text-muted-foreground">{bookmark.note}</p>
               ) : null}
             </button>
 
