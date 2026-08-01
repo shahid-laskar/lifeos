@@ -34,6 +34,8 @@ import type {
   SurahResponse,
   TafsirResponse,
   UserProfile,
+  MemorisationProgress,
+  HifdhReviewItem,
 } from "./types";
 import { PRAYER_NAMES } from "./types";
 
@@ -256,6 +258,21 @@ export function getAyahTafsir(surahNumber: number, ayahNumber: number, source?: 
     `/api/v1/quran/surahs/${surahNumber}/ayahs/${ayahNumber}/tafsir`,
     { query: source ? { source } : undefined }
   );
+}
+
+export function getHifdhProgress() {
+  return apiFetch<MemorisationProgress[]>("/api/v1/quran/memorisation/progress");
+}
+
+export function getHifdhTodayReview() {
+  return apiFetch<HifdhReviewItem[]>("/api/v1/quran/memorisation/today-review");
+}
+
+export function markAyahMemorised(surahNumber: number, ayahNumber: number) {
+  return apiFetch<null>("/api/v1/quran/memorisation/mark", {
+    method: "POST",
+    body: { surah_number: surahNumber, ayah_number: ayahNumber },
+  });
 }
 
 /* ---------------------------------- ai ---------------------------------- */

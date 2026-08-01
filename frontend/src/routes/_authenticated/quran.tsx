@@ -4,6 +4,7 @@ import { useState } from "react";
 import { AyahReader } from "@/components/quran/ayah-reader";
 import { BookmarksTab } from "@/components/quran/bookmarks-tab";
 import { SurahList } from "@/components/quran/surah-list";
+import { HifdhTab } from "@/components/quran/hifdh-tab";
 import { PageHeader } from "@/components/layout/page-header";
 import { getSurahs } from "@/lib/api/endpoints";
 import type { SurahResponse } from "@/lib/api/types";
@@ -28,7 +29,7 @@ export const Route = createFileRoute("/_authenticated/quran")({
   component: QuranPage,
 });
 
-type Tab = "surahs" | "bookmarks";
+type Tab = "surahs" | "bookmarks" | "hifdh";
 
 function QuranPage() {
   const [activeTab, setActiveTab] = useState<Tab>("surahs");
@@ -68,7 +69,7 @@ function QuranPage() {
         aria-label="Qur'an sections"
         className="mx-5 mb-4 flex rounded-xl border border-border bg-muted/50 p-1"
       >
-        {(["surahs", "bookmarks"] as const).map((tab) => (
+        {(["surahs", "bookmarks", "hifdh"] as const).map((tab) => (
           <button
             key={tab}
             id={`quran-tab-${tab}`}
@@ -83,7 +84,7 @@ function QuranPage() {
                 : "text-muted-foreground hover:text-foreground",
             )}
           >
-            {tab === "surahs" ? "All Surahs" : "Bookmarks"}
+            {tab === "surahs" ? "All Surahs" : tab === "bookmarks" ? "Bookmarks" : "Hifdh"}
           </button>
         ))}
       </div>
@@ -92,8 +93,15 @@ function QuranPage() {
       <div className="pb-24">
         {activeTab === "surahs" ? (
           <SurahList onSelect={setOpenSurah} />
-        ) : (
+        ) : activeTab === "bookmarks" ? (
           <BookmarksTab
+            surahs={surahsQuery.data ?? []}
+            onNavigateToSurah={(s) => {
+              setOpenSurah(s);
+            }}
+          />
+        ) : (
+          <HifdhTab
             surahs={surahsQuery.data ?? []}
             onNavigateToSurah={(s) => {
               setOpenSurah(s);

@@ -207,6 +207,18 @@ export type TafsirResponse = {
   text: string;
 };
 
+export type MemorisationProgress = {
+  surah_number: number;
+  ayahs_memorised: number[];
+  completion_percentage: number;
+};
+
+export type HifdhReviewItem = {
+  surah_number: number;
+  ayah_number: number;
+  last_reviewed: string;
+};
+
 /* --------------------------------- dhikr --------------------------------- */
 
 /** Matches DhikrItemResponse from openapi.json. */

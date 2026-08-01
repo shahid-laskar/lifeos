@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Bookmark, BookmarkCheck, BookOpen } from "lucide-react";
+import { ArrowLeft, Bookmark, BookmarkCheck, BookOpen, CheckCircle2, Circle } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { LoadingBlock } from "@/components/brand/pattern";
 import { ErrorState } from "@/components/brand/states";
@@ -10,6 +10,8 @@ import {
   removeBookmark,
   updateReadingProgress,
   getAyahTafsir,
+  getHifdhProgress,
+  markAyahMemorised,
 } from "@/lib/api/endpoints";
 import type { SurahResponse } from "@/lib/api/types";
 
@@ -46,6 +48,8 @@ function AyahCard({
   isBookmarked: boolean;
   onBookmark: (ayah: number) => void;
   onUnbookmark: (ayah: number) => void;
+  isMemorised: boolean;
+  onMemorise: (ayah: number) => void;
 }) {
   const [showTafsir, setShowTafsir] = useState(false);
   const [tafsirSource, setTafsirSource] = useState("ibn_kathir");
@@ -95,6 +99,19 @@ function AyahCard({
           className="flex size-9 items-center justify-center rounded-full transition-colors hover:bg-gold/10"
         >
           <BookOpen className="size-5 text-muted-foreground" />
+        </button>
+        <button
+          type="button"
+          aria-label={`Mark ayah ${numberInSurah} as memorised`}
+          onClick={() => !isMemorised && onMemorise(numberInSurah)}
+          disabled={isMemorised}
+          className="flex size-9 items-center justify-center rounded-full transition-colors hover:bg-gold/10 disabled:opacity-50"
+        >
+          {isMemorised ? (
+            <CheckCircle2 className="size-5 text-gold" />
+          ) : (
+            <Circle className="size-5 text-muted-foreground" />
+          )}
         </button>
         </div>
       </div>
@@ -167,6 +184,21 @@ export function AyahReader({
     return set;
   }, [bookmarksQuery.data, surah.number]);
 
+  const hifdhQuery = useQuery({
+    queryKey: ["hifdh-progress"],
+    queryFn: getHifdhProgress,
+  });
+
+  const memorisedAyahs = useMemo(() => {
+    const set = new Set<number>();
+    if (!hifdhQuery.data) return set;
+    const progress = hifdhQuery.data.find((p) => p.surah_number === surah.number);
+    if (progress) {
+      progress.ayahs_memorised.forEach((a) => set.add(a));
+    }
+    return set;
+  }, [hifdhQuery.data, surah.number]);
+
   const addBookmarkMutation = useMutation({
     mutationFn: (ayahNumber: number) =>
       addBookmark({ surah_number: surah.number, ayah_number: ayahNumber }),
@@ -179,6 +211,14 @@ export function AyahReader({
       removeBookmark(surah.number, ayahNumber),
     onSettled: () =>
       queryClient.invalidateQueries({ queryKey: ["bookmarks"] }),
+  });
+
+  const memoriseMutation = useMutation({
+    mutationFn: (ayahNumber: number) => markAyahMemorised(surah.number, ayahNumber),
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["hifdh-progress"] });
+      queryClient.invalidateQueries({ queryKey: ["hifdh-review"] });
+    }
   });
 
   // Scroll-debounced reading progress update (2 s debounce per spec)
@@ -274,6 +314,8 @@ export function AyahReader({
                 isBookmarked={bookmarkedAyahs.has(ayah.number_in_surah)}
                 onBookmark={(n) => addBookmarkMutation.mutate(n)}
                 onUnbookmark={(n) => removeBookmarkMutation.mutate(n)}
+                isMemorised={memorisedAyahs.has(ayah.number_in_surah)}
+                onMemorise={(n) => memoriseMutation.mutate(n)}
               />
             ))}
           </div>
