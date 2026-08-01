@@ -4,7 +4,9 @@ import uuid
 from datetime import date as date_type, datetime, timedelta, timezone
 
 from app.domain.habit.entities import PrayerLogRecord, PrayerName, PrayerStatus
+, PrayerJournalRecord
 from app.domain.habit.models import ConsistencyMetrics, DailyPrayerStatus
+, PrayerInsightsResponse
 from app.domain.habit.repository import HabitRepository
 
 
@@ -85,4 +87,60 @@ class HabitService:
 
     def get_fasting_status(self, user_id: str, date: date_type) -> dict:
         return self._repository.get_fasting_status(user_id, date)
+
+    def log_prayer_journal(
+        self, user_id: str, date: date_type, prayer_name: PrayerName, khushoo_rating: int, notes: str | None, distractions: str | None
+    ) -> PrayerJournalRecord:
+        now = datetime.now(timezone.utc)
+        existing = self._repository.get_prayer_journal(user_id, date, prayer_name)
+        if existing:
+            existing.khushoo_rating = khushoo_rating
+            existing.notes = notes
+            existing.distractions = distractions
+            existing.updated_at = now
+            return self._repository.log_prayer_journal(existing)
+
+        record = PrayerJournalRecord(
+            id=str(uuid.uuid4()),
+            user_id=user_id,
+            date=date,
+            prayer_name=prayer_name,
+            khushoo_rating=khushoo_rating,
+            notes=notes,
+            distractions=distractions,
+            created_at=now,
+            updated_at=now,
+        )
+        return self._repository.log_prayer_journal(record)
+
+    def get_prayer_journal(self, user_id: str, date: date_type, prayer_name: PrayerName) -> PrayerJournalRecord | None:
+        return self._repository.get_prayer_journal(user_id, date, prayer_name)
+
+    def get_prayer_insights(self, user_id: str, today: date_type) -> PrayerInsightsResponse:
+        start_date = today - timedelta(days=29)
+        journals = self._repository.get_prayer_journals_for_date_range(user_id, start_date, today)
+        
+        if not journals:
+            return PrayerInsightsResponse(
+                average_khushoo=0.0,
+                common_distractions=[],
+                encouragement="Start journaling your prayers to see insights."
+            )
+            
+        avg_khushoo = sum(j.khushoo_rating for j in journals) / len(journals)
+        distractions = []
+        for j in journals:
+            if j.distractions:
+                distractions.extend([d.strip() for d in j.distractions.split(",") if d.strip()])
+                
+        # Get top 3 distractions
+        from collections import Counter
+        top_distractions = [d for d, _ in Counter(distractions).most_common(3)]
+        
+        return PrayerInsightsResponse(
+            average_khushoo=round(avg_khushoo, 1),
+            common_distractions=top_distractions,
+            encouragement="May Allah accept your prayers and grant you khushoo."
+        )
+
 

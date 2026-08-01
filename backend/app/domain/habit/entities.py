@@ -25,3 +25,15 @@ class PrayerLogRecord:
     status: PrayerStatus
     created_at: datetime
     updated_at: datetime
+
+@dataclass
+class PrayerJournalRecord:
+    id: str
+    user_id: str
+    date: date_type
+    prayer_name: PrayerName
+    khushoo_rating: int
+    notes: str | None
+    distractions: str | None
+    created_at: datetime
+    updated_at: datetime

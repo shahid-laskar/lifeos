@@ -12,6 +12,11 @@ from app.domain.habit.models import (
     PrayerLogResponse,
     DailyPrayerStatus,
     ConsistencyMetrics
+,
+    PrayerJournalRequest,
+    PrayerJournalResponse,
+    PrayerInsightsResponse,
+    PrayerName
 )
 
 router = APIRouter(prefix="/habits", tags=["habits"])
@@ -99,3 +104,73 @@ def get_fasting_status(
     target_date = date or datetime.now(tz).date()
     return habit_service.get_fasting_status(current_user.id, target_date)
 
+
+@router.post("/prayers/journal", response_model=PrayerJournalResponse)
+def log_prayer_journal(
+    request: PrayerJournalRequest,
+    current_user: Annotated[UserRecord, Depends(get_current_user)],
+    habit_service: Annotated[HabitService, Depends(get_habit_service)],
+    date: date_type | None = Query(None, description="Date of the prayer. Defaults to today in user's timezone.")
+) -> PrayerJournalResponse:
+    if not current_user.timezone:
+        raise HTTPException(status_code=400, detail="User timezone must be set.")
+        
+    tz = resolve_timezone(current_user.timezone)
+    target_date = date or datetime.now(tz).date()
+
+    record = habit_service.log_prayer_journal(
+        user_id=current_user.id,
+        date=target_date,
+        prayer_name=request.prayer_name,
+        khushoo_rating=request.khushoo_rating,
+        notes=request.notes,
+        distractions=request.distractions
+    )
+    
+    return PrayerJournalResponse(
+        id=record.id,
+        date=record.date,
+        prayer_name=record.prayer_name,
+        khushoo_rating=record.khushoo_rating,
+        notes=record.notes,
+        distractions=record.distractions
+    )
+
+@router.get("/prayers/journal", response_model=PrayerJournalResponse)
+def get_prayer_journal(
+    prayer_name: PrayerName,
+    current_user: Annotated[UserRecord, Depends(get_current_user)],
+    habit_service: Annotated[HabitService, Depends(get_habit_service)],
+    date: date_type | None = Query(None, description="Date of the prayer.")
+) -> PrayerJournalResponse:
+    if not current_user.timezone:
+        raise HTTPException(status_code=400, detail="User timezone must be set.")
+        
+    tz = resolve_timezone(current_user.timezone)
+    target_date = date or datetime.now(tz).date()
+    
+    record = habit_service.get_prayer_journal(current_user.id, target_date, prayer_name)
+    if not record:
+        raise HTTPException(status_code=404, detail="Journal entry not found.")
+        
+    return PrayerJournalResponse(
+        id=record.id,
+        date=record.date,
+        prayer_name=record.prayer_name,
+        khushoo_rating=record.khushoo_rating,
+        notes=record.notes,
+        distractions=record.distractions
+    )
+
+@router.get("/prayers/insights", response_model=PrayerInsightsResponse)
+def get_prayer_insights(
+    current_user: Annotated[UserRecord, Depends(get_current_user)],
+    habit_service: Annotated[HabitService, Depends(get_habit_service)]
+) -> PrayerInsightsResponse:
+    if not current_user.timezone:
+        raise HTTPException(status_code=400, detail="User timezone must be set.")
+        
+    tz = resolve_timezone(current_user.timezone)
+    today = datetime.now(tz).date()
+    
+    return habit_service.get_prayer_insights(current_user.id, today)
