@@ -232,25 +232,35 @@ export function AyahReader({ surah, onBack }: { surah: SurahResponse; onBack: ()
     const container = scrollContainerRef.current;
     if (!container) return;
 
-    function onScroll() {
-      const articles = container!.querySelectorAll("article[id^='ayah-']");
-      let bottomMost = 1;
-      for (const el of articles) {
-        const rect = el.getBoundingClientRect();
-        if (rect.top < window.innerHeight * 0.75) {
-          const num = parseInt(el.id.replace("ayah-", ""), 10);
-          if (!isNaN(num) && num > bottomMost) bottomMost = num;
-        }
-      }
-      if (bottomMost !== lastVisibleAyah) {
-        setLastVisibleAyah(bottomMost);
-        debouncedProgressUpdate(bottomMost);
-      }
-    }
+    const articles = container.querySelectorAll("article[id^='ayah-']");
+    if (!articles.length) return;
 
-    container.addEventListener("scroll", onScroll, { passive: true });
-    return () => container.removeEventListener("scroll", onScroll);
-  }, [debouncedProgressUpdate, lastVisibleAyah]);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        let bottomMost = lastVisibleAyah;
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            const num = parseInt(entry.target.id.replace("ayah-", ""), 10);
+            if (!isNaN(num) && num > bottomMost) {
+              bottomMost = num;
+            }
+          }
+        }
+        if (bottomMost !== lastVisibleAyah) {
+          setLastVisibleAyah(bottomMost);
+          debouncedProgressUpdate(bottomMost);
+        }
+      },
+      {
+        root: container,
+        rootMargin: "0px 0px -25% 0px",
+        threshold: 0,
+      }
+    );
+
+    articles.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, [debouncedProgressUpdate, lastVisibleAyah, ayahsQuery.data]);
 
   return (
     <div className="flex h-full flex-col">
