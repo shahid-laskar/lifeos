@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import type { ReactNode } from "react";
-import { GeometricPattern, StarSpinner } from "@/components/brand/pattern";
+import { GeometricPattern } from "@/components/brand/pattern";
 import { ErrorState } from "@/components/brand/states";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "@tanstack/react-router";
 import { getDhikrSummary, getPrayerConsistency, getWeeklyQuranSummary } from "@/lib/api/endpoints";
 import { todayISO } from "@/lib/prayer";
@@ -36,7 +37,7 @@ export function DhikrWidget() {
   return (
     <Card title="Dhikr today" pattern>
       {isPending ? (
-        <StarSpinner size={22} />
+        <Skeleton className="mt-2 h-16 w-full" />
       ) : isError ? (
         <ErrorState
           title="Couldn't load your dhikr"
@@ -75,7 +76,7 @@ export function WeeklyQuranCard() {
   return (
     <Card title="Qur'an this week">
       {isPending ? (
-        <StarSpinner size={22} />
+        <Skeleton className="mt-2 h-16 w-full" />
       ) : isError ? (
         <ErrorState
           title="Couldn't load your reading"
@@ -107,7 +108,7 @@ export function ConsistencyCard() {
   return (
     <Card title="Consistency" pattern>
       {isPending ? (
-        <StarSpinner size={22} />
+        <Skeleton className="mt-2 h-20 w-full" />
       ) : isError ? (
         <ErrorState
           title="Couldn't load your consistency"
@@ -131,20 +132,18 @@ export function ConsistencyCard() {
 
 export function DuasWidget() {
   return (
-    <Card title="Du'as" pattern>
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm text-muted-foreground mt-1">Supplications for every occasion</p>
-          <Link
-            to="/duas"
-            className="mt-4 inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90"
-          >
-            Explore Du'as
-          </Link>
-        </div>
-        <p className="arabic ms-auto text-3xl text-gold opacity-80" lang="ar" dir="rtl">
-          دُعَاء
+    <Card title="Du'a of the Day" pattern>
+      <div className="mt-2 space-y-3">
+        <p className="arabic text-2xl text-right text-foreground leading-loose" lang="ar" dir="rtl">
+          رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ
         </p>
+        <p className="text-sm text-muted-foreground italic">
+          "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire."
+        </p>
+        <div className="flex justify-between items-center pt-2">
+          <span className="text-[11px] text-muted-foreground">Quran 2:201</span>
+          <Link to="/duas" className="text-xs text-primary hover:underline font-medium">More Du'as →</Link>
+        </div>
       </div>
     </Card>
   );
@@ -152,22 +151,18 @@ export function DuasWidget() {
 
 export function HadithWidget() {
   return (
-    <Card title="Hadith" pattern>
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm text-muted-foreground mt-1">
-            Bukhari, Muslim, and more — with search and bookmarks
-          </p>
-          <Link
-            to="/hadith"
-            className="mt-4 inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90"
-          >
-            Browse Hadith
-          </Link>
-        </div>
-        <p className="arabic ms-auto text-3xl text-gold opacity-80" lang="ar" dir="rtl">
-          حَدِيث
+    <Card title="Hadith of the Day" pattern>
+      <div className="mt-2 space-y-3">
+        <p className="arabic text-2xl text-right text-foreground leading-loose" lang="ar" dir="rtl">
+          إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ
         </p>
+        <p className="text-sm text-muted-foreground italic">
+          "Actions are (judged) by motives (niyyah), so each man will have what he intended."
+        </p>
+        <div className="flex justify-between items-center pt-2">
+          <span className="text-[11px] text-muted-foreground">Sahih al-Bukhari 1</span>
+          <Link to="/hadith" className="text-xs text-primary hover:underline font-medium">Read Hadith →</Link>
+        </div>
       </div>
     </Card>
   );

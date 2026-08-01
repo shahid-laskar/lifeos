@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { StarSpinner } from "@/components/brand/pattern";
 import { ErrorState } from "@/components/brand/states";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   ConsistencyCard,
   DhikrWidget,
@@ -13,8 +14,9 @@ import {
 import { PrayerStatusRow } from "@/components/home/prayer-status-row";
 import { PrayerTimesStrip } from "@/components/home/prayer-times-strip";
 import { PageHeader } from "@/components/layout/page-header";
-import { getMyPrayerTimes, getPrayerTimesForLocation } from "@/lib/api/endpoints";
+import { getMyPrayerTimes, getPrayerTimesForLocation, getProfile } from "@/lib/api/endpoints";
 import { todayISO, utcOffsetHours } from "@/lib/prayer";
+import { getHijriDate } from "@/lib/hijri";
 
 export const Route = createFileRoute("/_authenticated/home")({
   ssr: false,
@@ -76,6 +78,11 @@ function HomePage() {
       }),
   });
 
+  const profileQuery = useQuery({
+    queryKey: ["profile"],
+    queryFn: getProfile,
+  });
+
   const times = prayerTimes.data ?? fallbackTimes.data;
   const loading =
     prayerTimes.isPending || (prayerTimes.isError && coords !== null && fallbackTimes.isPending);
@@ -85,15 +92,20 @@ function HomePage() {
     day: "numeric",
     month: "long",
   });
+  const hijriDate = getHijriDate();
+  
+  const firstName = profileQuery.data?.name?.split(" ")[0] || "there";
 
   return (
     <>
-      <PageHeader title="Today" subtitle={greetingDate} arabic="السَّلامُ عَلَيْكُم" />
+      <PageHeader 
+        title={`Assalamu Alaikum, ${firstName}`} 
+        subtitle={`${hijriDate} · ${greetingDate}`} 
+        arabic="السَّلامُ عَلَيْكُم" 
+      />
       <div className="space-y-4 px-5 pb-8">
         {loading ? (
-          <div className="flex justify-center py-10">
-            <StarSpinner size={32} />
-          </div>
+          <Skeleton className="h-[200px] w-full rounded-2xl" />
         ) : times ? (
           <PrayerTimesStrip times={times.times} />
         ) : (
@@ -111,12 +123,16 @@ function HomePage() {
           </p>
         ) : null}
 
-        <PrayerStatusRow />
-        <DhikrWidget />
+        <PrayerStatusRow times={times?.times} />
+        
+        <div className="grid grid-cols-2 gap-4">
+          <DhikrWidget />
+          <ConsistencyCard />
+        </div>
+        
         <DuasWidget />
         <HadithWidget />
         <WeeklyQuranCard />
-        <ConsistencyCard />
       </div>
     </>
   );
