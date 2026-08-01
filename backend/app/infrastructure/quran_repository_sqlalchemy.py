@@ -10,6 +10,8 @@ from sqlalchemy.orm import Session
 from sqlalchemy import and_
 
 from app.domain.quran.entities import QuranBookmark, QuranReadingProgress
+from app.domain.quran.memorisation import MemorisationRecord
+from datetime import date as date_type
 from app.infrastructure.orm_models import QuranBookmarkORM, QuranReadingProgressORM
 
 
@@ -39,6 +41,84 @@ def _progress_to_record(row: QuranReadingProgressORM) -> QuranReadingProgress:
 # ── repository ─────────────────────────────────────────────────────────────────
 
 class SqlAlchemyQuranRepository:
+
+    def get_memorisation(self, user_id: str, surah_number: int, ayah_number: int) -> MemorisationRecord | None:
+        from app.infrastructure.orm_models import QuranMemorisationORM
+        row = (
+            self._session.query(QuranMemorisationORM)
+            .filter(
+                and_(
+                    QuranMemorisationORM.user_id == user_id,
+                    QuranMemorisationORM.surah_number == surah_number,
+                    QuranMemorisationORM.ayah_number == ayah_number
+                )
+            )
+            .first()
+        )
+        if not row:
+            return None
+        return MemorisationRecord(
+            id=row.id,
+            user_id=row.user_id,
+            surah_number=row.surah_number,
+            ayah_number=row.ayah_number,
+            status=row.status,
+            last_reviewed=row.last_reviewed,
+            next_review=row.next_review,
+            strength=row.strength,
+            created_at=row.created_at,
+            updated_at=row.updated_at
+        )
+
+    def save_memorisation(self, record: MemorisationRecord) -> MemorisationRecord:
+        from app.infrastructure.orm_models import QuranMemorisationORM
+        row = self._session.get(QuranMemorisationORM, record.id)
+        if not row:
+            row = QuranMemorisationORM()
+            self._session.add(row)
+            
+        row.id = record.id
+        row.user_id = record.user_id
+        row.surah_number = record.surah_number
+        row.ayah_number = record.ayah_number
+        row.status = record.status
+        row.last_reviewed = record.last_reviewed
+        row.next_review = record.next_review
+        row.strength = record.strength
+        row.created_at = record.created_at
+        row.updated_at = record.updated_at
+        
+        self._session.commit()
+        return record
+
+    def get_memorisation_review_queue(self, user_id: str, date_until: date_type) -> list[MemorisationRecord]:
+        from app.infrastructure.orm_models import QuranMemorisationORM
+        rows = (
+            self._session.query(QuranMemorisationORM)
+            .filter(
+                and_(
+                    QuranMemorisationORM.user_id == user_id,
+                    QuranMemorisationORM.next_review <= date_until,
+                    QuranMemorisationORM.status == 'memorised'
+                )
+            )
+            .all()
+        )
+        return [
+            MemorisationRecord(
+                id=r.id,
+                user_id=r.user_id,
+                surah_number=r.surah_number,
+                ayah_number=r.ayah_number,
+                status=r.status,
+                last_reviewed=r.last_reviewed,
+                next_review=r.next_review,
+                strength=r.strength,
+                created_at=r.created_at,
+                updated_at=r.updated_at
+            ) for r in rows
+        ]
+
     def __init__(self, session: Session) -> None:
         self._session = session
 

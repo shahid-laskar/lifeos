@@ -33,6 +33,50 @@ class BookmarkNotFoundError(LookupError):
 
 
 class QuranService:
+
+    def mark_memorisation(self, user_id: str, surah_number: int, ayah_number: int, quality: int, current_date: date_type) -> MemorisationRecord:
+        from app.domain.quran.memorisation import MemorisationRecord, calculate_next_review
+        import uuid
+        from datetime import datetime, timezone
+        record = self._repository.get_memorisation(user_id, surah_number, ayah_number)
+        now = datetime.now(timezone.utc)
+        
+        if not record:
+            strength, next_review = calculate_next_review(0, current_date, quality)
+            record = MemorisationRecord(
+                id=str(uuid.uuid4()),
+                user_id=user_id,
+                surah_number=surah_number,
+                ayah_number=ayah_number,
+                status="memorised" if quality >= 3 else "learning",
+                last_reviewed=current_date,
+                next_review=next_review,
+                strength=strength,
+                created_at=now,
+                updated_at=now
+            )
+        else:
+            strength, next_review = calculate_next_review(record.strength, current_date, quality)
+            record.strength = strength
+            record.next_review = next_review
+            record.last_reviewed = current_date
+            record.status = "memorised" if quality >= 3 else "learning"
+            record.updated_at = now
+            
+        return self._repository.save_memorisation(record)
+
+    def get_memorisation_review_queue(self, user_id: str, today: date_type) -> list[MemorisationRecord]:
+        return self._repository.get_memorisation_review_queue(user_id, today)
+
+    def get_tafsir(self, surah_number: int, ayah_number: int) -> dict:
+        # Stub for tafsir data
+        return {
+            "surah_number": surah_number,
+            "ayah_number": ayah_number,
+            "source": "Ibn Kathir (Stub)",
+            "text": f"Tafsir for Surah {surah_number} Ayah {ayah_number}. This is a stubbed response since actual tafsir dataset is not fully integrated."
+        }
+
     def __init__(self, repository: QuranRepository) -> None:
         self._repo = repository
 

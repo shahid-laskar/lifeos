@@ -61,6 +61,21 @@ class PrayerLogORM(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
 
 
+class PrayerJournalORM(Base):
+    __tablename__ = "prayer_journals"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    user_id: Mapped[str] = mapped_column(String(36), index=True, nullable=False)
+    date: Mapped[date_type] = mapped_column(Date, index=True, nullable=False)
+    prayer_name: Mapped[str] = mapped_column(String(16), nullable=False)
+    khushoo_rating: Mapped[int] = mapped_column(nullable=False)
+    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    distractions: Mapped[str | None] = mapped_column(Text, nullable=True)
+    
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
+
 class QuranBookmarkORM(Base):
     """User bookmark on a specific ayah (surah_number:ayah_number)."""
     __tablename__ = "quran_bookmarks"
@@ -82,6 +97,21 @@ class QuranReadingProgressORM(Base):
     surah_number: Mapped[int] = mapped_column(nullable=False)
     last_ayah_number: Mapped[int] = mapped_column(nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
+class QuranMemorisationORM(Base):
+    __tablename__ = "quran_memorisation"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    user_id: Mapped[str] = mapped_column(String(36), index=True, nullable=False)
+    surah_number: Mapped[int] = mapped_column(nullable=False)
+    ayah_number: Mapped[int] = mapped_column(nullable=False)
+    status: Mapped[str] = mapped_column(String(16), nullable=False) # 'memorised', 'review', 'learning'
+    last_reviewed: Mapped[date_type] = mapped_column(Date, nullable=True)
+    next_review: Mapped[date_type] = mapped_column(Date, nullable=True)
+    strength: Mapped[int] = mapped_column(nullable=False, default=0) # SM2-like strength
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
 
 
 class DhikrLogORM(Base):

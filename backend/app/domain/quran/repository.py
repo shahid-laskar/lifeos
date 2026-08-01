@@ -6,6 +6,8 @@ from app.domain.quran.entities import QuranBookmark, QuranReadingProgress
 
 
 class QuranRepository(Protocol):
+    from datetime import date as date_type
+    from app.domain.quran.memorisation import MemorisationRecord
     # ── Bookmarks ────────────────────────────────────────────────────────────
 
     def add_bookmark(self, bookmark: QuranBookmark) -> QuranBookmark:

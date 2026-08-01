@@ -23,6 +23,9 @@ from app.domain.quran.service import (
     SurahNotFoundError,
 )
 from app.domain.quran.models import (
+    MemorisationMarkRequest,
+    MemorisationResponse,
+    TafsirResponse,
     BookmarkRequest,
     BookmarkResponse,
     AyahResponse,
@@ -34,6 +37,58 @@ from app.domain.quran.models import (
 )
 
 router = APIRouter(prefix="/quran", tags=["quran"])
+
+@router.post("/memorisation/mark", response_model=MemorisationResponse)
+def mark_memorisation(
+    request: MemorisationMarkRequest,
+    current_user: Annotated[UserRecord, Depends(get_current_user)],
+    quran_service: Annotated[QuranService, Depends(get_quran_service)],
+):
+    from datetime import datetime, timezone
+    now = datetime.now(timezone.utc).date()
+    record = quran_service.mark_memorisation(
+        current_user.id,
+        request.surah_number,
+        request.ayah_number,
+        request.quality,
+        now
+    )
+    return MemorisationResponse(
+        id=record.id,
+        surah_number=record.surah_number,
+        ayah_number=record.ayah_number,
+        status=record.status,
+        next_review=record.next_review
+    )
+
+@router.get("/memorisation/today-review", response_model=list[MemorisationResponse])
+def get_today_review(
+    current_user: Annotated[UserRecord, Depends(get_current_user)],
+    quran_service: Annotated[QuranService, Depends(get_quran_service)],
+):
+    from datetime import datetime, timezone
+    now = datetime.now(timezone.utc).date()
+    records = quran_service.get_memorisation_review_queue(current_user.id, now)
+    return [
+        MemorisationResponse(
+            id=r.id,
+            surah_number=r.surah_number,
+            ayah_number=r.ayah_number,
+            status=r.status,
+            next_review=r.next_review
+        ) for r in records
+    ]
+
+@router.get("/surahs/{surah_number}/ayahs/{ayah_number}/tafsir", response_model=TafsirResponse)
+def get_tafsir(
+    surah_number: int,
+    ayah_number: int,
+    current_user: Annotated[UserRecord, Depends(get_current_user)],
+    quran_service: Annotated[QuranService, Depends(get_quran_service)]
+):
+    res = quran_service.get_tafsir(surah_number, ayah_number)
+    return TafsirResponse(**res)
+
 
 
 # ── Surah listing & info ────────────────────────────────────────────────────────

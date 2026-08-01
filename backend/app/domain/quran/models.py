@@ -66,5 +66,25 @@ class ReadingProgressResponse(BaseModel):
 
 
 class QuranWeeklySummaryResponse(BaseModel):
+from datetime import date as date_type
     surahs_read_last_7_days: int
     active_days_last_7_days: int
+
+class MemorisationMarkRequest(BaseModel):
+    surah_number: int
+    ayah_number: int
+    quality: int = Field(..., ge=1, le=5) # 1 = forgotten, 5 = perfect
+
+class MemorisationResponse(BaseModel):
+    id: str
+    surah_number: int
+    ayah_number: int
+    status: str
+    next_review: date_type | None
+
+class TafsirResponse(BaseModel):
+    surah_number: int
+    ayah_number: int
+    source: str
+    text: str
+
