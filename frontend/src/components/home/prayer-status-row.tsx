@@ -104,7 +104,7 @@ export function PrayerStatusRow({ times }: { times?: PrayerTimes }) {
                     onClick={() => setDrawerPrayer(name)}
                     className={cn(
                       "flex size-12 items-center justify-center rounded-full border motion-safe:transition-all motion-safe:duration-300 motion-safe:ease-out",
-                      status === "completed" && "border-primary bg-primary text-primary-foreground fill-primary",
+                      status === "completed" && "border-primary bg-primary text-primary-foreground",
                       status === "missed" &&
                         "border-muted-foreground/40 bg-muted text-muted-foreground",
                       status === "excused" && "border-gold bg-gold/20 text-gold-foreground",
@@ -122,44 +122,39 @@ export function PrayerStatusRow({ times }: { times?: PrayerTimes }) {
           })}
         </ul>
 
-        {khushooPromptPrayer && (
-          <div className="mt-4 flex flex-col items-center rounded-xl bg-muted p-4 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-top-2 motion-safe:duration-300">
-            <p className="text-sm font-medium">How was your {PRAYER_LABELS[khushooPromptPrayer].latin}?</p>
-            <div className="mt-3 flex justify-between w-full max-w-[200px] text-2xl">
+        {khushooPromptPrayer ? (
+          <div className="mt-6 rounded-xl bg-primary/5 p-4 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-top-2 motion-safe:duration-300 border border-primary/10">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium text-primary">How was your {PRAYER_LABELS[khushooPromptPrayer].latin}?</p>
+              <Link to="/prayer-journal" className="text-xs text-primary hover:underline">Full Journal →</Link>
+            </div>
+            <div className="mt-4 flex justify-between w-full text-3xl px-2">
               {["🌑", "🌘", "🌗", "🌖", "🌕"].map((icon, i) => (
                 <button 
                   key={i} 
-                  className="motion-safe:hover:scale-125 motion-safe:transition-transform"
+                  className="motion-safe:hover:scale-125 motion-safe:transition-transform hover:drop-shadow-md"
                   onClick={() => {
                     toast.success("Reflection saved");
                     setKhushooPromptPrayer(null);
                   }}
+                  title={["Struggled", "Distracted", "Present", "Focused", "Deep Focus"][i]}
                 >
                   {icon}
                 </button>
               ))}
             </div>
           </div>
+        ) : (
+          <div className="mt-5 flex justify-center">
+            <Link
+              to="/prayer-journal"
+              className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+            >
+              <Book className="size-4" />
+              Open Prayer Journal
+            </Link>
+          </div>
         )}
-
-        <div className="mt-4 flex items-center justify-between border-t border-border pt-4">
-          {lastPrayer ? (
-            <p className="text-sm font-medium text-foreground flex-1 pr-4">
-              How was your {lastPrayerLabel}?
-            </p>
-          ) : (
-            <p className="text-xs leading-relaxed text-muted-foreground flex-1 pr-4">
-              Tap a prayer to log its status.
-            </p>
-          )}
-          <Link
-            to="/prayer-journal"
-            className="flex items-center gap-2 text-xs font-medium text-primary hover:underline"
-          >
-            <Book className="size-3" />
-            {lastPrayer ? "Reflect" : "Journal"}
-          </Link>
-        </div>
       </section>
 
       <Drawer open={!!drawerPrayer} onOpenChange={(open) => !open && setDrawerPrayer(null)}>
