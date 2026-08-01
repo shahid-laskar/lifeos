@@ -46,22 +46,28 @@ export function PrayerStatusRow({ times }: { times?: PrayerTimes }) {
     },
   });
 
-  const handleSelect = (prayer: PrayerName, newStatus: PrayerStatus, oldStatus: PrayerStatus | undefined) => {
+  const handleSelect = (
+    prayer: PrayerName,
+    newStatus: PrayerStatus,
+    oldStatus: PrayerStatus | undefined,
+  ) => {
     mutation.mutate({ prayer, status: newStatus });
     setDrawerPrayer(null);
-    
+
     toast(`Marked ${PRAYER_LABELS[prayer].latin} as ${newStatus}`, {
       duration: 10000,
-      action: oldStatus ? {
-        label: "Undo",
-        onClick: () => mutation.mutate({ prayer, status: oldStatus })
-      } : undefined
+      action: oldStatus
+        ? {
+            label: "Undo",
+            onClick: () => mutation.mutate({ prayer, status: oldStatus }),
+          }
+        : undefined,
     });
 
     if (newStatus === "completed") {
       setKhushooPromptPrayer(prayer);
       setTimeout(() => {
-        setKhushooPromptPrayer(current => current === prayer ? null : current);
+        setKhushooPromptPrayer((current) => (current === prayer ? null : current));
       }, 7000);
     } else {
       setKhushooPromptPrayer(null);
@@ -75,11 +81,14 @@ export function PrayerStatusRow({ times }: { times?: PrayerTimes }) {
           <h2 className="text-base font-semibold tracking-tight text-foreground flex items-center gap-2">
             <Sparkles className="size-4 text-primary" /> Today's Prayers
           </h2>
-          <Link to="/prayer-journal" className="text-xs font-medium text-muted-foreground hover:text-primary transition-colors flex items-center gap-1">
+          <Link
+            to="/prayer-journal"
+            className="text-xs font-medium text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"
+          >
             <Book className="size-3" /> Journal
           </Link>
         </div>
-        
+
         <div className="flex justify-between items-end relative">
           {PRAYER_NAMES.map((name) => {
             const status = statuses?.[name];
@@ -89,33 +98,41 @@ export function PrayerStatusRow({ times }: { times?: PrayerTimes }) {
             const isPendingState = !status;
 
             return (
-              <div key={name} className="flex flex-col items-center gap-3">
+              <div key={name} className="flex flex-col items-center gap-2">
                 {isPending ? (
-                  <Skeleton className="size-14 rounded-full" />
+                  <>
+                    <Skeleton className="size-11 rounded-full" />
+                    <Skeleton className="h-2 w-5 mt-1" />
+                  </>
                 ) : (
-                  <button
-                    type="button"
-                    aria-label={`${PRAYER_LABELS[name].latin}: ${status ?? "not logged"}`}
-                    onClick={() => setDrawerPrayer(name)}
-                    className={cn(
-                      "flex size-14 items-center justify-center rounded-full border-2 motion-safe:transition-all motion-safe:duration-300",
-                      isCompleted && "border-primary bg-primary shadow-md shadow-primary/20",
-                      isMissed && "border-muted-foreground/30 bg-muted text-muted-foreground",
-                      isExcused && "border-gold bg-gold/10 text-gold-foreground",
-                      isPendingState && "border-dashed border-border/60 bg-transparent text-muted-foreground/50 hover:border-primary/50 hover:bg-primary/5 hover:text-primary"
-                    )}
-                  >
-                    {isCompleted && <Check color="#ffffff" className="size-6 stroke-[3]" />}
-                    {isMissed && <X className="size-6 stroke-[3]" />}
-                    {isExcused && <Minus className="size-6 stroke-[3]" />}
-                  </button>
+                  <>
+                    <button
+                      type="button"
+                      aria-label={`${PRAYER_LABELS[name].latin}: ${status ?? "not logged"}`}
+                      onClick={() => setDrawerPrayer(name)}
+                      className={cn(
+                        "flex size-11 items-center justify-center rounded-full border-[1.5px] motion-safe:transition-all motion-safe:duration-300",
+                        isCompleted && "border-primary bg-primary shadow-sm shadow-primary/20",
+                        isMissed && "border-border bg-transparent text-muted-foreground",
+                        isExcused && "border-gold bg-gold/10 text-gold-foreground",
+                        isPendingState &&
+                          "border-dashed border-border text-muted-foreground hover:border-primary/50 hover:bg-primary/5 hover:text-primary",
+                      )}
+                    >
+                      {isCompleted && <Check color="#ffffff" className="size-5 stroke-[2.5]" />}
+                      {isMissed && <X className="size-5 stroke-[2.5]" />}
+                      {isExcused && <Minus className="size-5 stroke-[2.5]" />}
+                    </button>
+                    <span
+                      className={cn(
+                        "text-[11px] font-medium transition-colors",
+                        isCompleted ? "text-primary" : "text-muted-foreground",
+                      )}
+                    >
+                      {PRAYER_LABELS[name].latin.substring(0, 3)}
+                    </span>
+                  </>
                 )}
-                <span className={cn(
-                  "text-[11px] font-medium transition-colors",
-                  isCompleted ? "text-primary" : "text-muted-foreground"
-                )}>
-                  {PRAYER_LABELS[name].latin}
-                </span>
               </div>
             );
           })}
@@ -129,8 +146,8 @@ export function PrayerStatusRow({ times }: { times?: PrayerTimes }) {
               </p>
               <div className="flex justify-between w-full max-w-[250px] text-3xl">
                 {["🌑", "🌘", "🌗", "🌖", "🌕"].map((icon, i) => (
-                  <button 
-                    key={i} 
+                  <button
+                    key={i}
                     className="motion-safe:hover:-translate-y-2 motion-safe:transition-transform hover:drop-shadow-xl"
                     onClick={() => {
                       toast.success("Reflection saved beautifully.");

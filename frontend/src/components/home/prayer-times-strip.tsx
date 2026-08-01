@@ -24,7 +24,6 @@ function getGradientClass(nextPrayerName: string | null) {
   }
 }
 
-
 export function PrayerTimesStrip({ times }: { times: PrayerTimes }) {
   const [now, setNow] = useState(() => new Date());
 
@@ -34,61 +33,63 @@ export function PrayerTimesStrip({ times }: { times: PrayerTimes }) {
   }, []);
 
   const upcoming = useMemo(() => nextPrayer(times, now), [times, now]);
-  
+
   const gradientClass = getGradientClass(upcoming?.name ?? null);
   const isLightText = !gradientClass.includes("text-slate-900");
 
   return (
-    <section className={cn("relative overflow-hidden rounded-2xl px-5 py-6", gradientClass)}>
-      <GeometricPattern className={isLightText ? "text-white" : "text-slate-900"} opacity={0.1} />
+    <section
+      className={cn("relative overflow-hidden rounded-2xl p-5 text-white shadow-sm", gradientClass)}
+    >
+      {/* Pattern at 7% opacity per design spec */}
+      <GeometricPattern className={isLightText ? "text-white" : "text-slate-900"} opacity={0.07} />
       <div className="relative">
         {upcoming ? (
-          <div className="text-center">
-            <p className="text-xs uppercase tracking-[0.18em] opacity-70">
+          <>
+            <div className="text-[11px] uppercase tracking-[0.16em] opacity-75">
               {upcoming.tomorrow ? "Tomorrow" : "Next prayer"}
-            </p>
-            <p className={cn("arabic mt-1 text-3xl", isLightText ? "text-gold" : "text-amber-700")} lang="ar" dir="rtl">
-              {PRAYER_LABELS[upcoming.name].arabic}
-            </p>
-            <p className="text-lg font-medium">
-              {PRAYER_LABELS[upcoming.name].latin} · {formatPrayerTime(times[upcoming.name])}
-            </p>
-            <p className="mt-2 font-mono text-2xl tabular-nums">
-              {formatCountdown(upcoming.msRemaining)}
-            </p>
-          </div>
+            </div>
+            <div className="mt-2 flex items-baseline gap-2.5">
+              <div className="text-2xl font-bold tracking-[-0.01em]">
+                {PRAYER_LABELS[upcoming.name].latin}
+              </div>
+              <div className="ml-auto text-right">
+                <div className="font-mono text-[26px] font-semibold tabular-nums tracking-[-0.02em]">
+                  {formatCountdown(upcoming.msRemaining)}
+                </div>
+                <div className="mt-0.5 text-[11px] opacity-70">remaining</div>
+              </div>
+            </div>
+          </>
         ) : (
-          <p className="text-center text-sm opacity-80">
+          <div className="text-sm opacity-80 py-4">
             Prayer times will appear once your location is set.
-          </p>
+          </div>
         )}
 
-        <ul className="mt-6 grid grid-cols-5 gap-1">
-          {PRAYER_NAMES.map((name) => {
-            const isNext = upcoming?.name === name && !upcoming.tomorrow;
-            return (
-              <li
-                key={name}
-                className={cn(
-                  "rounded-xl px-1 py-2 text-center transition-colors",
-                  isNext ? "bg-primary-foreground/15" : "bg-transparent",
-                )}
-              >
-                <p className="text-[11px] uppercase tracking-wide opacity-75">
-                  {PRAYER_LABELS[name].latin}
-                </p>
-                <p
-                  className={cn(
-                    "mt-0.5 text-sm tabular-nums",
-                    isNext ? (isLightText ? "font-semibold text-gold" : "font-semibold text-amber-700") : "opacity-90",
-                  )}
+        {times && (
+          <div className="mt-5 flex justify-between border-t border-white/20 pt-3.5">
+            {PRAYER_NAMES.map((name) => {
+              const isNext = upcoming?.name === name && !upcoming.tomorrow;
+              return (
+                <div
+                  key={name}
+                  className={cn("flex-1 text-center", isNext ? "opacity-100" : "opacity-60")}
                 >
-                  {formatPrayerTime(times[name])}
-                </p>
-              </li>
-            );
-          })}
-        </ul>
+                  <b className="block text-[11px] font-semibold uppercase tracking-[0.1em]">
+                    {PRAYER_LABELS[name].latin}
+                  </b>
+                  <span className="mt-1.5 block text-[13px] tabular-nums">
+                    {formatPrayerTime(times[name])}
+                  </span>
+                  {isNext && (
+                    <i className="mx-auto mt-2 block h-[2px] w-[14px] rounded-sm bg-current"></i>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </section>
   );

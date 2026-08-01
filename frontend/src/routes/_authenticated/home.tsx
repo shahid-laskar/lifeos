@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { StarSpinner } from "@/components/brand/pattern";
 import { ErrorState } from "@/components/brand/states";
 import { Skeleton } from "@/components/ui/skeleton";
+import { HeroSkeleton } from "@/components/home/skeletons";
 import {
   ConsistencyCard,
   DhikrWidget,
@@ -93,19 +94,19 @@ function HomePage() {
     month: "long",
   });
   const hijriDate = getHijriDate();
-  
+
   const firstName = profileQuery.data?.name?.split(" ")[0] || "there";
 
   return (
     <>
-      <PageHeader 
-        title={`Assalamu Alaikum, ${firstName}`} 
-        subtitle={`${hijriDate} · ${greetingDate}`} 
-        arabic="السَّلامُ عَلَيْكُم" 
+      <PageHeader
+        title={`Assalamu Alaikum, ${firstName}`}
+        subtitle={`${hijriDate} · ${greetingDate}`}
+        arabic="السَّلامُ عَلَيْكُم"
       />
       <div className="space-y-4 px-5 pb-8">
         {loading ? (
-          <Skeleton className="h-[200px] w-full rounded-2xl" />
+          <HeroSkeleton />
         ) : times ? (
           <PrayerTimesStrip times={times.times} />
         ) : (
@@ -124,12 +125,12 @@ function HomePage() {
         ) : null}
 
         <PrayerStatusRow times={times?.times} />
-        
+
         <div className="grid grid-cols-2 gap-4">
           <DhikrWidget />
           <ConsistencyCard />
         </div>
-        
+
         <DuasWidget />
         <HadithWidget />
         <WeeklyQuranCard />

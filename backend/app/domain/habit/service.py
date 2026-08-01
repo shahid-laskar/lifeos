@@ -114,6 +114,9 @@ class HabitService:
     def get_prayer_journal(self, user_id: str, date: date_type, prayer_name: PrayerName) -> PrayerJournalRecord | None:
         return self._repository.get_prayer_journal(user_id, date, prayer_name)
 
+    def get_prayer_journals(self, user_id: str, start_date: date_type, end_date: date_type) -> list[PrayerJournalRecord]:
+        return self._repository.get_prayer_journals_for_date_range(user_id, start_date, end_date)
+
     def get_prayer_insights(self, user_id: str, today: date_type) -> PrayerInsightsResponse:
         start_date = today - timedelta(days=29)
         journals = self._repository.get_prayer_journals_for_date_range(user_id, start_date, today)

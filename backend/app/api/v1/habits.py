@@ -1,5 +1,5 @@
-from typing import Annotated
-from datetime import date as date_type, datetime
+from typing import Annotated, List
+from datetime import date as date_type, datetime, timedelta
 
 from fastapi import APIRouter, Depends, Query, HTTPException
 
@@ -136,31 +136,35 @@ def log_prayer_journal(
         distractions=record.distractions
     )
 
-@router.get("/prayers/journal", response_model=PrayerJournalResponse)
+@router.get("/prayers/journal", response_model=List[PrayerJournalResponse])
 def get_prayer_journal(
-    prayer_name: PrayerName,
     current_user: Annotated[UserRecord, Depends(get_current_user)],
     habit_service: Annotated[HabitService, Depends(get_habit_service)],
+    prayer_name: PrayerName | None = Query(None, description="Optional prayer name filter."),
     date: date_type | None = Query(None, description="Date of the prayer.")
-) -> PrayerJournalResponse:
+) -> List[PrayerJournalResponse]:
     if not current_user.timezone:
         raise HTTPException(status_code=400, detail="User timezone must be set.")
         
     tz = resolve_timezone(current_user.timezone)
-    target_date = date or datetime.now(tz).date()
     
-    record = habit_service.get_prayer_journal(current_user.id, target_date, prayer_name)
-    if not record:
-        raise HTTPException(status_code=404, detail="Journal entry not found.")
-        
-    return PrayerJournalResponse(
-        id=record.id,
-        date=record.date,
-        prayer_name=record.prayer_name,
-        khushoo_rating=record.khushoo_rating,
-        notes=record.notes,
-        distractions=record.distractions
-    )
+    if prayer_name and date:
+        record = habit_service.get_prayer_journal(current_user.id, date, prayer_name)
+        if not record:
+            return []
+        return [PrayerJournalResponse(
+            id=record.id, date=record.date, prayer_name=record.prayer_name,
+            khushoo_rating=record.khushoo_rating, notes=record.notes, distractions=record.distractions
+        )]
+    else:
+        # Return recent journals
+        today = datetime.now(tz).date()
+        start_date = today - timedelta(days=30)
+        journals = habit_service.get_prayer_journals(current_user.id, start_date, today)
+        return [PrayerJournalResponse(
+            id=record.id, date=record.date, prayer_name=record.prayer_name,
+            khushoo_rating=record.khushoo_rating, notes=record.notes, distractions=record.distractions
+        ) for record in journals]
 
 @router.get("/prayers/insights", response_model=PrayerInsightsResponse)
 def get_prayer_insights(

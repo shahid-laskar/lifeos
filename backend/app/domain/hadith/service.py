@@ -73,6 +73,22 @@ class HadithService:
             query, collection=collection, limit=limit
         )
 
+    def get_daily_hadith(self) -> HadithItem | None:
+        import datetime
+        try:
+            items = self.list_hadiths("nawawi40")
+        except HadithNotFoundError:
+            items = []
+        if not items:
+            for c in self.list_collections():
+                items = self.list_hadiths(c.slug)
+                if items:
+                    break
+        if not items:
+            return None
+        day_index = datetime.date.today().toordinal()
+        return items[day_index % len(items)]
+
     # ── Bookmarks ────────────────────────────────────────────────────────────
 
     def add_bookmark(

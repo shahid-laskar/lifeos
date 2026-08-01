@@ -89,3 +89,18 @@ def get_onboarding_status(
         # times calculated - goals are helpful but not required for this.
         first_meaningful_outcome_available=location_set and prayer_preferences_set,
     )
+
+
+@router.get("/export")
+def export_data(
+    current_user: Annotated[UserRecord, Depends(get_current_user)],
+) -> dict:
+    """
+    Returns user data as JSON. 
+    In the future, this can be expanded to include all associated records (prayer logs, etc).
+    """
+    profile = _to_profile_response(current_user)
+    return {
+        "profile": profile.model_dump(),
+        "exported_at": current_user.updated_at or current_user.created_at
+    }

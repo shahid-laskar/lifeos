@@ -72,6 +72,16 @@ def list_collections(
     ]
 
 
+@router.get("/daily", response_model=HadithItemResponse)
+def get_daily_hadith(
+    service: Annotated[HadithService, Depends(get_hadith_service)],
+) -> HadithItemResponse:
+    item = service.get_daily_hadith()
+    if not item:
+        raise HTTPException(status_code=404, detail="No hadiths found")
+    return _item_to_response(item)
+
+
 @router.get("/collections/{slug}", response_model=HadithCollectionResponse)
 def get_collection(
     slug: str,

@@ -21,3 +21,10 @@ class DuaService:
             if item.id == dua_id:
                 return item
         return None
+
+    def get_daily_dua(self) -> DuaItem | None:
+        import datetime
+        if not self._catalogue:
+            return None
+        day_index = datetime.date.today().toordinal()
+        return self._catalogue[day_index % len(self._catalogue)]

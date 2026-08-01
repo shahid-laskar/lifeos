@@ -81,6 +81,7 @@ export const ONBOARDING_GOALS: {
 export type UserProfile = {
   id?: string;
   email?: string;
+  name?: string;
   country?: string | null;
   timezone?: string | null;
   latitude?: number | null;

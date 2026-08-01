@@ -17,12 +17,28 @@ export function PageHeader({
     <header className="flex items-start justify-between gap-4 px-5 pb-4 pt-7">
       <div>
         {arabic ? (
-          <p className="arabic text-lg text-gold" lang="ar" dir="rtl">
+          <p
+            className="text-xs tracking-[0.14em] uppercase text-muted-foreground font-arabic"
+            lang="ar"
+            dir="rtl"
+          >
             {arabic}
           </p>
         ) : null}
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">{title}</h1>
-        {subtitle ? <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p> : null}
+        <h1 className="mt-1.5 text-[26px] font-bold tracking-[-0.02em] text-foreground">{title}</h1>
+        {subtitle ? (
+          <div className="mt-2 flex items-center gap-2 text-[13px] text-muted-foreground">
+            {subtitle.includes("·") ? (
+              <>
+                <span className="font-semibold text-primary">{subtitle.split("·")[0].trim()}</span>
+                <span className="h-[3px] w-[3px] rounded-full bg-current opacity-50"></span>
+                <span>{subtitle.split("·")[1].trim()}</span>
+              </>
+            ) : (
+              subtitle
+            )}
+          </div>
+        ) : null}
       </div>
       {action}
     </header>

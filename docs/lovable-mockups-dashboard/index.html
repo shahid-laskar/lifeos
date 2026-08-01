@@ -1,0 +1,384 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<title>Muslim Life OS — Dashboard Mockups</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#e9e6df;font-family:'Plus Jakarta Sans',system-ui,sans-serif;padding:48px;color:#1b1b1b}
+h1{font-size:26px;letter-spacing:-.02em;margin-bottom:6px}
+.lede{color:#5d5b55;font-size:14px;max-width:760px;margin-bottom:36px;line-height:1.6}
+.row{display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start;margin-bottom:56px}
+.cap{font:600 11px/1 'Plus Jakarta Sans';letter-spacing:.12em;text-transform:uppercase;color:#6b6862;margin-bottom:10px}
+.device{border-radius:26px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 60px -30px rgba(20,18,14,.55),0 0 0 1px rgba(0,0,0,.06)}
+
+/* ---------- tokens ---------- */
+.app{--bg:#faf7f1;--surface:#ffffff;--line:#e7e1d6;--ink:#1c1f1d;--mute:#6f7570;
+     --primary:#1f6b52;--primary-soft:#e6f0ea;--brass:#a8863f;--skel:#e7e2d8;
+     font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);color:var(--ink);
+     display:flex;flex-direction:column;flex:1;position:relative}
+.app.dark{--bg:#0d1211;--surface:#141a18;--line:#232b28;--ink:#eef2ef;--mute:#8d9791;
+     --primary:#4fae8b;--primary-soft:#16241f;--brass:#d3ad5f;--skel:#1e2724}
+
+.scroll{flex:1;padding:22px 20px 20px}
+.tablet .scroll{padding:30px 32px}
+.desktop .scroll{padding:34px 40px}
+
+/* ---------- greeting ---------- */
+.greet-salaam{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.greet-name{font-size:26px;font-weight:700;letter-spacing:-.02em;margin-top:6px}
+.greet-date{margin-top:8px;font-size:13px;color:var(--mute);display:flex;gap:8px;align-items:center}
+.dot{width:3px;height:3px;border-radius:99px;background:currentColor;opacity:.5}
+.hijri{color:var(--primary);font-weight:600}
+
+/* ---------- hero ---------- */
+.hero{margin-top:18px;border-radius:20px;padding:20px;color:#fff;position:relative;overflow:hidden}
+.hero .tex{position:absolute;inset:0;background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Cg fill='none' stroke='%23ffffff' stroke-width='1'%3E%3Cpath d='M32 4 L40 24 L60 32 L40 40 L32 60 L24 40 L4 32 L24 24 Z'/%3E%3Crect x='14' y='14' width='36' height='36' transform='rotate(45 32 32)'/%3E%3C/g%3E%3C/svg%3E");background-size:64px 64px;opacity:.07}
+.hero .in{position:relative}
+.hero-label{font-size:11px;letter-spacing:.16em;text-transform:uppercase;opacity:.75}
+.hero-next{display:flex;align-items:baseline;gap:10px;margin-top:8px}
+.hero-name{font-size:24px;font-weight:700;letter-spacing:-.01em}
+.hero-count{margin-left:auto;font-variant-numeric:tabular-nums;font-size:26px;font-weight:600;letter-spacing:-.02em}
+.hero-sub{font-size:11px;opacity:.7;margin-top:2px;text-align:right}
+.times{display:flex;justify-content:space-between;margin-top:20px;padding-top:14px;border-top:1px solid rgba(255,255,255,.18)}
+.t{text-align:center;flex:1;opacity:.62}
+.t.now{opacity:1}
+.t b{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+.t span{display:block;font-size:13px;margin-top:5px;font-variant-numeric:tabular-nums}
+.t.now i{display:block;width:14px;height:2px;background:#fff;border-radius:2px;margin:7px auto 0}
+
+/* ---------- cards ---------- */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;margin-top:14px}
+.card h3{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);font-weight:600}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+.grid2 .card{margin-top:0}
+
+/* prayers */
+.prow{display:flex;justify-content:space-between;margin-top:16px}
+.p{display:flex;flex-direction:column;align-items:center;gap:8px;flex:1}
+.circ{width:44px;height:44px;border-radius:99px;display:flex;align-items:center;justify-content:center;
+      font-size:14px;font-weight:600;border:1.5px dashed var(--line);color:var(--mute)}
+.circ.done{background:var(--primary);border:1.5px solid var(--primary);color:#fff}
+.circ.miss{border:1.5px solid var(--line);background:transparent;color:var(--mute)}
+.circ.miss::after{content:'';position:absolute}
+.p small{font-size:11px;color:var(--mute)}
+.prompt{margin-top:16px;background:var(--primary-soft);border-radius:12px;padding:11px 13px;display:flex;
+        align-items:center;gap:8px;font-size:13px;color:var(--primary);font-weight:500}
+.prompt em{margin-left:auto;font-style:normal;font-size:12px;opacity:.8}
+.khushoo{display:flex;gap:6px;margin-top:12px;align-items:center}
+.moon{width:26px;height:26px;border-radius:99px;border:1px solid var(--line);display:flex;align-items:center;
+      justify-content:center;font-size:12px}
+.moon.on{border-color:var(--brass);color:var(--brass)}
+.khushoo span{font-size:11px;color:var(--mute);margin-left:6px}
+
+/* du'a + dhikr */
+.ar{font-family:'Amiri',serif;direction:rtl;font-size:20px;line-height:1.9;margin-top:12px}
+.tr{font-family:'Lora',Georgia,serif;font-size:13px;line-height:1.6;color:var(--mute);margin-top:8px}
+.ring{width:74px;height:74px;border-radius:99px;margin:14px auto 0;display:flex;align-items:center;
+      justify-content:center;font-weight:700;font-size:16px;
+      background:conic-gradient(var(--primary) var(--pct),var(--line) 0);position:relative}
+.ring::after{content:'';position:absolute;inset:7px;border-radius:99px;background:var(--surface)}
+.ring b{position:relative;z-index:1;font-variant-numeric:tabular-nums}
+.mid{text-align:center;font-size:12px;color:var(--mute);margin-top:10px}
+
+/* bars */
+.bar{height:7px;border-radius:9px;background:var(--line);margin-top:14px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:9px;background:var(--primary)}
+.meta{display:flex;justify-content:space-between;font-size:12px;color:var(--mute);margin-top:10px}
+.weekdots{display:flex;gap:6px;margin-top:14px}
+.weekdots i{flex:1;height:26px;border-radius:7px;background:var(--line)}
+.weekdots i.on{background:var(--primary)}
+.weekdots i.part{background:var(--primary);opacity:.42}
+
+/* hadith */
+.quote{font-family:'Lora',Georgia,serif;font-size:15px;line-height:1.7;margin-top:12px}
+.attrib{font-size:12px;color:var(--mute);margin-top:10px}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--primary);
+      background:var(--primary-soft);border-radius:99px;padding:7px 12px;margin-top:14px}
+
+/* empty */
+.empty{text-align:center;padding:6px 4px 2px}
+.empty .glyph{width:38px;height:38px;margin:2px auto 10px;border-radius:12px;background:var(--primary-soft);
+      display:flex;align-items:center;justify-content:center;color:var(--primary);font-size:16px}
+.empty p{font-size:13px;color:var(--mute);line-height:1.6;margin-top:4px}
+.btn{display:inline-block;margin-top:12px;background:var(--primary);color:#fff;border-radius:11px;
+     padding:9px 16px;font-size:13px;font-weight:600}
+
+/* skeleton */
+.app.dark .btn{color:#08120f}
+.app.dark .circ.done{color:#08120f}
+.sk{background:var(--skel);border-radius:8px;animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+.sk-hero{margin-top:18px;height:158px;border-radius:20px;background:linear-gradient(160deg,var(--skel),color-mix(in oklab,var(--skel) 70%, var(--primary) 12%))}
+.sk-line{height:11px}
+.sk-circ{width:44px;height:44px;border-radius:99px}
+
+/* nav */
+.tabs{display:flex;border-top:1px solid var(--line);background:var(--surface);padding:10px 8px 20px}
+.tabs div{flex:1;text-align:center;font-size:10px;color:var(--mute);letter-spacing:.04em}
+.tabs div b{display:block;width:20px;height:20px;border-radius:6px;border:1.6px solid currentColor;margin:0 auto 6px;opacity:.55}
+.tabs div.on{color:var(--primary)}
+.tabs div.on b{opacity:1;background:var(--primary-soft)}
+.side{width:220px;border-right:1px solid var(--line);background:var(--surface);padding:26px 16px;flex:none}
+.brand{font-size:14px;font-weight:700;letter-spacing:-.01em;margin-bottom:22px;display:flex;gap:9px;align-items:center}
+.brand i{width:22px;height:22px;border-radius:7px;background:var(--primary);display:block}
+.nav a{display:flex;gap:10px;align-items:center;font-size:13px;color:var(--mute);padding:9px 10px;border-radius:10px;margin-bottom:2px}
+.nav a b{width:16px;height:16px;border-radius:5px;border:1.5px solid currentColor;opacity:.5}
+.nav a.on{background:var(--primary-soft);color:var(--primary);font-weight:600}
+.nav a.on b{opacity:1}
+.shell{display:flex;flex:1;align-items:stretch}
+.dgrid{display:grid;grid-template-columns:1.35fr 1fr 1fr;gap:16px;margin-top:16px;align-items:start}
+.dgrid .card{margin-top:0}
+.span2{grid-column:span 2}
+.col{display:flex;flex-direction:column;gap:16px}
+</style></head><body>
+<h1>Muslim Life OS — Dashboard</h1>
+<p class="lede">High-fidelity mockups for the redesigned Home Dashboard: mobile, tablet and desktop across light and dark themes, in loading, empty and populated states. Built to Frontend Redesign Plan V2 §3A, §3F, §4A–4C, §5E and §7C.</p>
+<div class="row"><div><div class="cap">Mobile 390pt wide (full scroll) · Light · Populated (Dhuhr)</div><div class="device" id="01-mobile-light-populated" style="width:390px;min-height:844px"><div class="app mobile"><div class="scroll"><div><div class="greet-salaam">السلام عليكم</div>
+    <div class="greet-name">Assalamu Alaikum, Shahid</div>
+    <div class="greet-date"><span class="hijri">14 Safar 1448</span><span class="dot"></span>
+    <span>Friday, 1 August 2026</span></div></div><div class="hero" style="background:linear-gradient(160deg,#2f7fb8 0%,#2367a6 55%,#1d4f86 100%)"><div class="tex"></div><div class="in">
+      <div class="hero-label">Next prayer</div>
+      <div class="hero-next"><div class="hero-name">Dhuhr</div>
+        <div style="margin-left:auto;text-align:right"><div class="hero-count">1:42:05</div>
+        <div class="hero-sub">remaining</div></div></div>
+      <div class="times"><div class="t"><b>Fajr</b><span>04:38</span></div><div class="t now"><b>Dhuhr</b><span>13:09</span><i></i></div><div class="t"><b>Asr</b><span>17:14</span></div><div class="t"><b>Maghrib</b><span>20:41</span></div><div class="t"><b>Isha</b><span>22:12</span></div></div></div></div><div class="card"><h3>Today's prayers</h3><div class="prow"><div class="p"><div class="circ done">✓</div><small>Faj</small></div><div class="p"><div class="circ done">✓</div><small>Dhu</small></div><div class="p"><div class="circ done">✓</div><small>Asr</small></div><div class="p"><div class="circ"></div><small>Mag</small></div><div class="p"><div class="circ"></div><small>Ish</small></div></div><div class="prompt"><span>How was your Asr?</span><em>Reflect →</em></div></div><div class="grid2"><div class="card"><h3>Du'a of the day</h3>
+<div class="ar">رَبِّ زِدْنِي عِلْمًا</div>
+<div class="tr">"My Lord, increase me in knowledge."</div>
+<div class="attrib">Ta-Ha 20:114</div></div><div class="card"><h3>Dhikr</h3>
+<div class="ring" style="--pct:100%"><b>33</b></div>
+<div class="mid">Subhanallah · complete</div></div></div><div class="card"><h3>Qur'an this week</h3>
+<div class="bar"><i style="width:64%"></i></div>
+<div class="meta"><span>3 surahs · 5 days read</span><span>Al-Mulk 12</span></div>
+<div class="weekdots"><i class="on"></i><i class="on"></i><i class="part"></i><i class="on"></i>
+<i class="on"></i><i></i><i class="on"></i></div></div><div class="card"><h3>Hadith of the day</h3>
+<div class="quote">"Actions are but by intention, and every man shall have only that which he intended."</div>
+<div class="attrib">Sahih al-Bukhari 1 · Narrated by Umar ibn al-Khattab</div></div></div><div class="tabs">
+<div class="on"><b></b>Home</div><div><b></b>Qur'an</div><div><b></b>Dhikr</div>
+<div><b></b>Du'as</div><div><b></b>More</div></div></div></div></div><div><div class="cap">Mobile 390pt wide (full scroll) · Dark · Populated (Isha)</div><div class="device" id="02-mobile-dark-populated" style="width:390px;min-height:844px"><div class="app mobile dark"><div class="scroll"><div><div class="greet-salaam">السلام عليكم</div>
+    <div class="greet-name">Assalamu Alaikum, Shahid</div>
+    <div class="greet-date"><span class="hijri">14 Safar 1448</span><span class="dot"></span>
+    <span>Friday, 1 August 2026</span></div></div><div class="hero" style="background:linear-gradient(160deg,#0e1330 0%,#141a2e 55%,#0a0d1c 100%)"><div class="tex"></div><div class="in">
+      <div class="hero-label">Next prayer</div>
+      <div class="hero-next"><div class="hero-name">Fajr</div>
+        <div style="margin-left:auto;text-align:right"><div class="hero-count">5:18:44</div>
+        <div class="hero-sub">remaining</div></div></div>
+      <div class="times"><div class="t"><b>Fajr</b><span>04:38</span></div><div class="t"><b>Dhuhr</b><span>13:09</span></div><div class="t"><b>Asr</b><span>17:14</span></div><div class="t"><b>Maghrib</b><span>20:41</span></div><div class="t now"><b>Isha</b><span>22:12</span><i></i></div></div></div></div><div class="card"><h3>Today's prayers</h3><div class="prow"><div class="p"><div class="circ done">✓</div><small>Faj</small></div><div class="p"><div class="circ done">✓</div><small>Dhu</small></div><div class="p"><div class="circ done">✓</div><small>Asr</small></div><div class="p"><div class="circ"></div><small>Mag</small></div><div class="p"><div class="circ"></div><small>Ish</small></div></div><div class="prompt"><span>How was your Asr?</span><em>Reflect →</em></div><div class="khushoo"><div class="moon on">🌑</div><div class="moon on">🌘</div><div class="moon on">🌗</div><div class="moon">🌖</div><div class="moon">🌕</div><span>Present, with effort</span></div></div><div class="grid2"><div class="card"><h3>Du'a of the day</h3>
+<div class="ar">رَبِّ زِدْنِي عِلْمًا</div>
+<div class="tr">"My Lord, increase me in knowledge."</div>
+<div class="attrib">Ta-Ha 20:114</div></div><div class="card"><h3>Dhikr</h3>
+<div class="ring" style="--pct:100%"><b>33</b></div>
+<div class="mid">Subhanallah · complete</div></div></div><div class="card"><h3>Qur'an this week</h3>
+<div class="bar"><i style="width:64%"></i></div>
+<div class="meta"><span>3 surahs · 5 days read</span><span>Al-Mulk 12</span></div>
+<div class="weekdots"><i class="on"></i><i class="on"></i><i class="part"></i><i class="on"></i>
+<i class="on"></i><i></i><i class="on"></i></div></div><div class="card"><h3>Hadith of the day</h3>
+<div class="quote">"Actions are but by intention, and every man shall have only that which he intended."</div>
+<div class="attrib">Sahih al-Bukhari 1 · Narrated by Umar ibn al-Khattab</div></div></div><div class="tabs">
+<div class="on"><b></b>Home</div><div><b></b>Qur'an</div><div><b></b>Dhikr</div>
+<div><b></b>Du'as</div><div><b></b>More</div></div></div></div></div><div><div class="cap">Mobile 390pt wide (full scroll) · Light · Loading</div><div class="device" id="03-mobile-light-loading" style="width:390px;min-height:844px"><div class="app mobile"><div class="scroll"><div><div class="greet-salaam">السلام عليكم</div>
+    <div class="greet-name">Assalamu Alaikum, Shahid</div>
+    <div class="greet-date"><span class="hijri">14 Safar 1448</span><span class="dot"></span>
+    <span>Friday, 1 August 2026</span></div></div><div class="sk sk-hero"></div><div class="card"><div class="sk sk-line" style="width:38%;height:9px"></div><div class="prow"><div class="p"><div class="sk sk-circ"></div><div class="sk sk-line" style="width:22px;height:8px"></div></div><div class="p"><div class="sk sk-circ"></div><div class="sk sk-line" style="width:22px;height:8px"></div></div><div class="p"><div class="sk sk-circ"></div><div class="sk sk-line" style="width:22px;height:8px"></div></div><div class="p"><div class="sk sk-circ"></div><div class="sk sk-line" style="width:22px;height:8px"></div></div><div class="p"><div class="sk sk-circ"></div><div class="sk sk-line" style="width:22px;height:8px"></div></div></div></div><div class="grid2"><div class="card"><div class="sk sk-line" style="width:34%;height:9px"></div><div class="sk sk-line" style="width:92%;margin-top:12px"></div><div class="sk sk-line" style="width:76%;margin-top:12px"></div><div class="sk sk-line" style="width:58%;margin-top:12px"></div></div><div class="card"><div class="sk sk-line" style="width:34%;height:9px"></div><div class="sk sk-line" style="width:92%;margin-top:12px"></div><div class="sk sk-line" style="width:76%;margin-top:12px"></div><div class="sk sk-line" style="width:58%;margin-top:12px"></div></div></div><div class="card"><div class="sk sk-line" style="width:34%;height:9px"></div><div class="sk sk-line" style="width:92%;margin-top:12px"></div><div class="sk sk-line" style="width:76%;margin-top:12px"></div></div></div><div class="tabs">
+<div class="on"><b></b>Home</div><div><b></b>Qur'an</div><div><b></b>Dhikr</div>
+<div><b></b>Du'as</div><div><b></b>More</div></div></div></div></div><div><div class="cap">Mobile 390pt wide (full scroll) · Dark · Loading</div><div class="device" id="04-mobile-dark-loading" style="width:390px;min-height:844px"><div class="app mobile dark"><div class="scroll"><div><div class="greet-salaam">السلام عليكم</div>
+    <div class="greet-name">Assalamu Alaikum, Shahid</div>
+    <div class="greet-date"><span class="hijri">14 Safar 1448</span><span class="dot"></span>
+    <span>Friday, 1 August 2026</span></div></div><div class="sk sk-hero"></div><div class="card"><div class="sk sk-line" style="width:38%;height:9px"></div><div class="prow"><div class="p"><div class="sk sk-circ"></div><div class="sk sk-line" style="width:22px;height:8px"></div></div><div class="p"><div class="sk sk-circ"></div><div class="sk sk-line" style="width:22px;height:8px"></div></div><div class="p"><div class="sk sk-circ"></div><div class="sk sk-line" style="width:22px;height:8px"></div></div><div class="p"><div class="sk sk-circ"></div><div class="sk sk-line" style="width:22px;height:8px"></div></div><div class="p"><div class="sk sk-circ"></div><div class="sk sk-line" style="width:22px;height:8px"></div></div></div></div><div class="grid2"><div class="card"><div class="sk sk-line" style="width:34%;height:9px"></div><div class="sk sk-line" style="width:92%;margin-top:12px"></div><div class="sk sk-line" style="width:76%;margin-top:12px"></div><div class="sk sk-line" style="width:58%;margin-top:12px"></div></div><div class="card"><div class="sk sk-line" style="width:34%;height:9px"></div><div class="sk sk-line" style="width:92%;margin-top:12px"></div><div class="sk sk-line" style="width:76%;margin-top:12px"></div><div class="sk sk-line" style="width:58%;margin-top:12px"></div></div></div><div class="card"><div class="sk sk-line" style="width:34%;height:9px"></div><div class="sk sk-line" style="width:92%;margin-top:12px"></div><div class="sk sk-line" style="width:76%;margin-top:12px"></div></div></div><div class="tabs">
+<div class="on"><b></b>Home</div><div><b></b>Qur'an</div><div><b></b>Dhikr</div>
+<div><b></b>Du'as</div><div><b></b>More</div></div></div></div></div><div><div class="cap">Mobile 390pt wide (full scroll) · Light · Empty</div><div class="device" id="05-mobile-light-empty" style="width:390px;min-height:844px"><div class="app mobile"><div class="scroll"><div><div class="greet-salaam">السلام عليكم</div>
+    <div class="greet-name">Assalamu Alaikum, Shahid</div>
+    <div class="greet-date"><span class="hijri">14 Safar 1448</span><span class="dot"></span>
+    <span>Friday, 1 August 2026</span></div></div><div class="hero" style="background:linear-gradient(160deg,#131a34 0%,#2b2350 45%,#8a5a2b 100%)"><div class="tex"></div><div class="in">
+      <div class="hero-label">Next prayer</div>
+      <div class="hero-next"><div class="hero-name">Fajr</div>
+        <div style="margin-left:auto;text-align:right"><div class="hero-count">5:18:44</div>
+        <div class="hero-sub">remaining</div></div></div>
+      <div class="times"><div class="t now"><b>Fajr</b><span>04:38</span><i></i></div><div class="t"><b>Dhuhr</b><span>13:09</span></div><div class="t"><b>Asr</b><span>17:14</span></div><div class="t"><b>Maghrib</b><span>20:41</span></div><div class="t"><b>Isha</b><span>22:12</span></div></div></div></div><div class="card"><h3>Today's prayers</h3><div class="prow"><div class="p"><div class="circ"></div><small>Faj</small></div><div class="p"><div class="circ"></div><small>Dhu</small></div><div class="p"><div class="circ"></div><small>Asr</small></div><div class="p"><div class="circ"></div><small>Mag</small></div><div class="p"><div class="circ"></div><small>Ish</small></div></div><div class="empty" style="padding-top:14px"><p>Nothing logged yet today. Tap a circle when you pray — it takes one second.</p><div class="btn">Log Fajr</div></div></div><div class="grid2"><div class="card"><h3>Du'a of the day</h3>
+<div class="ar">رَبِّ زِدْنِي عِلْمًا</div>
+<div class="tr">"My Lord, increase me in knowledge."</div>
+<div class="attrib">Ta-Ha 20:114</div></div><div class="card"><h3>Dhikr</h3><div class="empty"><div class="glyph">◍</div><p>Start with 33 Subhanallah.</p><div class="btn">Begin</div></div></div></div><div class="card"><h3>Qur'an</h3><div class="empty"><div class="glyph">﴾</div><p>Pick up where the Qur'an calls you. We'll remember your place.</p><div class="btn">Open Al-Fatiha</div></div></div></div><div class="tabs">
+<div class="on"><b></b>Home</div><div><b></b>Qur'an</div><div><b></b>Dhikr</div>
+<div><b></b>Du'as</div><div><b></b>More</div></div></div></div></div><div><div class="cap">Mobile 390pt wide (full scroll) · Dark · Empty</div><div class="device" id="06-mobile-dark-empty" style="width:390px;min-height:844px"><div class="app mobile dark"><div class="scroll"><div><div class="greet-salaam">السلام عليكم</div>
+    <div class="greet-name">Assalamu Alaikum, Shahid</div>
+    <div class="greet-date"><span class="hijri">14 Safar 1448</span><span class="dot"></span>
+    <span>Friday, 1 August 2026</span></div></div><div class="hero" style="background:linear-gradient(160deg,#131a34 0%,#2b2350 45%,#8a5a2b 100%)"><div class="tex"></div><div class="in">
+      <div class="hero-label">Next prayer</div>
+      <div class="hero-next"><div class="hero-name">Fajr</div>
+        <div style="margin-left:auto;text-align:right"><div class="hero-count">5:18:44</div>
+        <div class="hero-sub">remaining</div></div></div>
+      <div class="times"><div class="t now"><b>Fajr</b><span>04:38</span><i></i></div><div class="t"><b>Dhuhr</b><span>13:09</span></div><div class="t"><b>Asr</b><span>17:14</span></div><div class="t"><b>Maghrib</b><span>20:41</span></div><div class="t"><b>Isha</b><span>22:12</span></div></div></div></div><div class="card"><h3>Today's prayers</h3><div class="prow"><div class="p"><div class="circ"></div><small>Faj</small></div><div class="p"><div class="circ"></div><small>Dhu</small></div><div class="p"><div class="circ"></div><small>Asr</small></div><div class="p"><div class="circ"></div><small>Mag</small></div><div class="p"><div class="circ"></div><small>Ish</small></div></div><div class="empty" style="padding-top:14px"><p>Nothing logged yet today. Tap a circle when you pray — it takes one second.</p><div class="btn">Log Fajr</div></div></div><div class="grid2"><div class="card"><h3>Du'a of the day</h3>
+<div class="ar">رَبِّ زِدْنِي عِلْمًا</div>
+<div class="tr">"My Lord, increase me in knowledge."</div>
+<div class="attrib">Ta-Ha 20:114</div></div><div class="card"><h3>Dhikr</h3><div class="empty"><div class="glyph">◍</div><p>Start with 33 Subhanallah.</p><div class="btn">Begin</div></div></div></div><div class="card"><h3>Qur'an</h3><div class="empty"><div class="glyph">﴾</div><p>Pick up where the Qur'an calls you. We'll remember your place.</p><div class="btn">Open Al-Fatiha</div></div></div></div><div class="tabs">
+<div class="on"><b></b>Home</div><div><b></b>Qur'an</div><div><b></b>Dhikr</div>
+<div><b></b>Du'as</div><div><b></b>More</div></div></div></div></div><div><div class="cap">Tablet 834pt wide (full scroll) · Light · Populated (Asr)</div><div class="device" id="07-tablet-light-populated" style="width:834px;min-height:1112px"><div class="app tablet"><div class="scroll"><div><div class="greet-salaam">السلام عليكم</div>
+    <div class="greet-name">Assalamu Alaikum, Shahid</div>
+    <div class="greet-date"><span class="hijri">14 Safar 1448</span><span class="dot"></span>
+    <span>Friday, 1 August 2026</span></div></div><div class="hero" style="background:linear-gradient(160deg,#2f7fb8 0%,#2367a6 55%,#1d4f86 100%)"><div class="tex"></div><div class="in">
+      <div class="hero-label">Next prayer</div>
+      <div class="hero-next"><div class="hero-name">Asr</div>
+        <div style="margin-left:auto;text-align:right"><div class="hero-count">2:04:11</div>
+        <div class="hero-sub">remaining</div></div></div>
+      <div class="times"><div class="t"><b>Fajr</b><span>04:38</span></div><div class="t"><b>Dhuhr</b><span>13:09</span></div><div class="t now"><b>Asr</b><span>17:14</span><i></i></div><div class="t"><b>Maghrib</b><span>20:41</span></div><div class="t"><b>Isha</b><span>22:12</span></div></div></div></div><div class="grid2" style="align-items:start"><div><div class="card"><h3>Today's prayers</h3><div class="prow"><div class="p"><div class="circ done">✓</div><small>Faj</small></div><div class="p"><div class="circ done">✓</div><small>Dhu</small></div><div class="p"><div class="circ"></div><small>Asr</small></div><div class="p"><div class="circ"></div><small>Mag</small></div><div class="p"><div class="circ"></div><small>Ish</small></div></div><div class="prompt"><span>How was your Asr?</span><em>Reflect →</em></div><div class="khushoo"><div class="moon on">🌑</div><div class="moon on">🌘</div><div class="moon on">🌗</div><div class="moon">🌖</div><div class="moon">🌕</div><span>Present, with effort</span></div></div><div class="card"><h3>Qur'an this week</h3>
+<div class="bar"><i style="width:64%"></i></div>
+<div class="meta"><span>3 surahs · 5 days read</span><span>Al-Mulk 12</span></div>
+<div class="weekdots"><i class="on"></i><i class="on"></i><i class="part"></i><i class="on"></i>
+<i class="on"></i><i></i><i class="on"></i></div></div><div class="card"><h3>Hadith of the day</h3>
+<div class="quote">"Actions are but by intention, and every man shall have only that which he intended."</div>
+<div class="attrib">Sahih al-Bukhari 1 · Narrated by Umar ibn al-Khattab</div></div><div class="card"><h3>Reflections</h3>
+<div class="quote" style="font-size:14px">Khushoo has trended upward for three weeks. Your calmest prayer is Fajr.</div>
+<div class="bar"><i style="width:78%"></i></div>
+<div class="meta"><span>Avg. presence 3.9 / 5</span><span>21 entries</span></div></div></div><div><div class="card"><h3>Du'a of the day</h3>
+<div class="ar">رَبِّ زِدْنِي عِلْمًا</div>
+<div class="tr">"My Lord, increase me in knowledge."</div>
+<div class="attrib">Ta-Ha 20:114</div></div><div class="card"><h3>Dhikr</h3>
+<div class="ring" style="--pct:100%"><b>33</b></div>
+<div class="mid">Subhanallah · complete</div></div><div class="card"><h3>Fasting</h3>
+<div class="quote" style="font-size:14px">Monday sunnah fast — 6h 12m until Maghrib.</div>
+<div class="pill">Logged today ✓</div></div><div class="card"><h3>Consistency</h3>
+<div class="quote" style="font-size:14px">You've prayed Fajr on time 6 of the last 7 days — your steadiest week yet.</div>
+<div class="weekdots"><i class="on"></i><i class="on"></i><i class="on"></i><i></i>
+<i class="on"></i><i class="on"></i><i class="on"></i></div></div><div class="card"><h3>Qibla</h3>
+<div class="quote" style="font-size:14px">118° SE from your location in Manchester.</div>
+<div class="attrib">Accurate to ±2° · tap to open the compass</div></div></div></div></div><div class="tabs">
+<div class="on"><b></b>Home</div><div><b></b>Qur'an</div><div><b></b>Dhikr</div>
+<div><b></b>Du'as</div><div><b></b>More</div></div></div></div></div><div><div class="cap">Tablet 834pt wide (full scroll) · Dark · Populated (Fajr)</div><div class="device" id="08-tablet-dark-populated" style="width:834px;min-height:1112px"><div class="app tablet dark"><div class="scroll"><div><div class="greet-salaam">السلام عليكم</div>
+    <div class="greet-name">Assalamu Alaikum, Shahid</div>
+    <div class="greet-date"><span class="hijri">14 Safar 1448</span><span class="dot"></span>
+    <span>Friday, 1 August 2026</span></div></div><div class="hero" style="background:linear-gradient(160deg,#131a34 0%,#2b2350 45%,#8a5a2b 100%)"><div class="tex"></div><div class="in">
+      <div class="hero-label">Next prayer</div>
+      <div class="hero-next"><div class="hero-name">Asr</div>
+        <div style="margin-left:auto;text-align:right"><div class="hero-count">2:04:11</div>
+        <div class="hero-sub">remaining</div></div></div>
+      <div class="times"><div class="t"><b>Fajr</b><span>04:38</span></div><div class="t"><b>Dhuhr</b><span>13:09</span></div><div class="t now"><b>Asr</b><span>17:14</span><i></i></div><div class="t"><b>Maghrib</b><span>20:41</span></div><div class="t"><b>Isha</b><span>22:12</span></div></div></div></div><div class="grid2" style="align-items:start"><div><div class="card"><h3>Today's prayers</h3><div class="prow"><div class="p"><div class="circ done">✓</div><small>Faj</small></div><div class="p"><div class="circ done">✓</div><small>Dhu</small></div><div class="p"><div class="circ"></div><small>Asr</small></div><div class="p"><div class="circ"></div><small>Mag</small></div><div class="p"><div class="circ"></div><small>Ish</small></div></div><div class="prompt"><span>How was your Asr?</span><em>Reflect →</em></div><div class="khushoo"><div class="moon on">🌑</div><div class="moon on">🌘</div><div class="moon on">🌗</div><div class="moon">🌖</div><div class="moon">🌕</div><span>Present, with effort</span></div></div><div class="card"><h3>Qur'an this week</h3>
+<div class="bar"><i style="width:64%"></i></div>
+<div class="meta"><span>3 surahs · 5 days read</span><span>Al-Mulk 12</span></div>
+<div class="weekdots"><i class="on"></i><i class="on"></i><i class="part"></i><i class="on"></i>
+<i class="on"></i><i></i><i class="on"></i></div></div><div class="card"><h3>Hadith of the day</h3>
+<div class="quote">"Actions are but by intention, and every man shall have only that which he intended."</div>
+<div class="attrib">Sahih al-Bukhari 1 · Narrated by Umar ibn al-Khattab</div></div><div class="card"><h3>Reflections</h3>
+<div class="quote" style="font-size:14px">Khushoo has trended upward for three weeks. Your calmest prayer is Fajr.</div>
+<div class="bar"><i style="width:78%"></i></div>
+<div class="meta"><span>Avg. presence 3.9 / 5</span><span>21 entries</span></div></div></div><div><div class="card"><h3>Du'a of the day</h3>
+<div class="ar">رَبِّ زِدْنِي عِلْمًا</div>
+<div class="tr">"My Lord, increase me in knowledge."</div>
+<div class="attrib">Ta-Ha 20:114</div></div><div class="card"><h3>Dhikr</h3>
+<div class="ring" style="--pct:100%"><b>33</b></div>
+<div class="mid">Subhanallah · complete</div></div><div class="card"><h3>Fasting</h3>
+<div class="quote" style="font-size:14px">Monday sunnah fast — 6h 12m until Maghrib.</div>
+<div class="pill">Logged today ✓</div></div><div class="card"><h3>Consistency</h3>
+<div class="quote" style="font-size:14px">You've prayed Fajr on time 6 of the last 7 days — your steadiest week yet.</div>
+<div class="weekdots"><i class="on"></i><i class="on"></i><i class="on"></i><i></i>
+<i class="on"></i><i class="on"></i><i class="on"></i></div></div><div class="card"><h3>Qibla</h3>
+<div class="quote" style="font-size:14px">118° SE from your location in Manchester.</div>
+<div class="attrib">Accurate to ±2° · tap to open the compass</div></div></div></div></div><div class="tabs">
+<div class="on"><b></b>Home</div><div><b></b>Qur'an</div><div><b></b>Dhikr</div>
+<div><b></b>Du'as</div><div><b></b>More</div></div></div></div></div><div><div class="cap">Tablet 834pt wide (full scroll) · Light · Loading</div><div class="device" id="09-tablet-light-loading" style="width:834px;min-height:1112px"><div class="app tablet"><div class="scroll"><div><div class="greet-salaam">السلام عليكم</div>
+    <div class="greet-name">Assalamu Alaikum, Shahid</div>
+    <div class="greet-date"><span class="hijri">14 Safar 1448</span><span class="dot"></span>
+    <span>Friday, 1 August 2026</span></div></div><div class="sk sk-hero"></div><div class="grid2" style="align-items:start"><div><div class="card"><div class="sk sk-line" style="width:38%;height:9px"></div><div class="prow"><div class="p"><div class="sk sk-circ"></div><div class="sk sk-line" style="width:22px;height:8px"></div></div><div class="p"><div class="sk sk-circ"></div><div class="sk sk-line" style="width:22px;height:8px"></div></div><div class="p"><div class="sk sk-circ"></div><div class="sk sk-line" style="width:22px;height:8px"></div></div><div class="p"><div class="sk sk-circ"></div><div class="sk sk-line" style="width:22px;height:8px"></div></div><div class="p"><div class="sk sk-circ"></div><div class="sk sk-line" style="width:22px;height:8px"></div></div></div></div><div class="card"><div class="sk sk-line" style="width:34%;height:9px"></div><div class="sk sk-line" style="width:92%;margin-top:12px"></div><div class="sk sk-line" style="width:76%;margin-top:12px"></div><div class="sk sk-line" style="width:58%;margin-top:12px"></div></div><div class="card"><div class="sk sk-line" style="width:34%;height:9px"></div><div class="sk sk-line" style="width:92%;margin-top:12px"></div><div class="sk sk-line" style="width:76%;margin-top:12px"></div></div></div><div><div class="card"><div class="sk sk-line" style="width:34%;height:9px"></div><div class="sk sk-line" style="width:92%;margin-top:12px"></div><div class="sk sk-line" style="width:76%;margin-top:12px"></div><div class="sk sk-line" style="width:58%;margin-top:12px"></div></div><div class="card"><div class="sk sk-line" style="width:34%;height:9px"></div><div class="sk sk-line" style="width:92%;margin-top:12px"></div><div class="sk sk-line" style="width:76%;margin-top:12px"></div></div><div class="card"><div class="sk sk-line" style="width:34%;height:9px"></div><div class="sk sk-line" style="width:92%;margin-top:12px"></div><div class="sk sk-line" style="width:76%;margin-top:12px"></div><div class="sk sk-line" style="width:58%;margin-top:12px"></div></div></div></div></div><div class="tabs">
+<div class="on"><b></b>Home</div><div><b></b>Qur'an</div><div><b></b>Dhikr</div>
+<div><b></b>Du'as</div><div><b></b>More</div></div></div></div></div><div><div class="cap">Tablet 834pt wide (full scroll) · Light · Empty</div><div class="device" id="10-tablet-light-empty" style="width:834px;min-height:1112px"><div class="app tablet"><div class="scroll"><div><div class="greet-salaam">السلام عليكم</div>
+    <div class="greet-name">Assalamu Alaikum, Shahid</div>
+    <div class="greet-date"><span class="hijri">14 Safar 1448</span><span class="dot"></span>
+    <span>Friday, 1 August 2026</span></div></div><div class="hero" style="background:linear-gradient(160deg,#131a34 0%,#2b2350 45%,#8a5a2b 100%)"><div class="tex"></div><div class="in">
+      <div class="hero-label">Next prayer</div>
+      <div class="hero-next"><div class="hero-name">Fajr</div>
+        <div style="margin-left:auto;text-align:right"><div class="hero-count">5:18:44</div>
+        <div class="hero-sub">remaining</div></div></div>
+      <div class="times"><div class="t now"><b>Fajr</b><span>04:38</span><i></i></div><div class="t"><b>Dhuhr</b><span>13:09</span></div><div class="t"><b>Asr</b><span>17:14</span></div><div class="t"><b>Maghrib</b><span>20:41</span></div><div class="t"><b>Isha</b><span>22:12</span></div></div></div></div><div class="grid2" style="align-items:start"><div><div class="card"><h3>Today's prayers</h3><div class="prow"><div class="p"><div class="circ"></div><small>Faj</small></div><div class="p"><div class="circ"></div><small>Dhu</small></div><div class="p"><div class="circ"></div><small>Asr</small></div><div class="p"><div class="circ"></div><small>Mag</small></div><div class="p"><div class="circ"></div><small>Ish</small></div></div><div class="empty" style="padding-top:14px"><p>Nothing logged yet today. Tap a circle after you pray.</p><div class="btn">Log Fajr</div></div></div><div class="card"><h3>Qur'an</h3><div class="empty"><div class="glyph">ف</div><p>No reading logged yet. Begin with a single ayah today.</p><div class="btn">Open the Qur'an</div></div></div><div class="card"><h3>Reflections</h3><div class="empty"><div class="glyph">◌</div><p>Once you log a few prayers, patterns in your khushoo appear here.</p><div class="btn">About the journal</div></div></div></div><div><div class="card"><h3>Du'a of the day</h3>
+<div class="ar">رَبِّ زِدْنِي عِلْمًا</div>
+<div class="tr">"My Lord, increase me in knowledge."</div>
+<div class="attrib">Ta-Ha 20:114</div></div><div class="card"><h3>Dhikr</h3><div class="empty"><div class="glyph">◍</div><p>Your tasbih is empty. Morning adhkar takes about four minutes.</p><div class="btn">Start morning adhkar</div></div></div><div class="card"><h3>Fasting</h3><div class="empty"><div class="glyph">☾</div><p>Track sunnah fasts on Mondays and Thursdays.</p><div class="btn">Log a fast</div></div></div><div class="card"><h3>Qibla</h3>
+<div class="quote" style="font-size:14px">118° SE from your location in Manchester.</div>
+<div class="attrib">Accurate to ±2° · tap to open the compass</div></div></div></div></div><div class="tabs">
+<div class="on"><b></b>Home</div><div><b></b>Qur'an</div><div><b></b>Dhikr</div>
+<div><b></b>Du'as</div><div><b></b>More</div></div></div></div></div><div><div class="cap">Desktop 1440pt wide (full scroll) · Light · Populated (Maghrib)</div><div class="device" id="11-desktop-light-populated" style="width:1440px;min-height:900px"><div class="app desktop"><div class="shell"><div class="side"><div class="brand"><i></i>Muslim Life OS</div>
+<div class="nav">
+<a class="on"><b></b>Home</a><a><b></b>Prayer</a><a><b></b>Qur'an</a><a><b></b>Dhikr</a>
+<a><b></b>Du'as</a><a><b></b>Hadith</a><a><b></b>Journal</a><a><b></b>Assistant</a>
+<a><b></b>Family</a><a><b></b>Settings</a></div></div><div class="scroll"><div><div class="greet-salaam">السلام عليكم</div>
+    <div class="greet-name">Assalamu Alaikum, Shahid</div>
+    <div class="greet-date"><span class="hijri">14 Safar 1448</span><span class="dot"></span>
+    <span>Friday, 1 August 2026</span></div></div><div class="dgrid"><div class="col span2"><div class="hero"  style="background:linear-gradient(160deg,#c96a3a 0%,#a8445a 50%,#4d2a63 100%)"><div class="tex"></div><div class="in">
+      <div class="hero-label">Next prayer</div>
+      <div class="hero-next"><div class="hero-name">Maghrib</div>
+        <div style="margin-left:auto;text-align:right"><div class="hero-count">0:26:53</div>
+        <div class="hero-sub">remaining</div></div></div>
+      <div class="times"><div class="t"><b>Fajr</b><span>04:38</span></div><div class="t"><b>Dhuhr</b><span>13:09</span></div><div class="t"><b>Asr</b><span>17:14</span></div><div class="t now"><b>Maghrib</b><span>20:41</span><i></i></div><div class="t"><b>Isha</b><span>22:12</span></div></div></div></div><div class="card"><h3>Today's prayers</h3><div class="prow"><div class="p"><div class="circ done">✓</div><small>Faj</small></div><div class="p"><div class="circ done">✓</div><small>Dhu</small></div><div class="p"><div class="circ done">✓</div><small>Asr</small></div><div class="p"><div class="circ"></div><small>Mag</small></div><div class="p"><div class="circ"></div><small>Ish</small></div></div><div class="prompt"><span>How was your Asr?</span><em>Reflect →</em></div><div class="khushoo"><div class="moon on">🌑</div><div class="moon on">🌘</div><div class="moon on">🌗</div><div class="moon">🌖</div><div class="moon">🌕</div><span>Present, with effort</span></div></div><div class="card"><h3>Hadith of the day</h3>
+<div class="quote">"Actions are but by intention, and every man shall have only that which he intended."</div>
+<div class="attrib">Sahih al-Bukhari 1 · Narrated by Umar ibn al-Khattab</div></div></div><div class="col"><div class="card"><h3>Du'a of the day</h3>
+<div class="ar">رَبِّ زِدْنِي عِلْمًا</div>
+<div class="tr">"My Lord, increase me in knowledge."</div>
+<div class="attrib">Ta-Ha 20:114</div></div><div class="card"><h3>Dhikr</h3>
+<div class="ring" style="--pct:100%"><b>33</b></div>
+<div class="mid">Subhanallah · complete</div></div><div class="card"><h3>Fasting</h3>
+<div class="quote" style="font-size:14px">Monday sunnah fast — 6h 12m until Maghrib.</div>
+<div class="pill">Logged today ✓</div></div></div><div class="col" style="grid-column:1 / -1;display:grid;grid-template-columns:1fr 1fr;gap:16px"><div class="card"><h3>Qur'an this week</h3>
+<div class="bar"><i style="width:64%"></i></div>
+<div class="meta"><span>3 surahs · 5 days read</span><span>Al-Mulk 12</span></div>
+<div class="weekdots"><i class="on"></i><i class="on"></i><i class="part"></i><i class="on"></i>
+<i class="on"></i><i></i><i class="on"></i></div></div><div class="card"><h3>Consistency</h3>
+<div class="quote" style="font-size:14px">You've prayed Fajr on time 6 of the last 7 days — your steadiest week yet.</div>
+<div class="weekdots"><i class="on"></i><i class="on"></i><i class="on"></i><i></i>
+<i class="on"></i><i class="on"></i><i class="on"></i></div></div><div class="card"><h3>Reflections</h3>
+<div class="quote" style="font-size:14px">Khushoo has trended upward for three weeks. Your calmest prayer is Fajr.</div>
+<div class="bar"><i style="width:78%"></i></div>
+<div class="meta"><span>Avg. presence 3.9 / 5</span><span>21 entries</span></div></div><div class="card"><h3>Qibla</h3>
+<div class="quote" style="font-size:14px">118° SE from your location in Manchester.</div>
+<div class="attrib">Accurate to ±2° · tap to open the compass</div></div></div></div></div></div></div></div></div><div><div class="cap">Desktop 1440pt wide (full scroll) · Dark · Populated (Isha)</div><div class="device" id="12-desktop-dark-populated" style="width:1440px;min-height:900px"><div class="app desktop dark"><div class="shell"><div class="side"><div class="brand"><i></i>Muslim Life OS</div>
+<div class="nav">
+<a class="on"><b></b>Home</a><a><b></b>Prayer</a><a><b></b>Qur'an</a><a><b></b>Dhikr</a>
+<a><b></b>Du'as</a><a><b></b>Hadith</a><a><b></b>Journal</a><a><b></b>Assistant</a>
+<a><b></b>Family</a><a><b></b>Settings</a></div></div><div class="scroll"><div><div class="greet-salaam">السلام عليكم</div>
+    <div class="greet-name">Assalamu Alaikum, Shahid</div>
+    <div class="greet-date"><span class="hijri">14 Safar 1448</span><span class="dot"></span>
+    <span>Friday, 1 August 2026</span></div></div><div class="dgrid"><div class="col span2"><div class="hero"  style="background:linear-gradient(160deg,#0e1330 0%,#141a2e 55%,#0a0d1c 100%)"><div class="tex"></div><div class="in">
+      <div class="hero-label">Next prayer</div>
+      <div class="hero-next"><div class="hero-name">Isha</div>
+        <div style="margin-left:auto;text-align:right"><div class="hero-count">1:31:09</div>
+        <div class="hero-sub">remaining</div></div></div>
+      <div class="times"><div class="t"><b>Fajr</b><span>04:38</span></div><div class="t"><b>Dhuhr</b><span>13:09</span></div><div class="t"><b>Asr</b><span>17:14</span></div><div class="t"><b>Maghrib</b><span>20:41</span></div><div class="t now"><b>Isha</b><span>22:12</span><i></i></div></div></div></div><div class="card"><h3>Today's prayers</h3><div class="prow"><div class="p"><div class="circ done">✓</div><small>Faj</small></div><div class="p"><div class="circ done">✓</div><small>Dhu</small></div><div class="p"><div class="circ done">✓</div><small>Asr</small></div><div class="p"><div class="circ"></div><small>Mag</small></div><div class="p"><div class="circ"></div><small>Ish</small></div></div><div class="prompt"><span>How was your Asr?</span><em>Reflect →</em></div><div class="khushoo"><div class="moon on">🌑</div><div class="moon on">🌘</div><div class="moon on">🌗</div><div class="moon">🌖</div><div class="moon">🌕</div><span>Present, with effort</span></div></div><div class="card"><h3>Hadith of the day</h3>
+<div class="quote">"Actions are but by intention, and every man shall have only that which he intended."</div>
+<div class="attrib">Sahih al-Bukhari 1 · Narrated by Umar ibn al-Khattab</div></div></div><div class="col"><div class="card"><h3>Du'a of the day</h3>
+<div class="ar">رَبِّ زِدْنِي عِلْمًا</div>
+<div class="tr">"My Lord, increase me in knowledge."</div>
+<div class="attrib">Ta-Ha 20:114</div></div><div class="card"><h3>Dhikr</h3>
+<div class="ring" style="--pct:100%"><b>33</b></div>
+<div class="mid">Subhanallah · complete</div></div><div class="card"><h3>Fasting</h3>
+<div class="quote" style="font-size:14px">Monday sunnah fast — 6h 12m until Maghrib.</div>
+<div class="pill">Logged today ✓</div></div></div><div class="col" style="grid-column:1 / -1;display:grid;grid-template-columns:1fr 1fr;gap:16px"><div class="card"><h3>Qur'an this week</h3>
+<div class="bar"><i style="width:64%"></i></div>
+<div class="meta"><span>3 surahs · 5 days read</span><span>Al-Mulk 12</span></div>
+<div class="weekdots"><i class="on"></i><i class="on"></i><i class="part"></i><i class="on"></i>
+<i class="on"></i><i></i><i class="on"></i></div></div><div class="card"><h3>Consistency</h3>
+<div class="quote" style="font-size:14px">You've prayed Fajr on time 6 of the last 7 days — your steadiest week yet.</div>
+<div class="weekdots"><i class="on"></i><i class="on"></i><i class="on"></i><i></i>
+<i class="on"></i><i class="on"></i><i class="on"></i></div></div><div class="card"><h3>Reflections</h3>
+<div class="quote" style="font-size:14px">Khushoo has trended upward for three weeks. Your calmest prayer is Fajr.</div>
+<div class="bar"><i style="width:78%"></i></div>
+<div class="meta"><span>Avg. presence 3.9 / 5</span><span>21 entries</span></div></div><div class="card"><h3>Qibla</h3>
+<div class="quote" style="font-size:14px">118° SE from your location in Manchester.</div>
+<div class="attrib">Accurate to ±2° · tap to open the compass</div></div></div></div></div></div></div></div></div><div><div class="cap">Desktop 1440pt wide (full scroll) · Dark · Loading</div><div class="device" id="13-desktop-dark-loading" style="width:1440px;min-height:900px"><div class="app desktop dark"><div class="shell"><div class="side"><div class="brand"><i></i>Muslim Life OS</div>
+<div class="nav">
+<a class="on"><b></b>Home</a><a><b></b>Prayer</a><a><b></b>Qur'an</a><a><b></b>Dhikr</a>
+<a><b></b>Du'as</a><a><b></b>Hadith</a><a><b></b>Journal</a><a><b></b>Assistant</a>
+<a><b></b>Family</a><a><b></b>Settings</a></div></div><div class="scroll"><div><div class="greet-salaam">السلام عليكم</div>
+    <div class="greet-name">Assalamu Alaikum, Shahid</div>
+    <div class="greet-date"><span class="hijri">14 Safar 1448</span><span class="dot"></span>
+    <span>Friday, 1 August 2026</span></div></div><div class="dgrid"><div class="col span2"><div class="sk sk-hero"></div><div class="card"><div class="sk sk-line" style="width:38%;height:9px"></div><div class="prow"><div class="p"><div class="sk sk-circ"></div><div class="sk sk-line" style="width:22px;height:8px"></div></div><div class="p"><div class="sk sk-circ"></div><div class="sk sk-line" style="width:22px;height:8px"></div></div><div class="p"><div class="sk sk-circ"></div><div class="sk sk-line" style="width:22px;height:8px"></div></div><div class="p"><div class="sk sk-circ"></div><div class="sk sk-line" style="width:22px;height:8px"></div></div><div class="p"><div class="sk sk-circ"></div><div class="sk sk-line" style="width:22px;height:8px"></div></div></div></div><div class="card"><div class="sk sk-line" style="width:34%;height:9px"></div><div class="sk sk-line" style="width:92%;margin-top:12px"></div><div class="sk sk-line" style="width:76%;margin-top:12px"></div><div class="sk sk-line" style="width:58%;margin-top:12px"></div></div></div><div class="col"><div class="card"><div class="sk sk-line" style="width:34%;height:9px"></div><div class="sk sk-line" style="width:92%;margin-top:12px"></div><div class="sk sk-line" style="width:76%;margin-top:12px"></div><div class="sk sk-line" style="width:58%;margin-top:12px"></div></div><div class="card"><div class="sk sk-line" style="width:34%;height:9px"></div><div class="sk sk-line" style="width:92%;margin-top:12px"></div><div class="sk sk-line" style="width:76%;margin-top:12px"></div></div><div class="card"><div class="sk sk-line" style="width:34%;height:9px"></div><div class="sk sk-line" style="width:92%;margin-top:12px"></div><div class="sk sk-line" style="width:76%;margin-top:12px"></div></div></div></div></div></div></div></div></div><div><div class="cap">Desktop 1440pt wide (full scroll) · Light · Empty</div><div class="device" id="14-desktop-light-empty" style="width:1440px;min-height:900px"><div class="app desktop"><div class="shell"><div class="side"><div class="brand"><i></i>Muslim Life OS</div>
+<div class="nav">
+<a class="on"><b></b>Home</a><a><b></b>Prayer</a><a><b></b>Qur'an</a><a><b></b>Dhikr</a>
+<a><b></b>Du'as</a><a><b></b>Hadith</a><a><b></b>Journal</a><a><b></b>Assistant</a>
+<a><b></b>Family</a><a><b></b>Settings</a></div></div><div class="scroll"><div><div class="greet-salaam">السلام عليكم</div>
+    <div class="greet-name">Assalamu Alaikum, Shahid</div>
+    <div class="greet-date"><span class="hijri">14 Safar 1448</span><span class="dot"></span>
+    <span>Friday, 1 August 2026</span></div></div><div class="dgrid"><div class="col span2"><div class="hero" style="background:linear-gradient(160deg,#131a34 0%,#2b2350 45%,#8a5a2b 100%)"><div class="tex"></div><div class="in">
+      <div class="hero-label">Next prayer</div>
+      <div class="hero-next"><div class="hero-name">Fajr</div>
+        <div style="margin-left:auto;text-align:right"><div class="hero-count">5:18:44</div>
+        <div class="hero-sub">remaining</div></div></div>
+      <div class="times"><div class="t now"><b>Fajr</b><span>04:38</span><i></i></div><div class="t"><b>Dhuhr</b><span>13:09</span></div><div class="t"><b>Asr</b><span>17:14</span></div><div class="t"><b>Maghrib</b><span>20:41</span></div><div class="t"><b>Isha</b><span>22:12</span></div></div></div></div><div class="card"><h3>Today's prayers</h3><div class="prow"><div class="p"><div class="circ"></div><small>Faj</small></div><div class="p"><div class="circ"></div><small>Dhu</small></div><div class="p"><div class="circ"></div><small>Asr</small></div><div class="p"><div class="circ"></div><small>Mag</small></div><div class="p"><div class="circ"></div><small>Ish</small></div></div></div><div class="card"><h3>Hadith of the day</h3><div class="empty"><div class="glyph">❝</div><p>Your daily hadith arrives each morning after Fajr.</p><div class="btn">Browse collections</div></div></div></div><div class="col"><div class="card"><h3>Du'a of the day</h3>
+<div class="ar">رَبِّ زِدْنِي عِلْمًا</div>
+<div class="tr">"My Lord, increase me in knowledge."</div>
+<div class="attrib">Ta-Ha 20:114</div></div><div class="card"><h3>Dhikr</h3><div class="empty"><div class="glyph">◍</div><p>Nothing counted yet today.</p><div class="btn">Start morning adhkar</div></div></div><div class="card"><h3>Qur'an this week</h3><div class="empty"><div class="glyph">﴾</div><p>No pages read this week. One ayah is a beginning.</p><div class="btn">Open Al-Mulk</div></div></div></div></div></div></div></div></div></div></div></body></html>

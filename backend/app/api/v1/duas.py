@@ -33,6 +33,23 @@ def get_duas(
         for item in items
     ]
 
+@router.get("/daily", response_model=DuaItemResponse)
+def get_daily_dua(
+    service: DuaService = Depends(get_dua_service),
+) -> DuaItemResponse:
+    item = service.get_daily_dua()
+    if not item:
+        raise HTTPException(status_code=404, detail="No duas found")
+    return DuaItemResponse(
+        id=item.id,
+        category=item.category,
+        arabic_text=item.arabic_text,
+        transliteration=item.transliteration,
+        translation=item.translation,
+        reference=item.reference,
+        when_to_recite=item.when_to_recite,
+    )
+
 @router.get("/{dua_id}", response_model=DuaItemResponse)
 def get_dua(
     dua_id: str,
