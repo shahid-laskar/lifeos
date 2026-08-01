@@ -32,6 +32,7 @@ import type {
   ReadingProgressResponse,
   SurahAyahsResponse,
   SurahResponse,
+  TafsirResponse,
   UserProfile,
 } from "./types";
 import { PRAYER_NAMES } from "./types";
@@ -248,6 +249,13 @@ export function updateReadingProgress(body: ReadingProgressRequest) {
     method: "PUT",
     body,
   });
+}
+
+export function getAyahTafsir(surahNumber: number, ayahNumber: number, source?: string) {
+  return apiFetch<TafsirResponse>(
+    `/api/v1/quran/surahs/${surahNumber}/ayahs/${ayahNumber}/tafsir`,
+    { query: source ? { source } : undefined }
+  );
 }
 
 /* ---------------------------------- ai ---------------------------------- */

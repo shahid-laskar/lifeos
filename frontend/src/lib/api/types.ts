@@ -200,6 +200,13 @@ export type ReadingProgressResponse = {
   updated_at: string;
 };
 
+export type TafsirResponse = {
+  surah_number: number;
+  ayah_number: number;
+  source: string;
+  text: string;
+};
+
 /* --------------------------------- dhikr --------------------------------- */
 
 /** Matches DhikrItemResponse from openapi.json. */

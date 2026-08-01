@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Bookmark, BookmarkCheck } from "lucide-react";
+import { ArrowLeft, Bookmark, BookmarkCheck, BookOpen } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { LoadingBlock } from "@/components/brand/pattern";
 import { ErrorState } from "@/components/brand/states";
@@ -9,6 +9,7 @@ import {
   getSurahAyahs,
   removeBookmark,
   updateReadingProgress,
+  getAyahTafsir,
 } from "@/lib/api/endpoints";
 import type { SurahResponse } from "@/lib/api/types";
 
@@ -46,6 +47,15 @@ function AyahCard({
   onBookmark: (ayah: number) => void;
   onUnbookmark: (ayah: number) => void;
 }) {
+  const [showTafsir, setShowTafsir] = useState(false);
+  const [tafsirSource, setTafsirSource] = useState("ibn_kathir");
+
+  const tafsirQuery = useQuery({
+    queryKey: ["tafsir", surahNumber, numberInSurah, tafsirSource],
+    queryFn: () => getAyahTafsir(surahNumber, numberInSurah, tafsirSource),
+    enabled: showTafsir,
+  });
+
   return (
     <article
       id={`ayah-${numberInSurah}`}
@@ -78,6 +88,15 @@ function AyahCard({
             <Bookmark className="size-5 text-muted-foreground" />
           )}
         </button>
+        <button
+          type="button"
+          aria-label={`View Tafsir for ayah ${numberInSurah}`}
+          onClick={() => setShowTafsir(!showTafsir)}
+          className="flex size-9 items-center justify-center rounded-full transition-colors hover:bg-gold/10"
+        >
+          <BookOpen className="size-5 text-muted-foreground" />
+        </button>
+        </div>
       </div>
 
       {/* Arabic text — RTL, Amiri, ≥28px as per CONSTITUTION.md */}
@@ -88,6 +107,31 @@ function AyahCard({
       >
         {text}
       </p>
+
+      {showTafsir && (
+        <div className="mt-6 rounded-lg bg-muted p-4">
+          <div className="mb-4 flex items-center justify-between">
+            <h4 className="font-semibold text-sm">Tafsir</h4>
+            <select
+              value={tafsirSource}
+              onChange={(e) => setTafsirSource(e.target.value)}
+              className="rounded-md border border-input bg-background px-2 py-1 text-xs"
+            >
+              <option value="ibn_kathir">Ibn Kathir</option>
+              <option value="jalalayn">Jalalayn</option>
+            </select>
+          </div>
+          {tafsirQuery.isPending ? (
+            <LoadingBlock label="Loading tafsir..." />
+          ) : tafsirQuery.isError ? (
+            <ErrorState title="Error" message="Couldn't load tafsir." onRetry={() => tafsirQuery.refetch()} />
+          ) : (
+            <div className="text-sm leading-relaxed text-muted-foreground whitespace-pre-wrap">
+              {tafsirQuery.data?.text || "No tafsir found for this ayah."}
+            </div>
+          )}
+        </div>
+      )}
     </article>
   );
 }
