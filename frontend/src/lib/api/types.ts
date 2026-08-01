@@ -146,6 +146,21 @@ export type PrayerLogEntry = {
   date?: string;
 };
 
+export type PrayerJournalEntry = {
+  id: string;
+  prayer_name: PrayerName;
+  date: string;
+  khushoo_rating: number;
+  notes: string;
+  distractions: string;
+};
+
+export type PrayerInsights = {
+  weekly_quality: number;
+  monthly_quality: number;
+  insights: string[];
+};
+
 /* --------------------------------- quran --------------------------------- */
 
 /** Matches SurahResponse from openapi.json. */

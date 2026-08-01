@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Check, Minus, X } from "lucide-react";
+import { Check, Minus, X, Book } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { getPrayerStatus, logPrayer } from "@/lib/api/endpoints";
 import type { PrayerName, PrayerStatus } from "@/lib/api/types";
 import { PRAYER_LABELS, PRAYER_NAMES } from "@/lib/api/types";
@@ -85,10 +86,18 @@ export function PrayerStatusRow() {
           );
         })}
       </ul>
-      <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
-        Tap to cycle through completed, missed and excused. No pressure — this is
-        simply a record.
-      </p>
+      <div className="mt-4 flex items-center justify-between border-t border-border pt-4">
+        <p className="text-xs leading-relaxed text-muted-foreground flex-1 pr-4">
+          Tap to cycle through completed, missed and excused.
+        </p>
+        <Link 
+          to="/prayer-journal" 
+          className="flex items-center gap-2 text-xs font-medium text-primary hover:underline"
+        >
+          <Book className="size-3" />
+          Journal
+        </Link>
+      </div>
     </section>
   );
 }

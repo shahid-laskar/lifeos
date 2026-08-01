@@ -36,6 +36,8 @@ import type {
   UserProfile,
   MemorisationProgress,
   HifdhReviewItem,
+  PrayerJournalEntry,
+  PrayerInsights,
 } from "./types";
 import { PRAYER_NAMES } from "./types";
 
@@ -185,6 +187,18 @@ export async function getPrayerStatus(date: string) {
 
 export function getPrayerConsistency() {
   return apiFetch<ConsistencyMetrics>("/api/v1/habits/prayers/consistency");
+}
+
+export function getPrayerJournal() {
+  return apiFetch<PrayerJournalEntry[]>("/api/v1/habits/prayers/journal");
+}
+
+export function logPrayerJournal(body: { prayer_name: string; date: string; khushoo_rating: number; notes: string; distractions: string }) {
+  return apiFetch<PrayerJournalEntry>("/api/v1/habits/prayers/journal", { method: "POST", body });
+}
+
+export function getPrayerInsights() {
+  return apiFetch<PrayerInsights>("/api/v1/habits/prayers/insights");
 }
 
 export function getDhikrSummary(date?: string) {
