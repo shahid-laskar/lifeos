@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Check, Minus, X, Book } from "lucide-react";
+import { Check, Minus, X, Book, Sparkles } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { getPrayerStatus, logPrayer } from "@/lib/api/endpoints";
 import type { PrayerName, PrayerStatus, PrayerTimes } from "@/lib/api/types";
@@ -10,16 +10,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-
-function getLastPrayer(upcomingName: string | undefined): PrayerName | null {
-  if (!upcomingName) return null;
-  if (upcomingName === "sunrise") return "fajr";
-  if (upcomingName === "fajr") return "isha";
-  
-  const index = PRAYER_NAMES.indexOf(upcomingName as PrayerName);
-  if (index > 0) return PRAYER_NAMES[index - 1];
-  return null;
-}
 
 export function PrayerStatusRow({ times }: { times?: PrayerTimes }) {
   const date = todayISO();
@@ -72,123 +62,125 @@ export function PrayerStatusRow({ times }: { times?: PrayerTimes }) {
       setKhushooPromptPrayer(prayer);
       setTimeout(() => {
         setKhushooPromptPrayer(current => current === prayer ? null : current);
-      }, 5000);
+      }, 7000);
     } else {
       setKhushooPromptPrayer(null);
     }
   };
 
-  const upcoming = times ? nextPrayer(times, new Date()) : null;
-  const lastPrayer = getLastPrayer(upcoming?.name);
-  const lastPrayerLabel = lastPrayer ? PRAYER_LABELS[lastPrayer].latin : "";
-
   return (
     <>
-      <section className="rounded-2xl border border-border bg-card p-5">
-        <div className="flex items-baseline justify-between">
-          <h2 className="text-sm font-semibold text-foreground">Today's prayers</h2>
-          <p className="text-xs text-muted-foreground">Tap to log</p>
+      <section className="rounded-3xl border border-border/50 bg-card p-6 shadow-sm">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-base font-semibold tracking-tight text-foreground flex items-center gap-2">
+            <Sparkles className="size-4 text-primary" /> Today's Prayers
+          </h2>
+          <Link to="/prayer-journal" className="text-xs font-medium text-muted-foreground hover:text-primary transition-colors flex items-center gap-1">
+            <Book className="size-3" /> Journal
+          </Link>
         </div>
         
-        <ul className="mt-4 grid grid-cols-5 gap-2 relative">
+        <div className="flex justify-between items-end relative">
           {PRAYER_NAMES.map((name) => {
             const status = statuses?.[name];
+            const isCompleted = status === "completed";
+            const isMissed = status === "missed";
+            const isExcused = status === "excused";
+            const isPendingState = !status;
+
             return (
-              <li key={name} className="flex flex-col items-center gap-2 relative">
+              <div key={name} className="flex flex-col items-center gap-3">
                 {isPending ? (
-                  <Skeleton className="size-12 rounded-full" />
+                  <Skeleton className="size-14 rounded-full" />
                 ) : (
                   <button
                     type="button"
                     aria-label={`${PRAYER_LABELS[name].latin}: ${status ?? "not logged"}`}
                     onClick={() => setDrawerPrayer(name)}
                     className={cn(
-                      "flex size-12 items-center justify-center rounded-full border motion-safe:transition-all motion-safe:duration-300 motion-safe:ease-out",
-                      status === "completed" && "border-primary bg-primary text-primary-foreground",
-                      status === "missed" &&
-                        "border-muted-foreground/40 bg-muted text-muted-foreground",
-                      status === "excused" && "border-gold bg-gold/20 text-gold-foreground",
-                      !status && "border-dashed border-border bg-background text-muted-foreground hover:bg-muted/50",
+                      "flex size-14 items-center justify-center rounded-full border-2 motion-safe:transition-all motion-safe:duration-300",
+                      isCompleted && "border-primary bg-primary shadow-md shadow-primary/20",
+                      isMissed && "border-muted-foreground/30 bg-muted text-muted-foreground",
+                      isExcused && "border-gold bg-gold/10 text-gold-foreground",
+                      isPendingState && "border-dashed border-border/60 bg-transparent text-muted-foreground/50 hover:border-primary/50 hover:bg-primary/5 hover:text-primary"
                     )}
                   >
-                    {status === "completed" ? <Check className="size-5" /> : null}
-                    {status === "missed" ? <X className="size-5" /> : null}
-                    {status === "excused" ? <Minus className="size-5" /> : null}
+                    {isCompleted && <Check color="#ffffff" className="size-6 stroke-[3]" />}
+                    {isMissed && <X className="size-6 stroke-[3]" />}
+                    {isExcused && <Minus className="size-6 stroke-[3]" />}
                   </button>
                 )}
-                <span className="text-[11px] text-muted-foreground">{PRAYER_LABELS[name].latin}</span>
-              </li>
+                <span className={cn(
+                  "text-[11px] font-medium transition-colors",
+                  isCompleted ? "text-primary" : "text-muted-foreground"
+                )}>
+                  {PRAYER_LABELS[name].latin}
+                </span>
+              </div>
             );
           })}
-        </ul>
+        </div>
 
-        {khushooPromptPrayer ? (
-          <div className="mt-6 rounded-xl bg-primary/5 p-4 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-top-2 motion-safe:duration-300 border border-primary/10">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-medium text-primary">How was your {PRAYER_LABELS[khushooPromptPrayer].latin}?</p>
-              <Link to="/prayer-journal" className="text-xs text-primary hover:underline">Full Journal →</Link>
+        {khushooPromptPrayer && (
+          <div className="mt-6 rounded-2xl bg-gradient-to-br from-primary/10 to-transparent p-5 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-top-4 motion-safe:duration-500 border border-primary/20">
+            <div className="flex flex-col items-center gap-4">
+              <p className="text-sm font-medium text-foreground text-center">
+                Alhamdulillah. How was your focus during {PRAYER_LABELS[khushooPromptPrayer].latin}?
+              </p>
+              <div className="flex justify-between w-full max-w-[250px] text-3xl">
+                {["🌑", "🌘", "🌗", "🌖", "🌕"].map((icon, i) => (
+                  <button 
+                    key={i} 
+                    className="motion-safe:hover:-translate-y-2 motion-safe:transition-transform hover:drop-shadow-xl"
+                    onClick={() => {
+                      toast.success("Reflection saved beautifully.");
+                      setKhushooPromptPrayer(null);
+                    }}
+                    title={["Struggled", "Distracted", "Present", "Focused", "Deep Focus"][i]}
+                  >
+                    {icon}
+                  </button>
+                ))}
+              </div>
             </div>
-            <div className="mt-4 flex justify-between w-full text-3xl px-2">
-              {["🌑", "🌘", "🌗", "🌖", "🌕"].map((icon, i) => (
-                <button 
-                  key={i} 
-                  className="motion-safe:hover:scale-125 motion-safe:transition-transform hover:drop-shadow-md"
-                  onClick={() => {
-                    toast.success("Reflection saved");
-                    setKhushooPromptPrayer(null);
-                  }}
-                  title={["Struggled", "Distracted", "Present", "Focused", "Deep Focus"][i]}
-                >
-                  {icon}
-                </button>
-              ))}
-            </div>
-          </div>
-        ) : (
-          <div className="mt-5 flex justify-center">
-            <Link
-              to="/prayer-journal"
-              className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
-            >
-              <Book className="size-4" />
-              Open Prayer Journal
-            </Link>
           </div>
         )}
       </section>
 
       <Drawer open={!!drawerPrayer} onOpenChange={(open) => !open && setDrawerPrayer(null)}>
-        <DrawerContent>
-          <DrawerHeader>
-            <DrawerTitle>Log {drawerPrayer ? PRAYER_LABELS[drawerPrayer].latin : ""} Prayer</DrawerTitle>
+        <DrawerContent className="max-w-md mx-auto rounded-t-3xl border-x border-t border-border/50">
+          <DrawerHeader className="pb-2">
+            <DrawerTitle className="text-center text-xl">
+              Log {drawerPrayer ? PRAYER_LABELS[drawerPrayer].latin : ""}
+            </DrawerTitle>
           </DrawerHeader>
-          <div className="flex justify-center gap-4 p-4 pb-8">
+          <div className="flex justify-center gap-3 p-6 pb-10">
             <button
-              className="flex flex-col items-center gap-2 p-4 w-[100px] rounded-xl border border-border hover:bg-muted transition-colors"
+              className="flex flex-col items-center gap-3 p-5 w-28 rounded-2xl border-2 border-border bg-card hover:border-primary/50 hover:bg-primary/5 transition-all group"
               onClick={() => handleSelect(drawerPrayer!, "completed", statuses?.[drawerPrayer!])}
             >
-              <div className="flex size-14 items-center justify-center rounded-full border border-primary bg-primary text-primary-foreground">
-                <Check className="size-6" />
+              <div className="flex size-14 items-center justify-center rounded-full bg-primary/10 text-primary group-hover:bg-primary transition-colors">
+                <Check className="size-6 stroke-[3] text-primary group-hover:text-white" />
               </div>
-              <span className="text-sm font-medium">Prayed</span>
+              <span className="text-sm font-semibold text-foreground">Prayed</span>
             </button>
             <button
-              className="flex flex-col items-center gap-2 p-4 w-[100px] rounded-xl border border-border hover:bg-muted transition-colors"
+              className="flex flex-col items-center gap-3 p-5 w-28 rounded-2xl border-2 border-border bg-card hover:border-muted-foreground/30 hover:bg-muted transition-all group"
               onClick={() => handleSelect(drawerPrayer!, "missed", statuses?.[drawerPrayer!])}
             >
-              <div className="flex size-14 items-center justify-center rounded-full border border-muted-foreground/40 bg-muted text-muted-foreground">
-                <X className="size-6" />
+              <div className="flex size-14 items-center justify-center rounded-full bg-muted-foreground/10 text-muted-foreground group-hover:bg-muted-foreground group-hover:text-white transition-colors">
+                <X className="size-6 stroke-[3]" />
               </div>
-              <span className="text-sm font-medium">Missed</span>
+              <span className="text-sm font-semibold text-foreground">Missed</span>
             </button>
             <button
-              className="flex flex-col items-center gap-2 p-4 w-[100px] rounded-xl border border-border hover:bg-muted transition-colors"
+              className="flex flex-col items-center gap-3 p-5 w-28 rounded-2xl border-2 border-border bg-card hover:border-gold/50 hover:bg-gold/10 transition-all group"
               onClick={() => handleSelect(drawerPrayer!, "excused", statuses?.[drawerPrayer!])}
             >
-              <div className="flex size-14 items-center justify-center rounded-full border border-gold bg-gold/20 text-gold-foreground">
-                <Minus className="size-6" />
+              <div className="flex size-14 items-center justify-center rounded-full bg-gold/20 text-gold-foreground group-hover:bg-gold group-hover:text-white transition-colors">
+                <Minus className="size-6 stroke-[3]" />
               </div>
-              <span className="text-sm font-medium">Excused</span>
+              <span className="text-sm font-semibold text-foreground">Excused</span>
             </button>
           </div>
         </DrawerContent>
