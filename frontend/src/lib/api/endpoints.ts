@@ -583,6 +583,67 @@ export function deleteMilestone(milestoneId: string) {
   });
 }
 
+// ── Calendar ─────────────────────────────────────────────────────────────
+
+export function getEvents(startTime?: string, endTime?: string) {
+  const params = new URLSearchParams();
+  if (startTime) params.append("start_time", startTime);
+  if (endTime) params.append("end_time", endTime);
+  const qs = params.toString();
+  const url = `/api/v1/calendar/events${qs ? `?${qs}` : ''}`;
+  return apiFetch<EventResponse[]>(url);
+}
+
+export function createEvent(data: EventCreate) {
+  return apiFetch<EventResponse>("/api/v1/calendar/events", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export function updateEvent(eventId: string, data: EventUpdate) {
+  return apiFetch<EventResponse>(`/api/v1/calendar/events/${eventId}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+}
+
+export function deleteEvent(eventId: string) {
+  return apiFetch<void>(`/api/v1/calendar/events/${eventId}`, {
+    method: "DELETE",
+  });
+}
+
+// ── Weekly Reviews ─────────────────────────────────────────────────────────────
+
+export function getWeeklyReviews() {
+  return apiFetch<WeeklyReviewResponse[]>("/api/v1/reviews/weekly");
+}
+
+export function getCurrentWeeklyReview() {
+  return apiFetch<WeeklyReviewResponse | {}>("/api/v1/reviews/weekly/current");
+}
+
+export function saveWeeklyReview(data: WeeklyReviewCreate) {
+  return apiFetch<WeeklyReviewResponse>("/api/v1/reviews/weekly", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+// ── Productivity ─────────────────────────────────────────────────────────────
+
+export function getFocusSessions() {
+  return apiFetch<FocusSessionResponse[]>("/api/v1/productivity/focus-sessions");
+}
+
+export function logFocusSession(data: FocusSessionCreate) {
+  return apiFetch<FocusSessionResponse>("/api/v1/productivity/focus-sessions", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
 export function completeLearningModule(moduleId: string) {
   return apiFetch<LearningEnrollmentResponse>("/api/v1/learning/enrollments/complete-module", {
     method: "POST",

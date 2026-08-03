@@ -17,6 +17,8 @@ import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedAssistantRouteImport } from './routes/_authenticated/assistant'
+import { Route as AuthenticatedCalendarRouteImport } from './routes/_authenticated/calendar'
+import { Route as AuthenticatedDeepWorkRouteImport } from './routes/_authenticated/deep-work'
 import { Route as AuthenticatedDhikrRouteImport } from './routes/_authenticated/dhikr'
 import { Route as AuthenticatedDuasRouteImport } from './routes/_authenticated/duas'
 import { Route as AuthenticatedFamiliesRouteImport } from './routes/_authenticated/families'
@@ -28,6 +30,7 @@ import { Route as AuthenticatedPlannerRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedPrayerJournalRouteImport } from './routes/_authenticated/prayer-journal'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedQuranRouteImport } from './routes/_authenticated/quran'
+import { Route as AuthenticatedReviewsRouteImport } from './routes/_authenticated/reviews'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedTasksRouteImport } from './routes/_authenticated/tasks'
 
@@ -68,6 +71,16 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
 const AuthenticatedAssistantRoute = AuthenticatedAssistantRouteImport.update({
   id: '/assistant',
   path: '/assistant',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCalendarRoute = AuthenticatedCalendarRouteImport.update({
+  id: '/calendar',
+  path: '/calendar',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedDeepWorkRoute = AuthenticatedDeepWorkRouteImport.update({
+  id: '/deep-work',
+  path: '/deep-work',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedDhikrRoute = AuthenticatedDhikrRouteImport.update({
@@ -126,6 +139,11 @@ const AuthenticatedQuranRoute = AuthenticatedQuranRouteImport.update({
   path: '/quran',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedReviewsRoute = AuthenticatedReviewsRouteImport.update({
+  id: '/reviews',
+  path: '/reviews',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -145,6 +163,8 @@ export interface FileRoutesByFullPath {
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
   '/assistant': typeof AuthenticatedAssistantRoute
+  '/calendar': typeof AuthenticatedCalendarRoute
+  '/deep-work': typeof AuthenticatedDeepWorkRoute
   '/dhikr': typeof AuthenticatedDhikrRoute
   '/duas': typeof AuthenticatedDuasRoute
   '/families': typeof AuthenticatedFamiliesRoute
@@ -156,6 +176,7 @@ export interface FileRoutesByFullPath {
   '/prayer-journal': typeof AuthenticatedPrayerJournalRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/quran': typeof AuthenticatedQuranRoute
+  '/reviews': typeof AuthenticatedReviewsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/tasks': typeof AuthenticatedTasksRoute
 }
@@ -167,6 +188,8 @@ export interface FileRoutesByTo {
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
   '/assistant': typeof AuthenticatedAssistantRoute
+  '/calendar': typeof AuthenticatedCalendarRoute
+  '/deep-work': typeof AuthenticatedDeepWorkRoute
   '/dhikr': typeof AuthenticatedDhikrRoute
   '/duas': typeof AuthenticatedDuasRoute
   '/families': typeof AuthenticatedFamiliesRoute
@@ -178,6 +201,7 @@ export interface FileRoutesByTo {
   '/prayer-journal': typeof AuthenticatedPrayerJournalRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/quran': typeof AuthenticatedQuranRoute
+  '/reviews': typeof AuthenticatedReviewsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/tasks': typeof AuthenticatedTasksRoute
 }
@@ -191,6 +215,8 @@ export interface FileRoutesById {
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/assistant': typeof AuthenticatedAssistantRoute
+  '/_authenticated/calendar': typeof AuthenticatedCalendarRoute
+  '/_authenticated/deep-work': typeof AuthenticatedDeepWorkRoute
   '/_authenticated/dhikr': typeof AuthenticatedDhikrRoute
   '/_authenticated/duas': typeof AuthenticatedDuasRoute
   '/_authenticated/families': typeof AuthenticatedFamiliesRoute
@@ -202,6 +228,7 @@ export interface FileRoutesById {
   '/_authenticated/prayer-journal': typeof AuthenticatedPrayerJournalRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/quran': typeof AuthenticatedQuranRoute
+  '/_authenticated/reviews': typeof AuthenticatedReviewsRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/tasks': typeof AuthenticatedTasksRoute
 }
@@ -215,6 +242,8 @@ export interface FileRouteTypes {
     | '/register'
     | '/reset-password'
     | '/assistant'
+    | '/calendar'
+    | '/deep-work'
     | '/dhikr'
     | '/duas'
     | '/families'
@@ -226,6 +255,7 @@ export interface FileRouteTypes {
     | '/prayer-journal'
     | '/profile'
     | '/quran'
+    | '/reviews'
     | '/settings'
     | '/tasks'
   fileRoutesByTo: FileRoutesByTo
@@ -237,6 +267,8 @@ export interface FileRouteTypes {
     | '/register'
     | '/reset-password'
     | '/assistant'
+    | '/calendar'
+    | '/deep-work'
     | '/dhikr'
     | '/duas'
     | '/families'
@@ -248,6 +280,7 @@ export interface FileRouteTypes {
     | '/prayer-journal'
     | '/profile'
     | '/quran'
+    | '/reviews'
     | '/settings'
     | '/tasks'
   id:
@@ -260,6 +293,8 @@ export interface FileRouteTypes {
     | '/register'
     | '/reset-password'
     | '/_authenticated/assistant'
+    | '/_authenticated/calendar'
+    | '/_authenticated/deep-work'
     | '/_authenticated/dhikr'
     | '/_authenticated/duas'
     | '/_authenticated/families'
@@ -271,6 +306,7 @@ export interface FileRouteTypes {
     | '/_authenticated/prayer-journal'
     | '/_authenticated/profile'
     | '/_authenticated/quran'
+    | '/_authenticated/reviews'
     | '/_authenticated/settings'
     | '/_authenticated/tasks'
   fileRoutesById: FileRoutesById
@@ -341,6 +377,20 @@ declare module '@tanstack/react-router' {
       path: '/assistant'
       fullPath: '/assistant'
       preLoaderRoute: typeof AuthenticatedAssistantRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/calendar': {
+      id: '/_authenticated/calendar'
+      path: '/calendar'
+      fullPath: '/calendar'
+      preLoaderRoute: typeof AuthenticatedCalendarRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/deep-work': {
+      id: '/_authenticated/deep-work'
+      path: '/deep-work'
+      fullPath: '/deep-work'
+      preLoaderRoute: typeof AuthenticatedDeepWorkRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dhikr': {
@@ -420,6 +470,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedQuranRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/reviews': {
+      id: '/_authenticated/reviews'
+      path: '/reviews'
+      fullPath: '/reviews'
+      preLoaderRoute: typeof AuthenticatedReviewsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/settings': {
       id: '/_authenticated/settings'
       path: '/settings'
@@ -439,6 +496,8 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAssistantRoute: typeof AuthenticatedAssistantRoute
+  AuthenticatedCalendarRoute: typeof AuthenticatedCalendarRoute
+  AuthenticatedDeepWorkRoute: typeof AuthenticatedDeepWorkRoute
   AuthenticatedDhikrRoute: typeof AuthenticatedDhikrRoute
   AuthenticatedDuasRoute: typeof AuthenticatedDuasRoute
   AuthenticatedFamiliesRoute: typeof AuthenticatedFamiliesRoute
@@ -450,12 +509,15 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPrayerJournalRoute: typeof AuthenticatedPrayerJournalRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedQuranRoute: typeof AuthenticatedQuranRoute
+  AuthenticatedReviewsRoute: typeof AuthenticatedReviewsRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedTasksRoute: typeof AuthenticatedTasksRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAssistantRoute: AuthenticatedAssistantRoute,
+  AuthenticatedCalendarRoute: AuthenticatedCalendarRoute,
+  AuthenticatedDeepWorkRoute: AuthenticatedDeepWorkRoute,
   AuthenticatedDhikrRoute: AuthenticatedDhikrRoute,
   AuthenticatedDuasRoute: AuthenticatedDuasRoute,
   AuthenticatedFamiliesRoute: AuthenticatedFamiliesRoute,
@@ -467,6 +529,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPrayerJournalRoute: AuthenticatedPrayerJournalRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedQuranRoute: AuthenticatedQuranRoute,
+  AuthenticatedReviewsRoute: AuthenticatedReviewsRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedTasksRoute: AuthenticatedTasksRoute,
 }

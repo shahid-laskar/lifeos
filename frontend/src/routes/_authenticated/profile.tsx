@@ -90,6 +90,37 @@ function ProfilePage() {
           </div>
         </div>
 
+        <div className="rounded-xl border border-[var(--line)] bg-[var(--surface)] p-5">
+          <div className="flex items-center justify-between">
+            <div>
+              <h4 className="font-medium text-[14px]">Weekly Review</h4>
+              <p className="text-[12px] text-[var(--mute)]">Reflect and set intentions</p>
+            </div>
+            <Link
+              to="/reviews"
+              className="inline-flex items-center gap-1 text-[13px] font-medium text-[var(--primary)] hover:underline"
+            >
+              Start Review
+            </Link>
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-[var(--line)] bg-[var(--surface)] p-5">
+          <div className="flex items-center justify-between">
+            <div>
+              <h4 className="font-medium text-[14px]">Deep Work</h4>
+              <p className="text-[12px] text-[var(--mute)]">Focus without distractions</p>
+            </div>
+            <Link
+              to="/deep-work"
+              className="inline-flex items-center gap-1 text-[13px] font-medium text-[var(--primary)] hover:underline"
+            >
+              Start Session
+            </Link>
+          </div>
+        </div>
+
+
         <SettingsSection />
         <div className="pt-4">
           <button
