@@ -12,6 +12,9 @@ import {
 import { removeMember, deleteFamily, listInvitations } from "@/lib/api/endpoints";
 import { type Family } from "@/lib/api/types";
 import { InviteSection } from "./invite-section";
+import { FamilyEvents } from "./family-events";
+import { FamilyGoals } from "./family-goals";
+import { FamilyTasks } from "./family-tasks";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import {
@@ -189,6 +192,35 @@ export function FamilyDashboard({ family, currentUserId }: FamilyDashboardProps)
 
       {/* Invite Section */}
       <InviteSection familyId={family.id} invitations={invitations} isOwner={isOwner} />
+
+      {/* Phase 6 Sections */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <FamilyEvents familyId={family.id} currentUserId={currentUserId} />
+        <FamilyGoals familyId={family.id} currentUserId={currentUserId} />
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <FamilyTasks familyId={family.id} currentUserId={currentUserId} />
+        
+        {/* Parent Dashboard Placeholder (6C) */}
+        <div className="card p-5 border-[var(--primary-soft)] border">
+          <h3 className="font-semibold text-[16px] text-[var(--ink)] mb-4">Parent Dashboard</h3>
+          <p className="text-[13px] text-[var(--mute)]">
+            A space to gently guide your children's learning and habits, in accordance with age-appropriate design.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {family.members.filter(m => m.role === 'dependent').length === 0 ? (
+              <p className="text-[12px] text-[var(--primary)] font-medium">No dependents in family yet.</p>
+            ) : (
+              family.members.filter(m => m.role === 'dependent').map(m => (
+                <div key={m.user_id} className="h-10 w-10 bg-[var(--primary-soft)] rounded-full flex items-center justify-center text-[var(--primary)] font-bold text-xs" style={{ borderRadius: '99px' }}>
+                  CH
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </div>
 
       {/* Owner Danger Zone */}
       {isOwner && (

@@ -45,3 +45,59 @@ class AcceptInvitationRequest(BaseModel):
 
 class RemoveMemberRequest(BaseModel):
     user_id: str
+
+# Phase 6 Models
+
+from datetime import date as date_type
+
+class FamilyEventBase(BaseModel):
+    title: str
+    description: str | None = None
+    start_time: datetime
+    end_time: datetime
+    is_all_day: bool = False
+    location: str | None = None
+
+class FamilyEventCreate(FamilyEventBase):
+    pass
+
+class FamilyEventResponse(FamilyEventBase):
+    id: str
+    family_id: str
+    creator_id: str
+    created_at: datetime
+    updated_at: datetime
+
+class FamilyGoalBase(BaseModel):
+    title: str
+    description: str | None = None
+    target_date: date_type | None = None
+    is_completed: bool = False
+
+class FamilyGoalCreate(FamilyGoalBase):
+    pass
+
+class FamilyGoalResponse(FamilyGoalBase):
+    id: str
+    family_id: str
+    creator_id: str
+    created_at: datetime
+    updated_at: datetime
+
+class FamilyTaskBase(BaseModel):
+    title: str
+    description: str | None = None
+    due_date: date_type | None = None
+    is_completed: bool = False
+    assignee_id: str | None = None
+
+class FamilyTaskCreate(FamilyTaskBase):
+    pass
+
+class FamilyTaskResponse(FamilyTaskBase):
+    id: str
+    family_id: str
+    creator_id: str
+    created_at: datetime
+    updated_at: datetime
+

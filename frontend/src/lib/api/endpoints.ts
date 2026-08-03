@@ -761,6 +761,53 @@ export function updateSkillMilestone(milestoneId: string, data: SkillMilestoneUp
   });
 }
 
+// ── Family Extended (Phase 6) ─────────────────────────────────────────────────────────────
+
+export function getFamilyEvents(familyId: string) {
+  return apiFetch<FamilyEventResponse[]>(`/api/v1/families/${familyId}/events`);
+}
+
+export function createFamilyEvent(familyId: string, data: FamilyEventCreate) {
+  return apiFetch<FamilyEventResponse>(`/api/v1/families/${familyId}/events`, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export function deleteFamilyEvent(familyId: string, eventId: string) {
+  return apiFetch<void>(`/api/v1/families/${familyId}/events/${eventId}`, {
+    method: "DELETE",
+  });
+}
+
+export function getFamilyGoals(familyId: string) {
+  return apiFetch<FamilyGoalResponse[]>(`/api/v1/families/${familyId}/goals`);
+}
+
+export function createFamilyGoal(familyId: string, data: FamilyGoalCreate) {
+  return apiFetch<FamilyGoalResponse>(`/api/v1/families/${familyId}/goals`, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export function getFamilyTasks(familyId: string) {
+  return apiFetch<FamilyTaskResponse[]>(`/api/v1/families/${familyId}/tasks`);
+}
+
+export function createFamilyTask(familyId: string, data: FamilyTaskCreate) {
+  return apiFetch<FamilyTaskResponse>(`/api/v1/families/${familyId}/tasks`, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export function toggleFamilyTask(familyId: string, taskId: string) {
+  return apiFetch<FamilyTaskResponse>(`/api/v1/families/${familyId}/tasks/${taskId}/toggle`, {
+    method: "POST",
+  });
+}
+
 export function completeLearningModule(moduleId: string) {
   return apiFetch<LearningEnrollmentResponse>("/api/v1/learning/enrollments/complete-module", {
     method: "POST",
