@@ -1,12 +1,15 @@
+from typing import Annotated
+
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
-from app.domain.dua.models import DuaItemResponse
-from app.domain.dua.service import DuaService
+from app.api.deps import get_current_user, get_dua_service
+from app.domain.user.entities import UserRecord
+from app.domain.dua.models import (
+    DuaItemResponse, BookmarkRequest, BookmarkResponse, BookmarkItemResponse
+)
+from app.domain.dua.service import DuaService, BookmarkNotFoundError
 
 router = APIRouter(prefix="/duas", tags=["Duas"])
-
-def get_dua_service() -> DuaService:
-    return DuaService()
 
 @router.get("/categories", response_model=list[str])
 def get_categories(
@@ -70,3 +73,45 @@ def get_dua(
         reference=item.reference,
         when_to_recite=item.when_to_recite,
     )
+
+
+@router.get("/favourites/bookmarks", response_model=list[BookmarkItemResponse])
+def list_dua_bookmarks(
+    current_user: Annotated[UserRecord, Depends(get_current_user)],
+    service: Annotated[DuaService, Depends(get_dua_service)],
+) -> list[BookmarkItemResponse]:
+    bookmarks = service.list_bookmarks(current_user.id)
+    responses = []
+    for b in bookmarks:
+        dua = service.get_dua_by_id(b.dua_id)
+        responses.append(
+            BookmarkItemResponse(
+                id=b.id,
+                dua_id=b.dua_id,
+                created_at=b.created_at,
+                dua=DuaItemResponse(**dua.__dict__) if dua else None,
+            )
+        )
+    return responses
+
+
+@router.post("/favourites", response_model=BookmarkResponse, status_code=status.HTTP_201_CREATED)
+def add_dua_bookmark(
+    request: BookmarkRequest,
+    current_user: Annotated[UserRecord, Depends(get_current_user)],
+    service: Annotated[DuaService, Depends(get_dua_service)],
+) -> BookmarkResponse:
+    b = service.add_bookmark(current_user.id, request.dua_id)
+    return BookmarkResponse(id=b.id, dua_id=b.dua_id, created_at=b.created_at)
+
+
+@router.delete("/favourites/{dua_id}", status_code=status.HTTP_204_NO_CONTENT)
+def remove_dua_bookmark(
+    dua_id: str,
+    current_user: Annotated[UserRecord, Depends(get_current_user)],
+    service: Annotated[DuaService, Depends(get_dua_service)],
+) -> None:
+    try:
+        service.remove_bookmark(current_user.id, dua_id)
+    except BookmarkNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc

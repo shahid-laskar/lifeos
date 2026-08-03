@@ -9,7 +9,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from app.api.v1 import ai, auth, families, governance, prayer, users, habits, quran, dhikr, duas, hadith
+from app.api.v1 import ai, auth, families, governance, prayer, users, habits, quran, dhikr, duas, hadith, learning
 from app.core.config import get_settings
 from app.core.db import Base, engine
 from app.core.middleware import (
@@ -60,6 +60,7 @@ app.include_router(hadith.router, prefix=settings.api_v1_prefix)
 app.include_router(ai.router, prefix=settings.api_v1_prefix)
 app.include_router(families.router, prefix=settings.api_v1_prefix)
 app.include_router(governance.router, prefix=settings.api_v1_prefix)
+app.include_router(learning.router, prefix=settings.api_v1_prefix)
 
 
 @app.get("/health", tags=["system"])

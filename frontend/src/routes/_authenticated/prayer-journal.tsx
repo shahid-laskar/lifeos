@@ -10,6 +10,7 @@ import { todayISO } from "@/lib/prayer";
 import { Book, LineChart, Sparkles, ChevronDown, ChevronUp } from "lucide-react";
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { cn } from "@/lib/utils";
+import { Card, CardContent } from "@/components/ui/card";
 
 export const Route = createFileRoute("/_authenticated/prayer-journal")({
   ssr: false,
@@ -133,54 +134,54 @@ function PrayerJournalPage() {
     <>
       <PageHeader title="Prayer Journal" subtitle="Reflect on your khushoo" arabic="خُشُوع" />
 
-      <div className="mx-5 mb-6 flex rounded-xl border border-border bg-muted/30 p-1 backdrop-blur-md">
+      <div className="mb-6 flex gap-2 overflow-x-auto pb-2 scrollbar-none">
         <button
           onClick={() => setActiveTab("journal")}
           className={cn(
-            "flex-1 rounded-lg py-2 text-sm font-medium transition-all duration-300",
+            "shrink-0 rounded-full px-4 py-2 text-[13px] font-semibold transition-colors flex items-center",
             activeTab === "journal"
-              ? "bg-card text-foreground shadow-sm scale-[1.02]"
-              : "text-muted-foreground hover:text-foreground",
+              ? "bg-[var(--primary-soft)] text-[var(--primary)]"
+              : "text-[var(--mute)] hover:bg-[var(--line)]"
           )}
         >
-          <Book className="mr-2 inline size-4" />
+          <Book className="mr-2 h-4 w-4" />
           Journal
         </button>
         <button
           onClick={() => setActiveTab("insights")}
           className={cn(
-            "flex-1 rounded-lg py-2 text-sm font-medium transition-all duration-300",
+            "shrink-0 rounded-full px-4 py-2 text-[13px] font-semibold transition-colors flex items-center",
             activeTab === "insights"
-              ? "bg-card text-foreground shadow-sm scale-[1.02]"
-              : "text-muted-foreground hover:text-foreground",
+              ? "bg-[var(--primary-soft)] text-[var(--primary)]"
+              : "text-[var(--mute)] hover:bg-[var(--line)]"
           )}
         >
-          <LineChart className="mr-2 inline size-4" />
+          <LineChart className="mr-2 h-4 w-4" />
           Insights
         </button>
       </div>
 
-      <div className="px-5 pb-24">
+      <div className="flex flex-col gap-4">
         {activeTab === "journal" && (
-          <div className="space-y-8">
-            <div className="rounded-3xl border border-border/50 bg-card p-6 shadow-sm relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none" />
+          <div className="flex flex-col gap-6">
+            <Card className="overflow-hidden relative bg-[var(--surface)]">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-[var(--primary-soft)] rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none" />
 
-              <h3 className="mb-6 font-semibold text-lg flex items-center gap-2">
-                <Sparkles className="size-4 text-primary" /> New Reflection
-              </h3>
+              <CardContent className="pt-6 relative z-10 space-y-6">
+                <h3 className="font-semibold text-[15px] flex items-center gap-2 text-[var(--ink)]">
+                  <Sparkles className="h-4 w-4 text-[var(--primary)]" /> New Reflection
+                </h3>
 
-              <div className="space-y-6 relative z-10">
                 <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide snap-x">
                   {PRAYER_NAMES.map((name) => (
                     <button
                       key={name}
                       onClick={() => setSelectedPrayer(name)}
                       className={cn(
-                        "snap-center shrink-0 rounded-full px-5 py-2 text-sm font-medium transition-all border",
+                        "snap-center shrink-0 rounded-full px-5 py-2 text-[13px] font-medium transition-all border",
                         selectedPrayer === name
-                          ? "border-primary bg-primary text-primary-foreground shadow-md"
-                          : "border-border bg-muted/50 text-muted-foreground hover:border-primary/50 hover:bg-primary/5",
+                          ? "border-[var(--primary)] bg-[var(--primary)] text-white shadow-md"
+                          : "border-[var(--line)] bg-[var(--bg)] text-[var(--mute)] hover:border-[var(--primary-soft)] hover:text-[var(--ink)]",
                       )}
                     >
                       {PRAYER_LABELS[name].latin}
@@ -189,7 +190,7 @@ function PrayerJournalPage() {
                 </div>
 
                 <div className="pt-2">
-                  <label className="mb-4 block text-sm font-medium text-foreground text-center">
+                  <label className="mb-4 block text-[13px] font-medium text-[var(--ink)] text-center">
                     How was your focus during {PRAYER_LABELS[selectedPrayer].latin}?
                   </label>
                   <div className="flex justify-between items-end px-2">
@@ -206,11 +207,11 @@ function PrayerJournalPage() {
                               : "scale-100 opacity-40 hover:opacity-70",
                           )}
                         >
-                          <span className="text-3xl drop-shadow-sm">{level.icon}</span>
+                          <span className="text-[28px] drop-shadow-sm">{level.icon}</span>
                           <span
                             className={cn(
-                              "text-[10px] font-medium transition-colors",
-                              isSelected ? "text-primary" : "text-muted-foreground",
+                              "text-[10px] font-semibold transition-colors",
+                              isSelected ? "text-[var(--primary)]" : "text-[var(--mute)]",
                             )}
                           >
                             {level.label}
@@ -221,23 +222,23 @@ function PrayerJournalPage() {
                   </div>
                 </div>
 
-                <div className="border-t border-border/50 pt-4">
+                <div className="border-t border-[var(--line)] pt-4">
                   <button
                     onClick={() => setShowPrompts(!showPrompts)}
-                    className="flex w-full items-center justify-between py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                    className="flex w-full items-center justify-between py-2 text-[13px] font-medium text-[var(--mute)] hover:text-[var(--ink)] transition-colors"
                   >
                     <span>Guided Prompts</span>
                     {showPrompts ? (
-                      <ChevronUp className="size-4" />
+                      <ChevronUp className="h-4 w-4" />
                     ) : (
-                      <ChevronDown className="size-4" />
+                      <ChevronDown className="h-4 w-4" />
                     )}
                   </button>
 
                   {showPrompts && (
-                    <div className="mt-4 space-y-5 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div className="mt-4 space-y-5">
                       <div>
-                        <label className="mb-2 block text-xs font-medium text-foreground">
+                        <label className="mb-2 block text-[12px] font-medium text-[var(--ink)]">
                           What distracted you?
                         </label>
                         <div className="flex flex-wrap gap-2 mb-3">
@@ -248,8 +249,8 @@ function PrayerJournalPage() {
                               className={cn(
                                 "rounded-full px-3 py-1 text-[11px] font-medium transition-colors border",
                                 currentDistractionsArr.includes(d)
-                                  ? "bg-primary/10 border-primary/30 text-primary"
-                                  : "bg-muted border-border text-muted-foreground hover:border-muted-foreground/30",
+                                  ? "bg-[var(--primary-soft)] border-[var(--primary)] text-[var(--primary)]"
+                                  : "bg-[var(--bg)] border-[var(--line)] text-[var(--mute)] hover:border-[var(--mute)]",
                               )}
                             >
                               {d}
@@ -260,20 +261,20 @@ function PrayerJournalPage() {
                           value={distractions}
                           onChange={(e) => setDistractions(e.target.value)}
                           placeholder="Other distractions..."
-                          className="w-full rounded-xl border border-input bg-background p-3 text-sm focus:ring-1 focus:ring-primary focus:border-primary transition-all outline-none"
+                          className="w-full rounded-[12px] border border-[var(--line)] bg-[var(--bg)] p-3 text-[13px] text-[var(--ink)] focus:border-[var(--primary)] focus:outline-none"
                           rows={2}
                         />
                       </div>
 
                       <div>
-                        <label className="mb-2 block text-xs font-medium text-foreground">
+                        <label className="mb-2 block text-[12px] font-medium text-[var(--ink)]">
                           What was in your heart?
                         </label>
                         <textarea
                           value={notes}
                           onChange={(e) => setNotes(e.target.value)}
                           placeholder="Any specific duas or feelings..."
-                          className="w-full rounded-xl border border-input bg-background p-3 text-sm focus:ring-1 focus:ring-primary focus:border-primary transition-all outline-none"
+                          className="w-full rounded-[12px] border border-[var(--line)] bg-[var(--bg)] p-3 text-[13px] text-[var(--ink)] focus:border-[var(--primary)] focus:outline-none"
                           rows={3}
                         />
                       </div>
@@ -284,15 +285,15 @@ function PrayerJournalPage() {
                 <button
                   onClick={() => logMutation.mutate()}
                   disabled={logMutation.isPending}
-                  className="w-full rounded-xl bg-primary py-3.5 text-sm font-semibold text-primary-foreground shadow-md shadow-primary/20 hover:bg-primary/90 hover:shadow-lg transition-all disabled:opacity-50 disabled:shadow-none"
+                  className="w-full rounded-full bg-[var(--primary)] py-3 text-[14px] font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
                 >
-                  {logMutation.isPending ? "Saving Reflection..." : "Save Reflection"}
+                  {logMutation.isPending ? "Saving..." : "Save Reflection"}
                 </button>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
 
             <div>
-              <h3 className="mb-4 ml-1 font-semibold text-lg text-foreground/80">
+              <h3 className="mb-4 font-semibold text-[15px] text-[var(--ink)]">
                 Journal History
               </h3>
               {journalQuery.isPending ? (
@@ -304,16 +305,10 @@ function PrayerJournalPage() {
                   onRetry={() => journalQuery.refetch()}
                 />
               ) : (
-                <div className="space-y-4">
+                <div className="flex flex-col gap-3">
                   {journalQuery.data?.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center p-10 text-center bg-card/50 rounded-3xl border border-border/50 border-dashed">
-                      <div className="size-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                        <Book className="size-5 text-primary" />
-                      </div>
-                      <p className="text-sm font-semibold text-foreground">
-                        Your first reflection awaits
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-2 max-w-[200px] leading-relaxed">
+                    <div className="empty py-10 text-center">
+                      <p className="mt-1 text-[13px] leading-[1.6] text-[var(--mute)]">
                         Log your first prayer to start tracking your khushoo journey.
                       </p>
                     </div>
@@ -321,52 +316,51 @@ function PrayerJournalPage() {
                     journalQuery.data?.map((entry) => {
                       const iconInfo = KHUSHOO_LEVELS.find((l) => l.value === entry.khushoo_rating);
                       return (
-                        <div
-                          key={entry.id}
-                          className="rounded-2xl border border-border/50 bg-card p-5 shadow-sm transition-all hover:shadow-md"
-                        >
-                          <div className="flex justify-between items-center mb-3">
-                            <div className="flex items-center gap-2">
-                              <span className="text-2xl drop-shadow-sm">
-                                {iconInfo?.icon || "🌗"}
-                              </span>
-                              <div>
-                                <span className="font-semibold text-foreground capitalize block leading-none">
-                                  {PRAYER_LABELS[entry.prayer_name].latin}
+                        <Card key={entry.id}>
+                          <CardContent className="p-4">
+                            <div className="flex justify-between items-center mb-3">
+                              <div className="flex items-center gap-3">
+                                <span className="text-[24px] drop-shadow-sm">
+                                  {iconInfo?.icon || "🌗"}
                                 </span>
-                                <span className="text-[11px] text-primary font-medium">
-                                  {iconInfo?.label}
-                                </span>
-                              </div>
-                            </div>
-                            <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-md">
-                              {new Date(entry.date).toLocaleDateString(undefined, {
-                                month: "short",
-                                day: "numeric",
-                              })}
-                            </span>
-                          </div>
-
-                          {(entry.notes || entry.distractions) && (
-                            <div className="mt-3 space-y-2 pt-3 border-t border-border/30">
-                              {entry.notes && (
-                                <p className="text-sm text-foreground/90 italic">"{entry.notes}"</p>
-                              )}
-                              {entry.distractions && (
-                                <div className="flex flex-wrap gap-1 mt-1">
-                                  {entry.distractions.split(",").map((d) => (
-                                    <span
-                                      key={d}
-                                      className="text-[10px] bg-destructive/10 text-destructive/80 px-2 py-0.5 rounded-sm font-medium"
-                                    >
-                                      {d.trim()}
-                                    </span>
-                                  ))}
+                                <div>
+                                  <span className="font-semibold text-[14px] text-[var(--ink)] capitalize block leading-none mb-1">
+                                    {PRAYER_LABELS[entry.prayer_name].latin}
+                                  </span>
+                                  <span className="text-[11px] font-medium text-[var(--primary)]">
+                                    {iconInfo?.label}
+                                  </span>
                                 </div>
-                              )}
+                              </div>
+                              <span className="text-[11px] font-medium text-[var(--mute)] bg-[var(--line)] px-2 py-1 rounded-md">
+                                {new Date(entry.date).toLocaleDateString(undefined, {
+                                  month: "short",
+                                  day: "numeric",
+                                })}
+                              </span>
                             </div>
-                          )}
-                        </div>
+
+                            {(entry.notes || entry.distractions) && (
+                              <div className="mt-3 space-y-2 pt-3 border-t border-[var(--line)]">
+                                {entry.notes && (
+                                  <p className="text-[13px] text-[var(--ink)] italic">"{entry.notes}"</p>
+                                )}
+                                {entry.distractions && (
+                                  <div className="flex flex-wrap gap-1 mt-1">
+                                    {entry.distractions.split(",").map((d) => (
+                                      <span
+                                        key={d}
+                                        className="text-[10px] bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 px-2 py-0.5 rounded-sm font-medium"
+                                      >
+                                        {d.trim()}
+                                      </span>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </CardContent>
+                        </Card>
                       );
                     })
                   )}
@@ -377,7 +371,7 @@ function PrayerJournalPage() {
         )}
 
         {activeTab === "insights" && (
-          <div className="space-y-6">
+          <div className="flex flex-col gap-6">
             {insightsQuery.isPending || journalQuery.isPending ? (
               <LoadingBlock label="Loading insights..." />
             ) : insightsQuery.isError || journalQuery.isError ? (
@@ -392,110 +386,121 @@ function PrayerJournalPage() {
             ) : (
               <>
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="rounded-2xl border border-border/50 bg-card p-5 text-center shadow-sm relative overflow-hidden">
-                    <div className="absolute -top-4 -right-4 w-16 h-16 bg-gold/10 rounded-full blur-xl pointer-events-none" />
-                    <p className="text-xs font-medium text-muted-foreground mb-1 relative z-10">
-                      Weekly Quality
-                    </p>
-                    <p className="text-3xl font-bold text-gold drop-shadow-sm relative z-10">
-                      {insightsQuery.data?.weekly_quality.toFixed(1) || "N/A"}
-                    </p>
-                  </div>
-                  <div className="rounded-2xl border border-border/50 bg-card p-5 text-center shadow-sm relative overflow-hidden">
-                    <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-primary/10 rounded-full blur-xl pointer-events-none" />
-                    <p className="text-xs font-medium text-muted-foreground mb-1 relative z-10">
-                      Monthly Quality
-                    </p>
-                    <p className="text-3xl font-bold text-primary drop-shadow-sm relative z-10">
-                      {insightsQuery.data?.monthly_quality.toFixed(1) || "N/A"}
-                    </p>
-                  </div>
+                  <Card className="text-center overflow-hidden relative">
+                    <div className="absolute -top-4 -right-4 w-16 h-16 bg-[#d4af37]/10 rounded-full blur-xl pointer-events-none" />
+                    <CardContent className="p-5">
+                      <p className="text-[12px] font-medium text-[var(--mute)] mb-1 relative z-10">
+                        Weekly Quality
+                      </p>
+                      <p className="text-[28px] font-bold text-[#d4af37] drop-shadow-sm relative z-10">
+                        {insightsQuery.data?.weekly_quality.toFixed(1) || "N/A"}
+                      </p>
+                    </CardContent>
+                  </Card>
+                  <Card className="text-center overflow-hidden relative">
+                    <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-[var(--primary-soft)] rounded-full blur-xl pointer-events-none" />
+                    <CardContent className="p-5">
+                      <p className="text-[12px] font-medium text-[var(--mute)] mb-1 relative z-10">
+                        Monthly Quality
+                      </p>
+                      <p className="text-[28px] font-bold text-[var(--primary)] drop-shadow-sm relative z-10">
+                        {insightsQuery.data?.monthly_quality.toFixed(1) || "N/A"}
+                      </p>
+                    </CardContent>
+                  </Card>
                 </div>
 
-                <div className="rounded-3xl border border-border/50 bg-card p-6 shadow-sm">
-                  <h3 className="mb-6 font-semibold text-sm text-foreground flex items-center gap-2">
-                    <LineChart className="size-4 text-primary" /> Average Khushoo by Prayer
-                  </h3>
-                  <div className="h-[200px] w-full -ml-4">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart
-                        data={prayerAverages}
-                        margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
-                      >
-                        <XAxis
-                          dataKey="name"
-                          axisLine={false}
-                          tickLine={false}
-                          tick={{
-                            fontSize: 11,
-                            fill: "var(--color-muted-foreground)",
-                            fontWeight: 500,
-                          }}
-                          dy={10}
-                        />
-                        <Tooltip
-                          cursor={{ fill: "var(--color-muted)", opacity: 0.4 }}
-                          contentStyle={{
-                            borderRadius: "12px",
-                            border: "1px solid var(--color-border)",
-                            boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
-                            fontSize: "12px",
-                            fontWeight: 600,
-                          }}
-                          itemStyle={{ color: "var(--color-primary)" }}
-                        />
-                        <Bar dataKey="avg" radius={[6, 6, 0, 0]} maxBarSize={40}>
-                          {prayerAverages.map((entry, index) => (
-                            <Cell
-                              key={`cell-${index}`}
-                              fill="var(--color-primary)"
-                              opacity={entry.avg > 0 ? 0.9 : 0.2}
-                            />
-                          ))}
-                        </Bar>
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
-                </div>
+                <Card>
+                  <CardContent className="p-6">
+                    <h3 className="mb-6 font-semibold text-[14px] text-[var(--ink)] flex items-center gap-2">
+                      <LineChart className="h-4 w-4 text-[var(--primary)]" /> Average Khushoo
+                    </h3>
+                    <div className="h-[200px] w-full -ml-4">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart
+                          data={prayerAverages}
+                          margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+                        >
+                          <XAxis
+                            dataKey="name"
+                            axisLine={false}
+                            tickLine={false}
+                            tick={{
+                              fontSize: 11,
+                              fill: "var(--mute)",
+                              fontWeight: 500,
+                            }}
+                            dy={10}
+                          />
+                          <Tooltip
+                            cursor={{ fill: "var(--line)", opacity: 0.4 }}
+                            contentStyle={{
+                              borderRadius: "12px",
+                              border: "1px solid var(--line)",
+                              backgroundColor: "var(--surface)",
+                              boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+                              fontSize: "12px",
+                              fontWeight: 600,
+                            }}
+                            itemStyle={{ color: "var(--primary)" }}
+                          />
+                          <Bar dataKey="avg" radius={[6, 6, 0, 0]} maxBarSize={40}>
+                            {prayerAverages.map((entry, index) => (
+                              <Cell
+                                key={`cell-${index}`}
+                                fill="var(--primary)"
+                                opacity={entry.avg > 0 ? 0.9 : 0.2}
+                              />
+                            ))}
+                          </Bar>
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </CardContent>
+                </Card>
 
                 {topDistractions.length > 0 && (
-                  <div className="rounded-3xl border border-border/50 bg-card p-6 shadow-sm">
-                    <h3 className="mb-4 font-semibold text-sm text-foreground flex items-center gap-2">
-                      Top Distractions
-                    </h3>
-                    <div className="space-y-3">
-                      {topDistractions.map((item, i) => (
-                        <div
-                          key={i}
-                          className="flex items-center justify-between p-3 rounded-xl bg-muted/30"
-                        >
-                          <span className="text-sm font-medium capitalize">{item.name}</span>
-                          <span className="text-xs font-bold text-muted-foreground bg-background px-2 py-1 rounded-md border border-border/50">
-                            {item.count} {item.count === 1 ? "time" : "times"}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                  <Card>
+                    <CardContent className="p-6">
+                      <h3 className="mb-4 font-semibold text-[14px] text-[var(--ink)] flex items-center gap-2">
+                        Top Distractions
+                      </h3>
+                      <div className="flex flex-col gap-3">
+                        {topDistractions.map((item, i) => (
+                          <div
+                            key={i}
+                            className="flex items-center justify-between p-3 rounded-[12px] bg-[var(--bg)] border border-[var(--line)]"
+                          >
+                            <span className="text-[13px] font-medium text-[var(--ink)] capitalize">{item.name}</span>
+                            <span className="text-[11px] font-semibold text-[var(--mute)] bg-[var(--surface)] px-2 py-1 rounded-md border border-[var(--line)]">
+                              {item.count} {item.count === 1 ? "time" : "times"}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
                 )}
 
                 {insightsQuery.data?.insights && insightsQuery.data.insights.length > 0 && (
-                  <div className="rounded-3xl border border-border/50 bg-card p-6 shadow-sm bg-gradient-to-br from-card to-primary/5">
-                    <h3 className="mb-5 font-semibold text-sm flex items-center gap-2 text-primary">
-                      <Sparkles className="size-4" /> AI Insights
-                    </h3>
-                    <ul className="space-y-4">
-                      {insightsQuery.data.insights.map((insight, i) => (
-                        <li
-                          key={i}
-                          className="flex items-start gap-3 text-sm text-foreground/90 leading-relaxed"
-                        >
-                          <div className="mt-1.5 size-1.5 rounded-full bg-primary/60 shrink-0" />
-                          {insight}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                  <Card className="bg-gradient-to-br from-[var(--surface)] to-[var(--primary-soft)] border-[var(--line)]">
+                    <CardContent className="p-6">
+                      <h3 className="mb-5 font-semibold text-[14px] flex items-center gap-2 text-[var(--primary)]">
+                        <Sparkles className="h-4 w-4" /> AI Insights
+                      </h3>
+                      <ul className="flex flex-col gap-4">
+                        {insightsQuery.data.insights.map((insight, i) => (
+                          <li
+                            key={i}
+                            className="flex items-start gap-3 text-[13px] text-[var(--ink)] leading-relaxed"
+                          >
+                            <div className="mt-1.5 h-1.5 w-1.5 rounded-full bg-[var(--primary)] shrink-0 opacity-60" />
+                            {insight}
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                  </Card>
                 )}
               </>
             )}

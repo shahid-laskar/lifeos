@@ -1,34 +1,57 @@
 import { DuaItemResponse } from "@/lib/api/types";
+import { Card, CardContent } from "@/components/ui/card";
+import { ArabicText } from "@/components/ui/arabic-text";
+import { TranslationText } from "@/components/ui/translation-text";
+import { Attrib } from "@/components/ui/quote";
+import { Volume2, Heart } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface DuaCardProps {
   item: DuaItemResponse;
+  bookmarked?: boolean;
+  onToggleBookmark?: (item: DuaItemResponse) => void;
+  bookmarkPending?: boolean;
 }
 
-export function DuaCard({ item }: DuaCardProps) {
+export function DuaCard({ item, bookmarked = false, onToggleBookmark, bookmarkPending = false }: DuaCardProps) {
   return (
-    <div className="rounded-2xl border bg-card p-5 shadow-sm transition-shadow hover:shadow-md">
-      <div className="mb-4">
-        <p dir="rtl" className="text-right font-arabic text-3xl leading-relaxed text-foreground">
-          {item.arabic_text}
-        </p>
-      </div>
+    <Card>
+      <CardContent className="p-0">
+        <div className="mb-4 flex items-center justify-between">
+          <button className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--primary-soft)] text-[var(--primary)] transition-colors hover:bg-[var(--primary)] hover:text-white">
+            <Volume2 className="h-4 w-4" />
+          </button>
+          {onToggleBookmark ? (
+            <button 
+              disabled={bookmarkPending}
+              onClick={() => onToggleBookmark(item)}
+              className={cn(
+                "flex h-8 w-8 items-center justify-center rounded-full transition-colors",
+                bookmarked ? "text-[var(--primary)]" : "text-[var(--mute)] hover:text-[var(--primary)]",
+                bookmarkPending ? "opacity-50" : ""
+              )}
+            >
+              <Heart className={cn("h-4 w-4", bookmarked && "fill-current")} />
+            </button>
+          ) : null}
+        </div>
+        <ArabicText className="mb-4 text-[26px]">{item.arabic_text}</ArabicText>
+        <div className="mb-4 text-[13px] italic text-[var(--mute)]">
+          {item.transliteration}
+        </div>
+        <TranslationText className="mb-5">{item.translation}</TranslationText>
 
-      <div className="space-y-3">
-        <p className="text-sm font-medium italic text-muted-foreground">{item.transliteration}</p>
-        <p className="text-base text-foreground/90">"{item.translation}"</p>
-      </div>
-
-      <div className="mt-5 border-t pt-4 text-xs text-muted-foreground space-y-1">
-        {item.when_to_recite && (
-          <p>
-            <span className="font-medium text-foreground/70">When to recite:</span>{" "}
-            {item.when_to_recite}
-          </p>
-        )}
-        <p>
-          <span className="font-medium text-foreground/70">Source:</span> {item.reference}
-        </p>
-      </div>
-    </div>
+        <div className="flex flex-col gap-1 border-t border-[var(--line)] pt-4">
+          {item.when_to_recite && (
+            <Attrib className="mt-0">
+              <span className="font-semibold text-[var(--ink)]">When to recite:</span> {item.when_to_recite}
+            </Attrib>
+          )}
+          <Attrib className="mt-0">
+            <span className="font-semibold text-[var(--ink)]">Source:</span> {item.reference}
+          </Attrib>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

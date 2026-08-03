@@ -125,7 +125,7 @@ function HadithPage() {
       <div
         role="tablist"
         aria-label="Hadith views"
-        className="mx-5 mb-4 flex gap-2 overflow-x-auto pb-2"
+        className="mb-6 flex gap-2 overflow-x-auto pb-2 scrollbar-none"
       >
         {(
           [
@@ -141,10 +141,10 @@ function HadithPage() {
             aria-selected={tab === id}
             onClick={() => setTab(id)}
             className={cn(
-              "shrink-0 px-4 py-2 text-sm font-medium transition-colors",
+              "shrink-0 rounded-full px-4 py-2 text-[13px] font-semibold transition-colors",
               tab === id
-                ? "bg-primary text-primary-foreground"
-                : "bg-secondary/50 text-secondary-foreground hover:bg-secondary/80",
+                ? "bg-[var(--primary-soft)] text-[var(--primary)]"
+                : "text-[var(--mute)] hover:bg-[var(--line)]"
             )}
           >
             {label}
@@ -153,11 +153,11 @@ function HadithPage() {
       </div>
 
       {tab === "browse" ? (
-        <div className="space-y-4 px-5 pb-10">
+        <div className="flex flex-col gap-6">
           <div
             role="tablist"
             aria-label="Hadith collections"
-            className="flex gap-2 overflow-x-auto pb-1"
+            className="flex gap-2 overflow-x-auto pb-1 scrollbar-none"
           >
             {collectionsQuery.isSuccess &&
               collectionsQuery.data.map((collection) => (
@@ -171,10 +171,10 @@ function HadithPage() {
                     setChapterId(null);
                   }}
                   className={cn(
-                    "shrink-0 px-4 py-2 text-sm font-medium transition-colors",
+                    "shrink-0 rounded-full px-4 py-1.5 text-[12px] font-medium transition-colors border border-[var(--line)]",
                     collectionSlug === collection.slug
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-secondary/50 text-secondary-foreground hover:bg-secondary/80",
+                      ? "bg-[var(--ink)] text-[var(--bg)] border-transparent"
+                      : "bg-transparent text-[var(--mute)] hover:text-[var(--ink)]"
                   )}
                 >
                   {collection.name_english}
@@ -184,11 +184,11 @@ function HadithPage() {
 
           {selectedCollection ? (
             <div className="space-y-1">
-              <p dir="rtl" lang="ar" className="arabic text-right text-lg text-gold">
+              <p dir="rtl" lang="ar" className="arabic text-right text-[20px] text-[var(--brass)]">
                 {selectedCollection.name_arabic}
               </p>
-              <p className="text-sm text-muted-foreground">
-                {selectedCollection.author_english} · {selectedCollection.hadith_count} hadiths in
+              <p className="text-[13px] text-[var(--mute)]">
+                {selectedCollection.author_english} &middot; {selectedCollection.hadith_count} hadiths in
                 this library slice
               </p>
             </div>
@@ -203,22 +203,22 @@ function HadithPage() {
               onRetry={() => chaptersQuery.refetch()}
             />
           ) : (
-            <div className="flex gap-2 overflow-x-auto pb-1">
+            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
               {chaptersQuery.data?.map((chapter) => (
                 <button
                   key={chapter.chapter_id}
                   type="button"
                   onClick={() => setChapterId(chapter.chapter_id)}
                   className={cn(
-                    "shrink-0 max-w-[220px] truncate border px-3 py-2 text-left text-sm transition-colors",
+                    "shrink-0 max-w-[220px] truncate rounded-[12px] border px-3 py-2 text-left text-[13px] transition-colors",
                     activeChapterId === chapter.chapter_id
-                      ? "border-primary bg-primary/10 text-foreground"
-                      : "border-border bg-card text-muted-foreground hover:text-foreground",
+                      ? "border-[var(--primary)] bg-[var(--primary-soft)] text-[var(--ink)]"
+                      : "border-[var(--line)] bg-[var(--surface)] text-[var(--mute)] hover:text-[var(--ink)]"
                   )}
                   title={chapter.name_english}
                 >
                   {chapter.name_english}
-                  <span className="mt-0.5 block text-xs opacity-70">
+                  <span className="mt-0.5 block text-[11px] opacity-70">
                     {chapter.hadith_count} hadiths
                   </span>
                 </button>
@@ -235,7 +235,7 @@ function HadithPage() {
               onRetry={() => hadithsQuery.refetch()}
             />
           ) : (
-            <div className="space-y-4">
+            <div className="flex flex-col gap-4">
               {hadithsQuery.data?.map((item) => (
                 <HadithCard
                   key={item.id}
@@ -253,7 +253,7 @@ function HadithPage() {
       ) : null}
 
       {tab === "search" ? (
-        <div className="space-y-4 px-5 pb-10">
+        <div className="flex flex-col gap-4">
           <form
             className="flex gap-2"
             onSubmit={(event) => {
@@ -262,25 +262,25 @@ function HadithPage() {
             }}
           >
             <div className="relative flex-1">
-              <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--mute)]" />
               <Input
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
                 placeholder="Search translation, narrator, or chapter"
-                className="h-12 pl-10"
+                className="h-11 rounded-[14px] border border-[var(--line)] bg-[var(--surface)] pl-9 text-[14px] text-[var(--ink)] focus:border-[var(--primary)] focus:ring-0"
                 aria-label="Search hadiths"
               />
             </div>
             <button
               type="submit"
-              className="h-12 shrink-0 bg-primary px-5 text-sm font-medium text-primary-foreground"
+              className="h-11 shrink-0 rounded-[14px] bg-[var(--primary)] px-5 text-[14px] font-medium text-white transition-opacity hover:opacity-90"
             >
               Search
             </button>
           </form>
 
           {!submittedQuery ? (
-            <p className="text-sm text-muted-foreground">
+            <p className="text-[13px] text-[var(--mute)]">
               Try words like “intention”, “prayer”, or a narrator name.
             </p>
           ) : searchQueryResult.isPending ? (
@@ -293,11 +293,11 @@ function HadithPage() {
             />
           ) : (
             <>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-[13px] text-[var(--mute)]">
                 {searchQueryResult.data?.total ?? 0} result
                 {(searchQueryResult.data?.total ?? 0) === 1 ? "" : "s"} for “{submittedQuery}”
               </p>
-              <div className="space-y-4">
+              <div className="flex flex-col gap-4">
                 {searchQueryResult.data?.results.map((item) => (
                   <HadithCard
                     key={item.id}
@@ -316,7 +316,7 @@ function HadithPage() {
       ) : null}
 
       {tab === "bookmarks" ? (
-        <div className="space-y-4 px-5 pb-10">
+        <div className="flex flex-col gap-4">
           {bookmarksQuery.isPending ? (
             <LoadingBlock label="Loading bookmarks" />
           ) : bookmarksQuery.isError ? (
@@ -326,11 +326,11 @@ function HadithPage() {
               onRetry={() => bookmarksQuery.refetch()}
             />
           ) : (bookmarksQuery.data?.length ?? 0) === 0 ? (
-            <p className="text-sm text-muted-foreground">
+            <p className="text-[13px] text-[var(--mute)]">
               No bookmarks yet. Save a hadith while browsing or searching.
             </p>
           ) : (
-            <div className="space-y-4">
+            <div className="flex flex-col gap-4">
               {bookmarksQuery.data?.map((bookmark) =>
                 bookmark.hadith ? (
                   <HadithCard

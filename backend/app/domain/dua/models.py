@@ -10,3 +10,19 @@ class DuaItemResponse(BaseModel):
     translation: str
     reference: str
     when_to_recite: str | None = None
+
+import datetime
+
+class BookmarkRequest(BaseModel):
+    dua_id: str
+
+class BookmarkResponse(BaseModel):
+    id: str
+    dua_id: str
+    created_at: datetime.datetime
+
+class BookmarkItemResponse(BaseModel):
+    id: str
+    dua_id: str
+    created_at: datetime.datetime
+    dua: DuaItemResponse | None = None

@@ -351,6 +351,13 @@ export type DuaItemResponse = {
   when_to_recite: string | null;
 };
 
+export type DuaBookmarkItemResponse = {
+  id: string;
+  dua_id: string;
+  created_at: string;
+  dua?: DuaItemResponse | null;
+};
+
 /* -------------------------------- hadith --------------------------------- */
 
 export type HadithCollectionResponse = {
@@ -397,4 +404,36 @@ export type HadithBookmarkResponse = {
   note: string | null;
   created_at: string;
   hadith: HadithItemResponse | null;
+};
+
+/* ------------------------------- learning -------------------------------- */
+
+export type LearningModuleResponse = {
+  id: string;
+  path_id: string;
+  title: string;
+  order: number;
+  content: string;
+  type: string;
+  created_at: string;
+};
+
+export type LearningPathResponse = {
+  id: string;
+  title: string;
+  description: string;
+  created_at: string;
+  updated_at: string;
+  modules?: LearningModuleResponse[] | null;
+};
+
+export type LearningEnrollmentResponse = {
+  id: string;
+  user_id: string;
+  path_id: string;
+  progress: number;
+  completed_modules: string[];
+  created_at: string;
+  updated_at: string;
+  path?: LearningPathResponse | null;
 };

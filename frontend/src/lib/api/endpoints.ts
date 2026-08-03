@@ -224,6 +224,25 @@ export function getWeeklyQuranSummary() {
   return apiFetch<QuranWeeklySummaryResponse>("/api/v1/quran/reading-progress/summary/weekly");
 }
 
+export function getDua(duaId: string) {
+  return apiFetch<DuaItemResponse>(`/api/v1/duas/${duaId}`, { auth: false });
+}
+
+export function getDuaBookmarks() {
+  return apiFetch<DuaBookmarkItemResponse[]>("/api/v1/duas/favourites/bookmarks");
+}
+
+export function addDuaBookmark(duaId: string) {
+  return apiFetch<{ id: string; dua_id: string }>("/api/v1/duas/favourites", {
+    method: "POST",
+    body: { dua_id: duaId },
+  });
+}
+
+export function removeDuaBookmark(duaId: string) {
+  return apiFetch<null>(`/api/v1/duas/favourites/${duaId}`, { method: "DELETE" });
+}
+
 export function getSurahs() {
   return apiFetch<SurahResponse[]>("/api/v1/quran/surahs", { auth: false });
 }
@@ -435,5 +454,35 @@ export function addHadithBookmark(hadithId: string, note?: string) {
 export function removeHadithBookmark(hadithId: string) {
   return apiFetch<void>(`/api/v1/hadith/bookmarks/${hadithId}`, {
     method: "DELETE",
+  });
+}
+
+/* ------------------------------- learning -------------------------------- */
+
+import type { LearningPathResponse, LearningEnrollmentResponse } from "./types";
+
+export function listLearningPaths() {
+  return apiFetch<LearningPathResponse[]>("/api/v1/learning/paths");
+}
+
+export function getLearningPath(pathId: string) {
+  return apiFetch<LearningPathResponse>(`/api/v1/learning/paths/${pathId}`);
+}
+
+export function getLearningEnrollments() {
+  return apiFetch<LearningEnrollmentResponse[]>("/api/v1/learning/enrollments");
+}
+
+export function enrollInPath(pathId: string) {
+  return apiFetch<LearningEnrollmentResponse>("/api/v1/learning/enrollments", {
+    method: "POST",
+    body: { path_id: pathId },
+  });
+}
+
+export function completeLearningModule(moduleId: string) {
+  return apiFetch<LearningEnrollmentResponse>("/api/v1/learning/enrollments/complete-module", {
+    method: "POST",
+    body: { module_id: moduleId },
   });
 }

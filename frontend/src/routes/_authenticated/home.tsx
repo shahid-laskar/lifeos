@@ -1,9 +1,7 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { StarSpinner } from "@/components/brand/pattern";
 import { ErrorState } from "@/components/brand/states";
-import { Skeleton } from "@/components/ui/skeleton";
 import { HeroSkeleton } from "@/components/home/skeletons";
 import {
   ConsistencyCard,
@@ -104,7 +102,7 @@ function HomePage() {
         subtitle={`${hijriDate} · ${greetingDate}`}
         arabic="السَّلامُ عَلَيْكُم"
       />
-      <div className="space-y-4 px-5 pb-8">
+      <div className="flex flex-col gap-[22px]">
         {loading ? (
           <HeroSkeleton />
         ) : times ? (
@@ -117,23 +115,23 @@ function HomePage() {
           />
         )}
         {!times && !loading ? (
-          <p className="text-center text-sm">
-            <Link to="/settings" className="text-primary underline-offset-4 hover:underline">
-              Open Settings → Location
+          <p className="text-center text-[13px]">
+            <Link to="/settings" className="text-[var(--primary)] underline-offset-4 hover:underline">
+              Open Settings &rarr; Location
             </Link>
           </p>
         ) : null}
 
         <PrayerStatusRow times={times?.times} />
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-3.5 md:gap-4">
+          <DuasWidget />
           <DhikrWidget />
-          <ConsistencyCard />
         </div>
 
-        <DuasWidget />
-        <HadithWidget />
         <WeeklyQuranCard />
+        <HadithWidget />
+        <ConsistencyCard />
       </div>
     </>
   );

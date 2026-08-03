@@ -1,6 +1,8 @@
 import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { BottomTabs } from "@/components/layout/bottom-tabs";
+import { Sidebar } from "@/components/layout/sidebar";
+import { AppShell } from "@/components/layout/app-shell";
 import { StarSpinner } from "@/components/brand/pattern";
 import { Toaster } from "@/components/ui/toaster";
 import { useIsAuthenticated } from "@/lib/auth";
@@ -20,19 +22,20 @@ function AuthenticatedLayout() {
 
   if (!isAuthenticated) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
+      <div className="flex min-h-screen items-center justify-center bg-[var(--bg)]">
         <StarSpinner size={36} />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background pb-24">
-      <div className="mx-auto max-w-2xl">
+    <AppShell>
+      <Sidebar />
+      <main className="flex-1 pb-[env(safe-area-inset-bottom)] lg:pb-0">
         <Outlet />
-      </div>
+      </main>
       <BottomTabs />
       <Toaster />
-    </div>
+    </AppShell>
   );
 }

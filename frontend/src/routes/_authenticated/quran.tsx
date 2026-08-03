@@ -45,7 +45,7 @@ function QuranPage() {
   // ── Ayah reader view ─────────────────────────────────────────────────────
   if (openSurah) {
     return (
-      <div className="fixed inset-0 z-50 flex flex-col bg-background">
+      <div className="fixed inset-0 z-50 flex flex-col bg-[var(--bg)]">
         <AyahReader surah={openSurah} onBack={() => setOpenSurah(null)} />
       </div>
     );
@@ -60,7 +60,7 @@ function QuranPage() {
       <div
         role="tablist"
         aria-label="Qur'an sections"
-        className="mx-5 mb-4 flex rounded-xl border border-border bg-muted/50 p-1"
+        className="mb-6 flex gap-2 overflow-x-auto pb-2"
       >
         {(["surahs", "bookmarks", "hifdh"] as const).map((tab) => (
           <button
@@ -71,10 +71,10 @@ function QuranPage() {
             type="button"
             onClick={() => setActiveTab(tab)}
             className={cn(
-              "flex-1 rounded-lg py-2 text-sm font-medium capitalize transition-colors",
+              "shrink-0 rounded-full px-4 py-2 text-[13px] font-semibold transition-colors",
               activeTab === tab
-                ? "bg-card text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground",
+                ? "bg-[var(--primary-soft)] text-[var(--primary)]"
+                : "text-[var(--mute)] hover:bg-[var(--line)]"
             )}
           >
             {tab === "surahs" ? "All Surahs" : tab === "bookmarks" ? "Bookmarks" : "Hifdh"}
@@ -83,7 +83,7 @@ function QuranPage() {
       </div>
 
       {/* Tab panels */}
-      <div className="pb-24">
+      <div className="flex flex-col gap-4">
         {activeTab === "surahs" ? (
           <SurahList onSelect={setOpenSurah} />
         ) : activeTab === "bookmarks" ? (

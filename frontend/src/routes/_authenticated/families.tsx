@@ -39,10 +39,10 @@ function FamiliesPage() {
   return (
     <>
       <PageHeader title="Family" arabic="الأُسْرَة" subtitle="Walk together" />
-      <div className="px-5 pb-8">
+      <div className="flex flex-col gap-4">
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            <Loader2 className="h-6 w-6 animate-spin text-[var(--mute)]" />
           </div>
         ) : families.length === 0 ? (
           <CreateFamilyPrompt />

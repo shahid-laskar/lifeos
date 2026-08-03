@@ -5,22 +5,19 @@ import { PRAYER_LABELS, PRAYER_NAMES } from "@/lib/api/types";
 import { formatCountdown, formatPrayerTime, nextPrayer } from "@/lib/prayer";
 import { cn } from "@/lib/utils";
 
-function getGradientClass(nextPrayerName: string | null) {
+function getGradientStyle(nextPrayerName: string | null) {
   switch (nextPrayerName) {
     case "fajr":
-      return "bg-gradient-to-b from-indigo-950 via-slate-900 to-slate-950 text-white";
-    case "sunrise":
-      return "bg-gradient-to-b from-slate-900 via-indigo-900 to-amber-800 text-white";
+      return { backgroundImage: "linear-gradient(160deg, #131a34, #2b2350, #8a5a2b)" };
     case "dhuhr":
-      return "bg-gradient-to-b from-amber-100 via-sky-200 to-blue-300 text-slate-900";
     case "asr":
-      return "bg-gradient-to-b from-sky-400 via-blue-500 to-blue-600 text-white";
+      return { backgroundImage: "linear-gradient(160deg, #2f7fb8, #2367a6, #1d4f86)" };
     case "maghrib":
-      return "bg-gradient-to-b from-orange-400 via-rose-500 to-purple-700 text-white";
+      return { backgroundImage: "linear-gradient(160deg, #8a4a0e, #a3542e, #6b2d4d)" };
     case "isha":
-      return "bg-gradient-to-b from-indigo-900 via-slate-800 to-slate-900 text-white";
+      return { backgroundImage: "linear-gradient(160deg, #0e1330, #141a2e, #0a0d1c)" };
     default:
-      return "bg-primary text-primary-foreground";
+      return { backgroundImage: "linear-gradient(160deg, #0e1330, #141a2e, #0a0d1c)" };
   }
 }
 
@@ -33,57 +30,50 @@ export function PrayerTimesStrip({ times }: { times: PrayerTimes }) {
   }, []);
 
   const upcoming = useMemo(() => nextPrayer(times, now), [times, now]);
-
-  const gradientClass = getGradientClass(upcoming?.name ?? null);
-  const isLightText = !gradientClass.includes("text-slate-900");
+  const gradientStyle = getGradientStyle(upcoming?.name ?? null);
 
   return (
     <section
-      className={cn("relative overflow-hidden rounded-2xl p-5 text-white shadow-sm", gradientClass)}
+      className="relative overflow-hidden rounded-[20px] p-5 text-white"
+      style={gradientStyle}
     >
-      {/* Pattern at 7% opacity per design spec */}
-      <GeometricPattern className={isLightText ? "text-white" : "text-slate-900"} opacity={0.07} />
+      <GeometricPattern className="text-white" opacity={0.07} />
       <div className="relative">
         {upcoming ? (
-          <>
-            <div className="text-[11px] uppercase tracking-[0.16em] opacity-75">
-              {upcoming.tomorrow ? "Tomorrow" : "Next prayer"}
+          <div className="flex items-baseline justify-between">
+            <div className="text-[26px] font-bold tracking-[-0.02em]">
+              {PRAYER_LABELS[upcoming.name].latin}
             </div>
-            <div className="mt-2 flex items-baseline gap-2.5">
-              <div className="text-2xl font-bold tracking-[-0.01em]">
-                {PRAYER_LABELS[upcoming.name].latin}
+            <div className="text-right">
+              <div className="font-sans text-[26px] font-semibold tabular-nums tracking-[-0.02em]">
+                {formatCountdown(upcoming.msRemaining)}
               </div>
-              <div className="ml-auto text-right">
-                <div className="font-mono text-[26px] font-semibold tabular-nums tracking-[-0.02em]">
-                  {formatCountdown(upcoming.msRemaining)}
-                </div>
-                <div className="mt-0.5 text-[11px] opacity-70">remaining</div>
-              </div>
+              <div className="text-[12px] opacity-62">remaining</div>
             </div>
-          </>
+          </div>
         ) : (
-          <div className="text-sm opacity-80 py-4">
+          <div className="py-4 text-[13px] opacity-75">
             Prayer times will appear once your location is set.
           </div>
         )}
 
         {times && (
-          <div className="mt-5 flex justify-between border-t border-white/20 pt-3.5">
+          <div className="mt-6 flex justify-between border-t border-white/20 pt-4">
             {PRAYER_NAMES.map((name) => {
               const isNext = upcoming?.name === name && !upcoming.tomorrow;
               return (
                 <div
                   key={name}
-                  className={cn("flex-1 text-center", isNext ? "opacity-100" : "opacity-60")}
+                  className={cn("flex-1 text-center", isNext ? "opacity-100" : "opacity-62")}
                 >
-                  <b className="block text-[11px] font-semibold uppercase tracking-[0.1em]">
-                    {PRAYER_LABELS[name].latin}
+                  <b className="block text-[11px] font-semibold uppercase tracking-[0.14em]">
+                    {PRAYER_LABELS[name].latin.substring(0, 3)}
                   </b>
-                  <span className="mt-1.5 block text-[13px] tabular-nums">
+                  <span className="mt-1 block text-[13px] font-medium tabular-nums">
                     {formatPrayerTime(times[name])}
                   </span>
                   {isNext && (
-                    <i className="mx-auto mt-2 block h-[2px] w-[14px] rounded-sm bg-current"></i>
+                    <i className="mx-auto mt-2 block h-[2px] w-[14px] rounded-full bg-white"></i>
                   )}
                 </div>
               );

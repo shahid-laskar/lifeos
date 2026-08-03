@@ -14,7 +14,6 @@ import {
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/components/ui/use-toast";
 import { Menu, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/assistant")({
   ssr: false,
@@ -116,20 +115,18 @@ function AssistantPage() {
   return (
     <>
       <PageHeader title="Assistant" arabic="مُساعِد" subtitle="Ask, slowly">
-        <Button
-          variant="ghost"
-          size="icon"
+        <button
           onClick={() => setShowSidebar(!showSidebar)}
-          className="ml-auto"
+          className="ml-auto text-[var(--mute)] hover:text-[var(--ink)] transition-colors"
         >
           {showSidebar ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </Button>
+        </button>
       </PageHeader>
 
-      <div className="flex h-[calc(100vh-180px)]">
+      <div className="flex h-[calc(100vh-160px)]">
         {/* Sidebar */}
         {showSidebar && (
-          <div className="w-80 border-r border-border bg-card">
+          <div className="w-80 border-r border-[var(--line)] bg-[var(--surface)]">
             <ConversationList
               conversations={conversations || []}
               currentConversationId={currentConversationId}
@@ -161,17 +158,17 @@ function AssistantPage() {
           ) : (
             <div className="flex flex-1 items-center justify-center">
               <div className="text-center">
-                <p className="text-lg font-medium">No conversation selected</p>
-                <p className="mt-2 text-sm text-muted-foreground">
+                <p className="text-[15px] font-semibold text-[var(--ink)]">No conversation selected</p>
+                <p className="mt-2 text-[13px] text-[var(--mute)]">
                   Start a new conversation or select one from the sidebar
                 </p>
-                <Button
+                <button
                   onClick={handleNewConversation}
-                  className="mt-4"
+                  className="mt-4 rounded-full bg-[var(--primary)] px-6 py-2.5 text-[14px] font-medium text-white transition-opacity hover:opacity-90"
                   disabled={createMutation.isPending}
                 >
                   New Conversation
-                </Button>
+                </button>
               </div>
             </div>
           )}

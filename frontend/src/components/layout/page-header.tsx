@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { cn } from "@/lib/utils";
 
 export function PageHeader({
   title,
@@ -6,31 +7,33 @@ export function PageHeader({
   arabic,
   action,
   children,
+  className,
 }: {
   title: string;
   subtitle?: string;
   arabic?: string;
   action?: ReactNode;
   children?: ReactNode;
+  className?: string;
 }) {
   return (
-    <header className="flex items-start justify-between gap-4 px-5 pb-4 pt-7">
+    <header className={cn("mb-6 flex items-start justify-between gap-4", className)}>
       <div>
         {arabic ? (
           <p
-            className="text-xs tracking-[0.14em] uppercase text-muted-foreground font-arabic"
+            className="mb-1 text-[12px] font-semibold uppercase tracking-[0.14em] text-[var(--mute)]"
             lang="ar"
             dir="rtl"
           >
             {arabic}
           </p>
         ) : null}
-        <h1 className="mt-1.5 text-[26px] font-bold tracking-[-0.02em] text-foreground">{title}</h1>
+        <h1 className="text-[26px] font-bold tracking-[-0.02em] text-[var(--ink)]">{title}</h1>
         {subtitle ? (
-          <div className="mt-2 flex items-center gap-2 text-[13px] text-muted-foreground">
+          <div className="mt-1 flex items-center gap-2 text-[13px] text-[var(--mute)]">
             {subtitle.includes("·") ? (
               <>
-                <span className="font-semibold text-primary">{subtitle.split("·")[0].trim()}</span>
+                <span className="font-semibold text-[var(--primary)]">{subtitle.split("·")[0].trim()}</span>
                 <span className="h-[3px] w-[3px] rounded-full bg-current opacity-50"></span>
                 <span>{subtitle.split("·")[1].trim()}</span>
               </>
@@ -41,6 +44,7 @@ export function PageHeader({
         ) : null}
       </div>
       {action}
+      {children}
     </header>
   );
 }

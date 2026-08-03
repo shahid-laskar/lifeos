@@ -14,6 +14,7 @@ import {
   markAyahMemorised,
 } from "@/lib/api/endpoints";
 import type { SurahResponse } from "@/lib/api/types";
+import { cn } from "@/lib/utils";
 
 /**
  * Debounce helper — returns a function that fires `fn` after `delay` ms of
@@ -120,17 +121,31 @@ function AyahCard({
       </p>
 
       {showTafsir && (
-        <div className="mt-6 rounded-lg bg-muted p-4">
-          <div className="mb-4 flex items-center justify-between">
-            <h4 className="font-semibold text-sm">Tafsir</h4>
-            <select
-              value={tafsirSource}
-              onChange={(e) => setTafsirSource(e.target.value)}
-              className="rounded-md border border-input bg-background px-2 py-1 text-xs"
-            >
-              <option value="ibn_kathir">Ibn Kathir</option>
-              <option value="jalalayn">Jalalayn</option>
-            </select>
+        <div className="card mt-6">
+          <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <h4 className="font-semibold text-[15px] text-[var(--ink)]">Tafsir</h4>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setTafsirSource("ibn_kathir")}
+                className={cn(
+                  "pill cursor-pointer",
+                  tafsirSource === "ibn_kathir" ? "bg-[var(--primary)] text-white" : ""
+                )}
+              >
+                Ibn Kathir
+              </button>
+              <button
+                type="button"
+                onClick={() => setTafsirSource("jalalayn")}
+                className={cn(
+                  "pill cursor-pointer",
+                  tafsirSource === "jalalayn" ? "bg-[var(--primary)] text-white" : ""
+                )}
+              >
+                Jalalayn
+              </button>
+            </div>
           </div>
           {tafsirQuery.isPending ? (
             <LoadingBlock label="Loading tafsir..." />
@@ -141,9 +156,9 @@ function AyahCard({
               onRetry={() => tafsirQuery.refetch()}
             />
           ) : (
-            <div className="text-sm leading-relaxed text-muted-foreground whitespace-pre-wrap">
+            <blockquote className="quote whitespace-pre-wrap">
               {tafsirQuery.data?.text || "No tafsir found for this ayah."}
-            </div>
+            </blockquote>
           )}
         </div>
       )}

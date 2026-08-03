@@ -127,6 +127,15 @@ def get_family_service(db: Annotated[Session, Depends(get_db)]):
     )
 
 
+def get_dua_service(db: Annotated[Session, Depends(get_db)]):
+    from app.domain.dua.service import DuaService
+    from app.infrastructure.dua_repository_sqlalchemy import DuaBookmarkRepositorySqlAlchemy
+
+    return DuaService(
+        bookmark_repo=DuaBookmarkRepositorySqlAlchemy(db),
+    )
+
+
 
 def get_current_user(
     credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(bearer_scheme)],

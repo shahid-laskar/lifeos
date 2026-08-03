@@ -6,6 +6,8 @@ import { ErrorState } from "@/components/brand/states";
 import { getReadingProgress, getSurahs } from "@/lib/api/endpoints";
 import type { ReadingProgressResponse, SurahResponse } from "@/lib/api/types";
 import { cn } from "@/lib/utils";
+import { ArabicText } from "@/components/ui/arabic-text";
+import { ProgressRing } from "@/components/ui/progress-ring";
 
 function RevelationBadge({ type }: { type: string }) {
   const isMeccan = type.toLowerCase() === "meccan";
@@ -13,37 +15,10 @@ function RevelationBadge({ type }: { type: string }) {
     <span
       className={cn(
         "rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide",
-        isMeccan ? "bg-gold/15 text-gold-foreground" : "bg-sage/20 text-sage-foreground",
+        isMeccan ? "bg-[#d4af37]/15 text-[#d4af37]" : "bg-[#879f84]/20 text-[#879f84]"
       )}
     >
       {type}
-    </span>
-  );
-}
-
-function ProgressDot({ fraction }: { fraction: number }) {
-  if (fraction <= 0) return null;
-  const pct = Math.min(Math.round(fraction * 100), 100);
-  return (
-    <span
-      aria-label={`${pct}% read`}
-      title={`${pct}% read`}
-      className="relative flex size-5 shrink-0 items-center justify-center"
-    >
-      <svg viewBox="0 0 20 20" className="absolute inset-0 size-full -rotate-90">
-        <circle cx="10" cy="10" r="8" fill="none" stroke="var(--color-muted)" strokeWidth="2" />
-        <circle
-          cx="10"
-          cy="10"
-          r="8"
-          fill="none"
-          stroke="var(--color-gold)"
-          strokeWidth="2"
-          strokeDasharray={`${2 * Math.PI * 8}`}
-          strokeDashoffset={`${2 * Math.PI * 8 * (1 - fraction)}`}
-          strokeLinecap="round"
-        />
-      </svg>
     </span>
   );
 }
@@ -54,7 +29,7 @@ export function SurahList({ onSelect }: { onSelect: (surah: SurahResponse) => vo
   const surahsQuery = useQuery({
     queryKey: ["surahs"],
     queryFn: getSurahs,
-    staleTime: 24 * 60 * 60 * 1000, // surah list is stable for a day
+    staleTime: 24 * 60 * 60 * 1000,
   });
 
   const progressQuery = useQuery({
@@ -62,7 +37,6 @@ export function SurahList({ onSelect }: { onSelect: (surah: SurahResponse) => vo
     queryFn: getReadingProgress,
   });
 
-  // Build a map of surah_number → fraction read
   const progressMap = useMemo(() => {
     const map = new Map<number, number>();
     if (!progressQuery.data || !surahsQuery.data) return map;
@@ -71,7 +45,7 @@ export function SurahList({ onSelect }: { onSelect: (surah: SurahResponse) => vo
     );
     for (const p of progressQuery.data as ReadingProgressResponse[]) {
       const total = ayahCounts.get(p.surah_number);
-      if (total) map.set(p.surah_number, p.last_ayah_number / total);
+      if (total) map.set(p.surah_number, (p.last_ayah_number / total) * 100);
     }
     return map;
   }, [progressQuery.data, surahsQuery.data]);
@@ -96,79 +70,68 @@ export function SurahList({ onSelect }: { onSelect: (surah: SurahResponse) => vo
         title="Couldn't load surahs"
         message="Check your connection and try again."
         onRetry={() => surahsQuery.refetch()}
-        className="mx-5"
       />
     );
 
   return (
-    <div className="flex flex-col gap-0">
-      {/* Search bar */}
-      <div className="relative mx-5 mb-3">
-        <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+    <div className="flex flex-col gap-4">
+      <div className="relative">
+        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--mute)]" />
         <input
           id="quran-surah-search"
           type="search"
           placeholder="Search by name or meaning…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full rounded-xl border border-border bg-card py-2.5 pl-9 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+          className="w-full rounded-[14px] border border-[var(--line)] bg-[var(--surface)] py-3 pl-10 pr-4 text-[14px] text-[var(--ink)] placeholder:text-[var(--mute)] focus:border-[var(--primary)] focus:outline-none"
         />
       </div>
 
       {filtered.length === 0 ? (
-        <p className="px-5 py-10 text-center text-sm text-muted-foreground">
+        <p className="py-10 text-center text-[13px] text-[var(--mute)]">
           No surahs match "{search}"
         </p>
       ) : (
-        <ul className="divide-y divide-border">
-          {filtered.map((surah) => {
-            const fraction = progressMap.get(surah.number) ?? 0;
-            return (
-              <li key={surah.number}>
-                <button
-                  type="button"
-                  id={`surah-${surah.number}`}
-                  onClick={() => onSelect(surah)}
-                  className="flex w-full items-center gap-4 px-5 py-4 text-left transition-colors hover:bg-accent/40 active:bg-accent/60"
-                >
-                  {/* Number badge */}
-                  <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-xs font-semibold text-primary">
-                    {surah.number}
-                  </span>
-
-                  {/* Name + meta */}
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium text-foreground">
-                        {surah.transliterated_name}
-                      </span>
-                      <RevelationBadge type={surah.revelation_type} />
-                    </div>
-                    <p className="mt-0.5 text-xs text-muted-foreground">
-                      {surah.meaning} · {surah.ayah_count} ayahs
-                    </p>
-                  </div>
-
-                  {/* Arabic name */}
-                  <span
-                    lang="ar"
-                    dir="rtl"
-                    className="arabic shrink-0 text-xl text-foreground"
-                    style={{ lineHeight: 1.5 }}
+        <div className="rounded-[18px] border border-[var(--line)] bg-[var(--surface)]">
+          <ul className="divide-y divide-[var(--line)]">
+            {filtered.map((surah) => {
+              const pct = progressMap.get(surah.number) ?? 0;
+              return (
+                <li key={surah.number}>
+                  <button
+                    type="button"
+                    onClick={() => onSelect(surah)}
+                    className="flex w-full items-center gap-4 p-4 text-left transition-colors hover:bg-[var(--bg)]"
                   >
-                    {surah.arabic_name}
-                  </span>
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--primary-soft)] text-[12px] font-semibold text-[var(--primary)]">
+                      {surah.number}
+                    </div>
 
-                  {/* Progress ring */}
-                  <ProgressDot fraction={fraction} />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-[var(--ink)]">
+                          {surah.transliterated_name}
+                        </span>
+                        <RevelationBadge type={surah.revelation_type} />
+                      </div>
+                      <p className="mt-0.5 text-[12px] text-[var(--mute)]">
+                        {surah.meaning} &middot; {surah.ayah_count} ayahs
+                      </p>
+                    </div>
 
-                  {/* Chevron */}
-                  <BookOpen className="size-4 shrink-0 text-muted-foreground" />
-                </button>
-              </li>
-            );
-          })}
-        </ul>
+                    <ArabicText className="shrink-0 text-[20px]">{surah.arabic_name}</ArabicText>
+
+                    {pct > 0 && (
+                      <ProgressRing percentage={pct} className="m-0 h-6 w-6 border-[2px]" />
+                    )}
+
+                    <BookOpen className="h-4 w-4 shrink-0 text-[var(--mute)]" />
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
       )}
     </div>
   );

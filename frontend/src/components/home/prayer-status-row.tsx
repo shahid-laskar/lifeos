@@ -1,15 +1,19 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Check, Minus, X, Book, Sparkles } from "lucide-react";
+import { Book, Check, X, Minus } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { getPrayerStatus, logPrayer } from "@/lib/api/endpoints";
 import type { PrayerName, PrayerStatus, PrayerTimes } from "@/lib/api/types";
 import { PRAYER_LABELS, PRAYER_NAMES } from "@/lib/api/types";
-import { nextPrayer, todayISO } from "@/lib/prayer";
+import { todayISO } from "@/lib/prayer";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { PrayerCircle } from "@/components/ui/prayer-circle";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+
+const MOONS = ["🌑", "🌘", "🌗", "🌖", "🌕"];
 
 export function PrayerStatusRow({ times }: { times?: PrayerTimes }) {
   const date = todayISO();
@@ -54,16 +58,6 @@ export function PrayerStatusRow({ times }: { times?: PrayerTimes }) {
     mutation.mutate({ prayer, status: newStatus });
     setDrawerPrayer(null);
 
-    toast(`Marked ${PRAYER_LABELS[prayer].latin} as ${newStatus}`, {
-      duration: 10000,
-      action: oldStatus
-        ? {
-            label: "Undo",
-            onClick: () => mutation.mutate({ prayer, status: oldStatus }),
-          }
-        : undefined,
-    });
-
     if (newStatus === "completed") {
       setKhushooPromptPrayer(prayer);
       setTimeout(() => {
@@ -76,128 +70,107 @@ export function PrayerStatusRow({ times }: { times?: PrayerTimes }) {
 
   return (
     <>
-      <section className="rounded-3xl border border-border/50 bg-card p-6 shadow-sm">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-base font-semibold tracking-tight text-foreground flex items-center gap-2">
-            <Sparkles className="size-4 text-primary" /> Today's Prayers
-          </h2>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+          <CardTitle>Today's Prayers</CardTitle>
           <Link
             to="/prayer-journal"
-            className="text-xs font-medium text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"
+            className="flex items-center gap-1 text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--mute)] hover:text-[var(--ink)]"
           >
-            <Book className="size-3" /> Journal
+            <Book className="h-3 w-3" /> Journal
           </Link>
-        </div>
+        </CardHeader>
+        <CardContent>
+          <div className="flex justify-between items-end">
+            {PRAYER_NAMES.map((name) => {
+              const status = statuses?.[name];
+              const isPendingState = !status;
 
-        <div className="flex justify-between items-end relative">
-          {PRAYER_NAMES.map((name) => {
-            const status = statuses?.[name];
-            const isCompleted = status === "completed";
-            const isMissed = status === "missed";
-            const isExcused = status === "excused";
-            const isPendingState = !status;
+              let mappedStatus: "unlogged" | "done" | "missed" = "unlogged";
+              if (status === "completed") mappedStatus = "done";
+              if (status === "missed" || status === "excused") mappedStatus = "missed";
 
-            return (
-              <div key={name} className="flex flex-col items-center gap-2">
-                {isPending ? (
-                  <>
-                    <Skeleton className="size-11 rounded-full" />
-                    <Skeleton className="h-2 w-5 mt-1" />
-                  </>
-                ) : (
-                  <>
-                    <button
-                      type="button"
-                      aria-label={`${PRAYER_LABELS[name].latin}: ${status ?? "not logged"}`}
-                      onClick={() => setDrawerPrayer(name)}
-                      className={cn(
-                        "flex size-11 items-center justify-center rounded-full border-[1.5px] motion-safe:transition-all motion-safe:duration-300",
-                        isCompleted && "border-primary bg-primary shadow-sm shadow-primary/20",
-                        isMissed && "border-border bg-transparent text-muted-foreground",
-                        isExcused && "border-gold bg-gold/10 text-gold-foreground",
-                        isPendingState &&
-                          "border-dashed border-border text-muted-foreground hover:border-primary/50 hover:bg-primary/5 hover:text-primary",
-                      )}
-                    >
-                      {isCompleted && <Check color="#ffffff" className="size-5 stroke-[2.5]" />}
-                      {isMissed && <X className="size-5 stroke-[2.5]" />}
-                      {isExcused && <Minus className="size-5 stroke-[2.5]" />}
-                    </button>
-                    <span
-                      className={cn(
-                        "text-[11px] font-medium transition-colors",
-                        isCompleted ? "text-primary" : "text-muted-foreground",
-                      )}
-                    >
-                      {PRAYER_LABELS[name].latin.substring(0, 3)}
-                    </span>
-                  </>
-                )}
-              </div>
-            );
-          })}
-        </div>
+              return (
+                <button
+                  key={name}
+                  onClick={() => setDrawerPrayer(name)}
+                  className="flex-1 focus:outline-none"
+                  type="button"
+                >
+                  {isPending ? (
+                    <div className="flex flex-col items-center gap-2">
+                      <Skeleton className="h-[44px] w-[44px] rounded-full" />
+                      <Skeleton className="h-2 w-5 mt-1" />
+                    </div>
+                  ) : (
+                    <PrayerCircle
+                      status={mappedStatus}
+                      label={PRAYER_LABELS[name].latin.substring(0, 3)}
+                    />
+                  )}
+                </button>
+              );
+            })}
+          </div>
 
-        {khushooPromptPrayer && (
-          <div className="mt-6 rounded-2xl bg-gradient-to-br from-primary/10 to-transparent p-5 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-top-4 motion-safe:duration-500 border border-primary/20">
-            <div className="flex flex-col items-center gap-4">
-              <p className="text-sm font-medium text-foreground text-center">
-                Alhamdulillah. How was your focus during {PRAYER_LABELS[khushooPromptPrayer].latin}?
+          {khushooPromptPrayer && (
+            <div className="prompt mt-5 rounded-[12px] bg-[var(--primary-soft)] p-4 text-center text-[var(--primary)]">
+              <p className="text-[13px] font-medium">
+                How was your {PRAYER_LABELS[khushooPromptPrayer].latin}? &middot; Reflect &rarr;
               </p>
-              <div className="flex justify-between w-full max-w-[250px] text-3xl">
-                {["🌑", "🌘", "🌗", "🌖", "🌕"].map((icon, i) => (
+              <div className="mt-3 flex justify-center gap-3">
+                {MOONS.map((moon, i) => (
                   <button
                     key={i}
-                    className="motion-safe:hover:-translate-y-2 motion-safe:transition-transform hover:drop-shadow-xl"
+                    className="flex h-[32px] w-[32px] items-center justify-center rounded-full border border-[var(--line)] bg-[var(--surface)] text-[14px] hover:border-[var(--brass)] hover:text-[var(--brass)]"
                     onClick={() => {
-                      toast.success("Reflection saved beautifully.");
+                      toast.success("Reflection saved.");
                       setKhushooPromptPrayer(null);
                     }}
-                    title={["Struggled", "Distracted", "Present", "Focused", "Deep Focus"][i]}
                   >
-                    {icon}
+                    {moon}
                   </button>
                 ))}
               </div>
             </div>
-          </div>
-        )}
-      </section>
+          )}
+        </CardContent>
+      </Card>
 
       <Drawer open={!!drawerPrayer} onOpenChange={(open) => !open && setDrawerPrayer(null)}>
-        <DrawerContent className="max-w-md mx-auto rounded-t-3xl border-x border-t border-border/50">
+        <DrawerContent className="mx-auto max-w-md rounded-t-[18px] border-x border-t border-[var(--line)] bg-[var(--surface)]">
           <DrawerHeader className="pb-2">
-            <DrawerTitle className="text-center text-xl">
+            <DrawerTitle className="text-center text-[16px] font-semibold text-[var(--ink)]">
               Log {drawerPrayer ? PRAYER_LABELS[drawerPrayer].latin : ""}
             </DrawerTitle>
           </DrawerHeader>
           <div className="flex justify-center gap-3 p-6 pb-10">
             <button
-              className="flex flex-col items-center gap-3 p-5 w-28 rounded-2xl border-2 border-border bg-card hover:border-primary/50 hover:bg-primary/5 transition-all group"
+              className="group flex w-24 flex-col items-center gap-3 rounded-[12px] border border-[var(--line)] bg-[var(--surface)] p-4 transition-colors hover:border-[var(--primary)] hover:bg-[var(--primary-soft)]"
               onClick={() => handleSelect(drawerPrayer!, "completed", statuses?.[drawerPrayer!])}
             >
-              <div className="flex size-14 items-center justify-center rounded-full bg-primary/10 text-primary group-hover:bg-primary transition-colors">
-                <Check className="size-6 stroke-[3] text-primary group-hover:text-white" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--primary-soft)] text-[var(--primary)] group-hover:bg-[var(--primary)] group-hover:text-white">
+                <Check className="h-5 w-5 stroke-[2.5]" />
               </div>
-              <span className="text-sm font-semibold text-foreground">Prayed</span>
+              <span className="text-[12px] font-semibold text-[var(--ink)]">Prayed</span>
             </button>
             <button
-              className="flex flex-col items-center gap-3 p-5 w-28 rounded-2xl border-2 border-border bg-card hover:border-muted-foreground/30 hover:bg-muted transition-all group"
+              className="group flex w-24 flex-col items-center gap-3 rounded-[12px] border border-[var(--line)] bg-[var(--surface)] p-4 transition-colors hover:bg-[var(--bg)]"
               onClick={() => handleSelect(drawerPrayer!, "missed", statuses?.[drawerPrayer!])}
             >
-              <div className="flex size-14 items-center justify-center rounded-full bg-muted-foreground/10 text-muted-foreground group-hover:bg-muted-foreground group-hover:text-white transition-colors">
-                <X className="size-6 stroke-[3]" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-full border border-[var(--line)] text-[var(--mute)]">
+                <X className="h-5 w-5 stroke-[2.5]" />
               </div>
-              <span className="text-sm font-semibold text-foreground">Missed</span>
+              <span className="text-[12px] font-semibold text-[var(--ink)]">Missed</span>
             </button>
             <button
-              className="flex flex-col items-center gap-3 p-5 w-28 rounded-2xl border-2 border-border bg-card hover:border-gold/50 hover:bg-gold/10 transition-all group"
+              className="group flex w-24 flex-col items-center gap-3 rounded-[12px] border border-[var(--line)] bg-[var(--surface)] p-4 transition-colors hover:bg-[var(--bg)]"
               onClick={() => handleSelect(drawerPrayer!, "excused", statuses?.[drawerPrayer!])}
             >
-              <div className="flex size-14 items-center justify-center rounded-full bg-gold/20 text-gold-foreground group-hover:bg-gold group-hover:text-white transition-colors">
-                <Minus className="size-6 stroke-[3]" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-full border border-[var(--line)] text-[var(--mute)]">
+                <Minus className="h-5 w-5 stroke-[2.5]" />
               </div>
-              <span className="text-sm font-semibold text-foreground">Excused</span>
+              <span className="text-[12px] font-semibold text-[var(--ink)]">Excused</span>
             </button>
           </div>
         </DrawerContent>
