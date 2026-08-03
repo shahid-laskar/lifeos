@@ -178,3 +178,59 @@ def get_prayer_insights(
     today = datetime.now(tz).date()
     
     return habit_service.get_prayer_insights(current_user.id, today)
+
+# ---------------------------------------------------------------------------
+# GENERIC HABITS (PHASE 5A)
+# ---------------------------------------------------------------------------
+
+from app.domain.habit.models import GenericHabitResponse, GenericHabitCreate, GenericHabitUpdate
+from app.domain.habit.generic_service import GenericHabitService
+from app.api.deps import get_db
+from sqlalchemy.orm import Session
+
+@router.get("/custom", response_model=list[GenericHabitResponse])
+def get_custom_habits(
+    user: UserRecord = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    svc = GenericHabitService(db)
+    return svc.get_habits(user.id)
+
+@router.post("/custom", response_model=GenericHabitResponse)
+def create_custom_habit(
+    req: GenericHabitCreate,
+    user: UserRecord = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    svc = GenericHabitService(db)
+    return svc.create_habit(user.id, req)
+
+@router.patch("/custom/{habit_id}", response_model=GenericHabitResponse)
+def update_custom_habit(
+    habit_id: str,
+    req: GenericHabitUpdate,
+    user: UserRecord = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    svc = GenericHabitService(db)
+    return svc.update_habit(user.id, habit_id, req)
+
+@router.delete("/custom/{habit_id}")
+def delete_custom_habit(
+    habit_id: str,
+    user: UserRecord = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    svc = GenericHabitService(db)
+    svc.delete_habit(user.id, habit_id)
+
+@router.post("/custom/{habit_id}/toggle", response_model=GenericHabitResponse)
+def toggle_custom_habit_completion(
+    habit_id: str,
+    date: date_type,
+    user: UserRecord = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    svc = GenericHabitService(db)
+    return svc.toggle_completion(user.id, habit_id, date)
+

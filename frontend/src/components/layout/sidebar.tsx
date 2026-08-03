@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, BookOpen, Sparkle, Heart, MessageCircle, Users, Settings, BookMarked, User, CheckSquare, Target, Calendar as CalendarIcon } from "lucide-react";
+import { Home, BookOpen, Sparkle, Heart, MessageCircle, Users, Settings, BookMarked, User, CheckSquare, Target, Calendar as CalendarIcon, Activity } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV_LINKS = [
@@ -11,6 +11,7 @@ const NAV_LINKS = [
   { to: "/prayer-journal", label: "Prayer Journal", icon: BookMarked },
   { to: "/hadith", label: "Hadith", icon: BookOpen },
   { to: "/tasks", label: "Tasks", icon: CheckSquare },
+  { to: "/habits", label: "Habits", icon: Activity },
   { to: "/planner", label: "Planner", icon: BookMarked },
   { to: "/calendar", label: "Calendar", icon: CalendarIcon },
   { to: "/goals", label: "Goals", icon: Target },

@@ -1,4 +1,4 @@
-from datetime import date as date_type
+from datetime import date as date_type, datetime
 from pydantic import BaseModel, Field
 
 from app.domain.habit.entities import PrayerName, PrayerStatus
@@ -43,3 +43,28 @@ class PrayerInsightsResponse(BaseModel):
     average_khushoo: float
     common_distractions: list[str]
     encouragement: str
+
+class GenericHabitBase(BaseModel):
+    name: str
+    frequency: str = Field("daily", pattern="^(daily|weekly)$")
+    icon: str | None = None
+    category: str | None = None
+
+class GenericHabitCreate(GenericHabitBase):
+    pass
+
+class GenericHabitUpdate(BaseModel):
+    name: str | None = None
+    frequency: str | None = Field(None, pattern="^(daily|weekly)$")
+    icon: str | None = None
+    category: str | None = None
+
+class GenericHabitResponse(GenericHabitBase):
+    id: str
+    user_id: str
+    streak: int
+    completed_today: bool
+    recent_completions: list[date_type] = []
+    created_at: datetime
+    updated_at: datetime
+

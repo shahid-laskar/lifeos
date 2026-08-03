@@ -644,6 +644,38 @@ export function logFocusSession(data: FocusSessionCreate) {
   });
 }
 
+// ── Custom Habits (Phase 5A) ─────────────────────────────────────────────────────────────
+
+export function getCustomHabits() {
+  return apiFetch<GenericHabitResponse[]>("/api/v1/habits/custom");
+}
+
+export function createCustomHabit(data: GenericHabitCreate) {
+  return apiFetch<GenericHabitResponse>("/api/v1/habits/custom", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export function updateCustomHabit(habitId: string, data: GenericHabitUpdate) {
+  return apiFetch<GenericHabitResponse>(`/api/v1/habits/custom/${habitId}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+}
+
+export function deleteCustomHabit(habitId: string) {
+  return apiFetch<void>(`/api/v1/habits/custom/${habitId}`, {
+    method: "DELETE",
+  });
+}
+
+export function toggleCustomHabitCompletion(habitId: string, date: string) {
+  return apiFetch<GenericHabitResponse>(`/api/v1/habits/custom/${habitId}/toggle?date=${date}`, {
+    method: "POST",
+  });
+}
+
 export function completeLearningModule(moduleId: string) {
   return apiFetch<LearningEnrollmentResponse>("/api/v1/learning/enrollments/complete-module", {
     method: "POST",

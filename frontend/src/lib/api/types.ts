@@ -141,6 +141,7 @@ export * from "./goal-types";
 export * from "./calendar-types";
 export * from "./review-types";
 export * from "./productivity-types";
+export * from "./custom-habit-types";
 
 export type QuranWeeklySummaryResponse = {
   surahs_read_last_7_days: number;

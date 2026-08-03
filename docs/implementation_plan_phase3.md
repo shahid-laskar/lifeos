@@ -940,12 +940,12 @@ The hero carries a subtle **khatam star tessellation** at 7% opacity via inline 
 ### 10E. Real LLM Provider Integration
 **Priority: P0 — Essential** | **Effort: Small** | **Dependencies: AI module (✅ exists)**
 
-**What**: Connect the AI backend to a real LLM (OpenAI, Anthropic, or open-source). Currently using in-memory stub.
+**What**: Connect the AI backend to a real LLM (OpenAI, Anthropic, or open-source). Currently using in-memory stub. check i am using open router. you can add gemini API key also
 
 **Why**: The AI assistant is useless without a real provider. All AI features depend on this.
 
 **Scope**:
-- Configure `MLOS_AI_PROVIDER=openai` with API key
+- Configure `MLOS_AI_PROVIDER=openai` with API key (i will use gemini )
 - Implement Islamic safety system prompt per [AI Safety Framework](file:///opt/lifeos/docs/Volume_02_AI_Architecture/048_AI_Safety_Framework.md)
 - Add confidence indicators to responses per [Islamic Knowledge Framework](file:///opt/lifeos/docs/Volume_00_Foundation/008_Islamic_Knowledge_Framework.md#L215-L236)
 

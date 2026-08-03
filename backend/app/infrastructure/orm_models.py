@@ -349,6 +349,27 @@ class FocusSessionORM(Base):
     completed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
 
+class GenericHabitORM(Base):
+    __tablename__ = "habits"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    user_id: Mapped[str] = mapped_column(String(36), ForeignKey("users.id"), nullable=False, index=True)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    frequency: Mapped[str] = mapped_column(String(32), default="daily", nullable=False)
+    icon: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    category: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
+class HabitCompletionORM(Base):
+    __tablename__ = "habit_completions"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    habit_id: Mapped[str] = mapped_column(String(36), ForeignKey("habits.id"), nullable=False, index=True)
+    completed_date: Mapped[date_type] = mapped_column(Date, nullable=False, index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
+
 
 
 
