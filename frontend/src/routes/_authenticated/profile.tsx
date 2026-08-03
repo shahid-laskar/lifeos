@@ -48,6 +48,21 @@ function ProfilePage() {
         <div className="rounded-xl border border-[var(--line)] bg-[var(--surface)] p-5">
           <div className="flex items-center justify-between">
             <div>
+              <h4 className="font-medium text-[14px]">Task Manager</h4>
+              <p className="text-[12px] text-[var(--mute)]">Manage your priorities and intentions</p>
+            </div>
+            <Link
+              to="/tasks"
+              className="inline-flex items-center gap-1 text-[13px] font-medium text-[var(--primary)] hover:underline"
+            >
+              Go to Tasks
+            </Link>
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-[var(--line)] bg-[var(--surface)] p-5">
+          <div className="flex items-center justify-between">
+            <div>
               <h4 className="font-medium text-[14px]">Daily Planner</h4>
               <p className="text-[12px] text-[var(--mute)]">Plan your day around your prayers</p>
             </div>

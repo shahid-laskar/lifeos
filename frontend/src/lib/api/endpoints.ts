@@ -506,6 +506,37 @@ export function deleteTimeBlock(blockId: string) {
   });
 }
 
+// ── Tasks ─────────────────────────────────────────────────────────────
+
+export function getTasks(project?: string, dueBefore?: string) {
+  const params = new URLSearchParams();
+  if (project) params.append("project", project);
+  if (dueBefore) params.append("due_before", dueBefore);
+  const qs = params.toString();
+  const url = `/api/v1/tasks${qs ? `?${qs}` : ''}`;
+  return apiFetch<TaskResponse[]>(url);
+}
+
+export function createTask(data: TaskCreate) {
+  return apiFetch<TaskResponse>(`/api/v1/tasks`, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export function updateTask(taskId: string, data: TaskUpdate) {
+  return apiFetch<TaskResponse>(`/api/v1/tasks/${taskId}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+}
+
+export function deleteTask(taskId: string) {
+  return apiFetch<void>(`/api/v1/tasks/${taskId}`, {
+    method: "DELETE",
+  });
+}
+
 export function completeLearningModule(moduleId: string) {
   return apiFetch<LearningEnrollmentResponse>("/api/v1/learning/enrollments/complete-module", {
     method: "POST",

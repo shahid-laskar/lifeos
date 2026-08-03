@@ -272,3 +272,21 @@ class PlannerTimeBlockORM(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
 
 
+class TaskORM(Base):
+    __tablename__ = "tasks"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    user_id: Mapped[str] = mapped_column(String(36), ForeignKey("users.id"), nullable=False, index=True)
+    title: Mapped[str] = mapped_column(String(255), nullable=False)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    priority: Mapped[str] = mapped_column(String(16), nullable=False, default="medium")
+    due_date: Mapped[date_type | None] = mapped_column(Date, nullable=True, index=True)
+    project: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
+    recurrence: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    completed: Mapped[bool] = mapped_column(default=False, nullable=False, index=True)
+    niyyah: Mapped[str | None] = mapped_column(Text, nullable=True)  # Intention field
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
+
+
