@@ -676,6 +676,91 @@ export function toggleCustomHabitCompletion(habitId: string, date: string) {
   });
 }
 
+// ── Reflection Journal (Phase 5B) ─────────────────────────────────────────────────────────────
+
+export function getJournalEntries() {
+  return apiFetch<JournalEntryResponse[]>("/api/v1/journal/entries");
+}
+
+export function createJournalEntry(data: JournalEntryCreate) {
+  return apiFetch<JournalEntryResponse>("/api/v1/journal/entries", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export function updateJournalEntry(entryId: string, data: JournalEntryUpdate) {
+  return apiFetch<JournalEntryResponse>(`/api/v1/journal/entries/${entryId}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+}
+
+export function deleteJournalEntry(entryId: string) {
+  return apiFetch<void>(`/api/v1/journal/entries/${entryId}`, {
+    method: "DELETE",
+  });
+}
+
+// ── Reading Tracker (Phase 5C) ─────────────────────────────────────────────────────────────
+
+export function getBooks() {
+  return apiFetch<BookResponse[]>("/api/v1/reading/books");
+}
+
+export function createBook(data: BookCreate) {
+  return apiFetch<BookResponse>("/api/v1/reading/books", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export function updateBook(bookId: string, data: BookUpdate) {
+  return apiFetch<BookResponse>(`/api/v1/reading/books/${bookId}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+}
+
+export function deleteBook(bookId: string) {
+  return apiFetch<void>(`/api/v1/reading/books/${bookId}`, {
+    method: "DELETE",
+  });
+}
+
+// ── Skills Roadmaps (Phase 5D) ─────────────────────────────────────────────────────────────
+
+export function getSkills() {
+  return apiFetch<SkillResponse[]>("/api/v1/skills");
+}
+
+export function createSkill(data: SkillCreate) {
+  return apiFetch<SkillResponse>("/api/v1/skills", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export function updateSkill(skillId: string, data: SkillUpdate) {
+  return apiFetch<SkillResponse>(`/api/v1/skills/${skillId}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+}
+
+export function deleteSkill(skillId: string) {
+  return apiFetch<void>(`/api/v1/skills/${skillId}`, {
+    method: "DELETE",
+  });
+}
+
+export function updateSkillMilestone(milestoneId: string, data: SkillMilestoneUpdate) {
+  return apiFetch<SkillMilestoneResponse>(`/api/v1/skills/milestones/${milestoneId}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+}
+
 export function completeLearningModule(moduleId: string) {
   return apiFetch<LearningEnrollmentResponse>("/api/v1/learning/enrollments/complete-module", {
     method: "POST",
