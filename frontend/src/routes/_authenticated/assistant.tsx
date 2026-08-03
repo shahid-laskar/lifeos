@@ -106,72 +106,126 @@ function AssistantPage() {
     createMutation.mutate();
   };
 
-  const handleDeleteConversation = (id: string) => {
-    deleteMutation.mutate(id);
-  };
-
-  const currentMessages = currentConversation?.messages || [];
+  const starterPrompts = [
+    { title: "Daily Coach", prompt: "Can you review my recent prayers and habits and give me some gentle advice for today?" },
+    { title: "Planning Assistant", prompt: "Help me plan my day around my prayer times and top priorities." },
+    { title: "Reflection Assistant", prompt: "I'd like to reflect on my day. Can you give me an Islamic reflection prompt?" },
+    { title: "Learning Coach", prompt: "I want to learn more about the Prophet's (PBUH) character. Can you guide me?" },
+  ];
 
   return (
     <>
-      <PageHeader title="Assistant" arabic="مُساعِد" subtitle="Ask, slowly">
-        <button
-          onClick={() => setShowSidebar(!showSidebar)}
-          className="ml-auto text-[var(--mute)] hover:text-[var(--ink)] transition-colors"
-        >
-          {showSidebar ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
-      </PageHeader>
-
-      <div className="flex h-[calc(100vh-160px)]">
-        {/* Sidebar */}
+      <PageHeader title="Assistant" arabic="المساعد" subtitle="Your calm, supportive companion" />
+      <div className="flex h-[calc(100vh-140px)] gap-4 overflow-hidden relative">
+        {/* Mobile overlay */}
         {showSidebar && (
-          <div className="w-80 border-r border-[var(--line)] bg-[var(--surface)]">
+          <div 
+            className="fixed inset-0 bg-black/20 z-40 lg:hidden"
+            onClick={() => setShowSidebar(false)}
+          />
+        )}
+
+        {/* Sidebar */}
+        <div className={`
+          fixed lg:static inset-y-0 left-0 z-50 w-[260px] transform transition-transform duration-300 ease-in-out
+          ${showSidebar ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+          bg-[var(--bg)] border-r border-[var(--line)] lg:border lg:rounded-lg
+          flex flex-col h-[calc(100vh-80px)] lg:h-full shadow-lg lg:shadow-none
+        `}>
+          <div className="p-4 border-b border-[var(--line)] flex justify-between items-center bg-[var(--surface)] shrink-0">
+            <h3 className="font-semibold text-[14px]">Conversations</h3>
+            <button 
+              onClick={() => setShowSidebar(false)}
+              className="lg:hidden p-1 hover:bg-[var(--bg)] rounded"
+            >
+              <X className="h-4 w-4 text-[var(--mute)]" />
+            </button>
+          </div>
+          <div className="flex-1 overflow-y-auto min-h-0">
             <ConversationList
               conversations={conversations || []}
               currentConversationId={currentConversationId}
-              onSelectConversation={setCurrentConversationId}
-              onNewConversation={handleNewConversation}
-              onDeleteConversation={handleDeleteConversation}
+              onSelectConversation={(id) => {
+                setCurrentConversationId(id);
+                setShowSidebar(false);
+              }}
+              onNewConversation={() => createMutation.mutate()}
+              onDeleteConversation={(id) => deleteMutation.mutate(id)}
               isLoading={isLoadingConversations}
             />
           </div>
-        )}
+        </div>
 
-        {/* Main content */}
-        <div className="flex-1 flex flex-col">
-          {currentConversation ? (
-            <>
-              <div className="flex-1 overflow-y-auto px-4 py-4">
+        {/* Main Chat Area */}
+        <div className="flex-1 flex flex-col min-w-0 bg-[var(--surface)] border border-[var(--line)] rounded-lg relative h-full">
+          {/* Mobile Header */}
+          <div className="lg:hidden p-3 border-b border-[var(--line)] flex items-center shrink-0">
+            <button 
+              onClick={() => setShowSidebar(true)}
+              className="p-2 hover:bg-[var(--bg)] rounded-md mr-2"
+            >
+              <Menu className="h-5 w-5 text-[var(--ink)]" />
+            </button>
+            <h2 className="font-medium text-[15px] truncate">
+              {currentConversation?.title || "New Chat"}
+            </h2>
+          </div>
+
+          <div className="flex-1 overflow-y-auto min-h-0 p-4">
+            {!currentConversationId ? (
+              <div className="h-full flex flex-col items-center justify-center text-[var(--mute)]">
+                <MessageCircle className="h-12 w-12 mb-4 opacity-20" />
+                <p>Select or start a conversation</p>
+                
+                <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-lg w-full">
+                  {starterPrompts.map((p, i) => (
+                    <button 
+                      key={i}
+                      onClick={() => {
+                        createMutation.mutate(undefined, {
+                          onSuccess: (data) => {
+                            sendMessageMutation.mutate({ convId: data.id, content: p.prompt });
+                          }
+                        });
+                      }}
+                      className="text-left p-4 rounded-xl border border-[var(--line)] bg-[var(--surface)] hover:border-[var(--primary-soft)] transition-colors"
+                    >
+                      <h4 className="font-medium text-[13px] text-[var(--ink)] mb-1">{p.title}</h4>
+                      <p className="text-[12px] text-[var(--mute)] line-clamp-2">{p.prompt}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <>
                 <ConversationThread
-                  messages={currentMessages}
+                  messages={currentConversation?.messages || []}
                   isLoading={sendMessageMutation.isPending}
                 />
+                
+                {currentConversation?.messages.length === 0 && (
+                  <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-lg mx-auto w-full">
+                    {starterPrompts.map((p, i) => (
+                      <button 
+                        key={i}
+                        onClick={() => handleSendMessage(p.prompt)}
+                        className="text-left p-4 rounded-xl border border-[var(--line)] bg-[var(--surface)] hover:border-[var(--primary-soft)] transition-colors"
+                      >
+                        <h4 className="font-medium text-[13px] text-[var(--ink)] mb-1">{p.title}</h4>
+                        <p className="text-[12px] text-[var(--mute)] line-clamp-2">{p.prompt}</p>
+                      </button>
+                    ))}
+                  </div>
+                )}
                 <div ref={messagesEndRef} />
-              </div>
-              <MessageInput
-                onSend={handleSendMessage}
-                disabled={!currentConversationId}
-                isLoading={sendMessageMutation.isPending}
-              />
-            </>
-          ) : (
-            <div className="flex flex-1 items-center justify-center">
-              <div className="text-center">
-                <p className="text-[15px] font-semibold text-[var(--ink)]">No conversation selected</p>
-                <p className="mt-2 text-[13px] text-[var(--mute)]">
-                  Start a new conversation or select one from the sidebar
-                </p>
-                <button
-                  onClick={handleNewConversation}
-                  className="mt-4 rounded-full bg-[var(--primary)] px-6 py-2.5 text-[14px] font-medium text-white transition-opacity hover:opacity-90"
-                  disabled={createMutation.isPending}
-                >
-                  New Conversation
-                </button>
-              </div>
-            </div>
-          )}
+              </>
+            )}
+          </div>
+          <MessageInput
+            onSend={handleSendMessage}
+            disabled={!currentConversationId}
+            isLoading={sendMessageMutation.isPending}
+          />
         </div>
       </div>
     </>
