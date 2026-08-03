@@ -9,6 +9,7 @@ import {
   WeeklyQuranCard,
   DuasWidget,
   HadithWidget,
+  FastingCard,
 } from "@/components/home/summary-cards";
 import { PrayerStatusRow } from "@/components/home/prayer-status-row";
 import { PrayerTimesStrip } from "@/components/home/prayer-times-strip";
@@ -124,6 +125,7 @@ function HomePage() {
 
         <PrayerStatusRow times={times?.times} />
 
+        {/* 2-column grid: Du'a + Dhikr */}
         <div className="grid grid-cols-2 gap-3.5 md:gap-4">
           <DuasWidget />
           <DhikrWidget />
@@ -132,6 +134,7 @@ function HomePage() {
         <WeeklyQuranCard />
         <HadithWidget />
         <ConsistencyCard />
+        <FastingCard />
       </div>
     </>
   );

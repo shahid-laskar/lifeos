@@ -1,7 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { LoadingBlock } from "@/components/brand/pattern";
+import { CardSkeleton } from "@/components/home/skeletons";
+import { EmptyState } from "@/components/ui/empty-state";
 import { ErrorState } from "@/components/brand/states";
 import { DuaCard } from "@/components/dua/dua-card";
 import { PageHeader } from "@/components/layout/page-header";
@@ -55,7 +56,7 @@ function DuasPage() {
   const bookmarksQuery = useQuery({
     queryKey: ["dua-bookmarks"],
     queryFn: getDuaBookmarks,
-    enabled: tab === "bookmarks" || tab === "browse", // keep fresh
+    enabled: tab === "bookmarks" || tab === "browse",
   });
 
   const bookmarkedIds = useMemo(() => {
@@ -169,7 +170,10 @@ function DuasPage() {
           {/* Items */}
           <div className="flex flex-col gap-4">
             {isPending ? (
-              <LoadingBlock label="Loading Du'as…" />
+              <div className="flex flex-col gap-3">
+                <CardSkeleton lines={2} />
+                <CardSkeleton lines={2} />
+              </div>
             ) : isError ? (
               <ErrorState
                 title="Couldn't load Du'as"
@@ -177,11 +181,10 @@ function DuasPage() {
                 onRetry={() => refetch()}
               />
             ) : filteredData.length === 0 ? (
-              <div className="empty py-12 text-center">
-                <p className="mt-1 text-[13px] leading-[1.6] text-[var(--mute)]">
-                  No Du'as found.
-                </p>
-              </div>
+              <EmptyState
+                glyph="🤲"
+                description="No Du'as found for this filter."
+              />
             ) : (
               filteredData.map((item) => (
                 <DuaCard 
@@ -200,7 +203,9 @@ function DuasPage() {
       {tab === "bookmarks" ? (
         <div className="flex flex-col gap-4">
           {bookmarksQuery.isPending ? (
-            <LoadingBlock label="Loading bookmarks" />
+            <div className="flex flex-col gap-3">
+              <CardSkeleton lines={2} />
+            </div>
           ) : bookmarksQuery.isError ? (
             <ErrorState
               title="Couldn't load bookmarks"
@@ -208,9 +213,10 @@ function DuasPage() {
               onRetry={() => bookmarksQuery.refetch()}
             />
           ) : (bookmarksQuery.data?.length ?? 0) === 0 ? (
-            <p className="text-[13px] text-[var(--mute)]">
-              No bookmarks yet. Save a dua while browsing.
-            </p>
+            <EmptyState
+              glyph="🔖"
+              description="No bookmarks yet. Save a dua while browsing."
+            />
           ) : (
             <div className="flex flex-col gap-4">
               {bookmarksQuery.data?.map((bookmark) =>

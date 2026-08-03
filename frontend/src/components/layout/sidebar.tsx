@@ -1,30 +1,37 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, BookOpen, Sparkle, Heart, MessageCircle, Users, Settings, BookMarked, User, CheckSquare, Target, Calendar as CalendarIcon, Activity } from "lucide-react";
+import {
+  Home, BookOpen, Sparkles, Heart, MessageCircle, Users, Settings,
+  BookMarked, User, CheckSquare, Target, Calendar as CalendarIcon,
+  Activity, ScrollText, GraduationCap, Brain, Leaf, HandHeart,
+  ClipboardList, Timer, Library
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV_LINKS = [
-  { to: "/home", label: "Home", icon: Home },
-  { to: "/quran", label: "Qur'an", icon: BookOpen },
-  { to: "/dhikr", label: "Dhikr", icon: Sparkle },
-  { to: "/duas", label: "Du'as", icon: Heart },
-  { to: "/assistant", label: "Assistant", icon: MessageCircle },
-  { to: "/prayer-journal", label: "Prayer Journal", icon: BookMarked },
-  { to: "/hadith", label: "Hadith", icon: BookOpen },
-  { to: "/tasks", label: "Tasks", icon: CheckSquare },
-  { to: "/habits", label: "Habits", icon: Activity },
-  { to: "/journal", label: "Journal", icon: BookOpen },
-  { to: "/reading", label: "Reading", icon: BookOpen },
-  { to: "/skills", label: "Skills", icon: Target },
-  { to: "/knowledge", label: "Knowledge", icon: BookOpen },
-  { to: "/health", label: "Health", icon: Activity },
-  { to: "/community", label: "Community", icon: Users },
-  { to: "/planner", label: "Planner", icon: BookMarked },
-  { to: "/calendar", label: "Calendar", icon: CalendarIcon },
-  { to: "/goals", label: "Goals", icon: Target },
-  { to: "/families", label: "Family", icon: Users },
-  { to: "/learning", label: "Learning", icon: BookOpen },
-  { to: "/profile", label: "Profile", icon: User },
-  { to: "/settings", label: "Settings", icon: Settings },
+  { to: "/home",          label: "Home",           icon: Home },
+  { to: "/quran",         label: "Qur'an",          icon: BookOpen },
+  { to: "/dhikr",         label: "Dhikr",           icon: Sparkles },
+  { to: "/duas",          label: "Du'as",           icon: Heart },
+  { to: "/hadith",        label: "Hadith",          icon: Library },
+  { to: "/prayer-journal",label: "Prayer Journal",  icon: BookMarked },
+  { to: "/assistant",     label: "Assistant",       icon: MessageCircle },
+  { to: "/tasks",         label: "Tasks",           icon: CheckSquare },
+  { to: "/planner",       label: "Planner",         icon: ClipboardList },
+  { to: "/goals",         label: "Goals",           icon: Target },
+  { to: "/calendar",      label: "Calendar",        icon: CalendarIcon },
+  { to: "/habits",        label: "Habits",          icon: Activity },
+  { to: "/journal",       label: "Journal",         icon: ScrollText },
+  { to: "/reading",       label: "Reading",         icon: BookOpen },
+  { to: "/deep-work",     label: "Deep Work",       icon: Timer },
+  { to: "/reviews",       label: "Weekly Review",   icon: Brain },
+  { to: "/health",        label: "Health",          icon: Leaf },
+  { to: "/community",     label: "Community",       icon: HandHeart },
+  { to: "/families",      label: "Family",          icon: Users },
+  { to: "/learning",      label: "Learning",        icon: GraduationCap },
+  { to: "/knowledge",     label: "Knowledge",       icon: Brain },
+  { to: "/skills",        label: "Skills",          icon: Target },
+  { to: "/profile",       label: "Profile",         icon: User },
+  { to: "/settings",      label: "Settings",        icon: Settings },
 ] as const;
 
 export function Sidebar() {

@@ -41,8 +41,13 @@ export function PrayerTimesStrip({ times }: { times: PrayerTimes }) {
       <div className="relative">
         {upcoming ? (
           <div className="flex items-baseline justify-between">
-            <div className="text-[26px] font-bold tracking-[-0.02em]">
-              {PRAYER_LABELS[upcoming.name].latin}
+            <div>
+              <div className="text-[11px] font-semibold uppercase tracking-[0.16em] opacity-75">
+                Next Prayer
+              </div>
+              <div className="mt-2 text-[26px] font-bold tracking-[-0.02em]">
+                {PRAYER_LABELS[upcoming.name].latin}
+              </div>
             </div>
             <div className="text-right">
               <div className="font-sans text-[26px] font-semibold tabular-nums tracking-[-0.02em]">

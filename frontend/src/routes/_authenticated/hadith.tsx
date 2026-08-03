@@ -1,12 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Search } from "lucide-react";
-import { LoadingBlock } from "@/components/brand/pattern";
+import { CardSkeleton } from "@/components/home/skeletons";
+import { EmptyState } from "@/components/ui/empty-state";
 import { ErrorState } from "@/components/brand/states";
 import { HadithCard } from "@/components/hadith/hadith-card";
 import { PageHeader } from "@/components/layout/page-header";
-import { Input } from "@/components/ui/input";
 import { SearchBar } from "@/components/ui/search-bar";
 import { useToast } from "@/components/ui/use-toast";
 import {
@@ -196,7 +195,7 @@ function HadithPage() {
           ) : null}
 
           {chaptersQuery.isPending ? (
-            <LoadingBlock label="Loading chapters" />
+            <CardSkeleton lines={2} />
           ) : chaptersQuery.isError ? (
             <ErrorState
               title="Couldn't load chapters"
@@ -228,7 +227,10 @@ function HadithPage() {
           )}
 
           {hadithsQuery.isPending ? (
-            <LoadingBlock label="Loading hadiths" />
+            <div className="flex flex-col gap-3">
+              <CardSkeleton lines={3} />
+              <CardSkeleton lines={3} />
+            </div>
           ) : hadithsQuery.isError ? (
             <ErrorState
               title="Couldn't load hadiths"
@@ -272,7 +274,7 @@ function HadithPage() {
             </div>
             <button
               type="submit"
-              className="h-[38px] shrink-0 rounded-[11px] bg-[var(--primary)] px-5 text-[13px] font-medium text-white transition-opacity hover:opacity-90"
+              className="h-[38px] shrink-0 rounded-[11px] bg-[var(--primary)] px-5 text-[13px] font-medium text-white transition-opacity hover:opacity-90 dark:text-[#08120f]"
             >
               Search
             </button>
@@ -283,12 +285,17 @@ function HadithPage() {
               Try words like “intention”, “prayer”, or a narrator name.
             </p>
           ) : searchQueryResult.isPending ? (
-            <LoadingBlock label="Searching" />
+            <CardSkeleton lines={3} />
           ) : searchQueryResult.isError ? (
             <ErrorState
               title="Search failed"
               message="Please try again in a moment."
               onRetry={() => searchQueryResult.refetch()}
+            />
+          ) : searchQueryResult.data?.results.length === 0 ? (
+            <EmptyState
+              glyph="🔍"
+              description={`No hadiths found matching "${submittedQuery}".`}
             />
           ) : (
             <>
@@ -317,7 +324,7 @@ function HadithPage() {
       {tab === "bookmarks" ? (
         <div className="flex flex-col gap-4">
           {bookmarksQuery.isPending ? (
-            <LoadingBlock label="Loading bookmarks" />
+            <CardSkeleton lines={3} />
           ) : bookmarksQuery.isError ? (
             <ErrorState
               title="Couldn't load bookmarks"
@@ -325,9 +332,10 @@ function HadithPage() {
               onRetry={() => bookmarksQuery.refetch()}
             />
           ) : (bookmarksQuery.data?.length ?? 0) === 0 ? (
-            <p className="text-[13px] text-[var(--mute)]">
-              No bookmarks yet. Save a hadith while browsing or searching.
-            </p>
+            <EmptyState
+              glyph="🔖"
+              description="No bookmarks yet. Save a hadith while browsing or searching."
+            />
           ) : (
             <div className="flex flex-col gap-4">
               {bookmarksQuery.data?.map((bookmark) =>

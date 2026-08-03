@@ -2,27 +2,37 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, useMemo } from "react";
 import { PageHeader } from "@/components/layout/page-header";
+import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingBlock } from "@/components/brand/pattern";
 import { ErrorState } from "@/components/brand/states";
 import { getPrayerJournal, getPrayerInsights, logPrayerJournal } from "@/lib/api/endpoints";
 import { PRAYER_NAMES, PRAYER_LABELS, PrayerName } from "@/lib/api/types";
 import { todayISO } from "@/lib/prayer";
-import { Book, LineChart, Sparkles, ChevronDown, ChevronUp } from "lucide-react";
-import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import { getHijriDate } from "@/lib/hijri";
+import { Book, Sparkles, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
+import { KhushooMoons } from "@/components/ui/khushoo-moons";
+import { ProgressBar, ProgressMeta } from "@/components/ui/progress-bar";
+import { WeekDots } from "@/components/ui/week-dots";
 
 export const Route = createFileRoute("/_authenticated/prayer-journal")({
   ssr: false,
+  head: () => ({
+    meta: [
+      { title: "Prayer Journal — Muslim Life OS" },
+      { name: "description", content: "Reflect on your khushoo and prayer quality." },
+    ],
+  }),
   component: PrayerJournalPage,
 });
 
 const KHUSHOO_LEVELS = [
-  { value: 1, icon: "🌑", label: "Struggled" },
-  { value: 2, icon: "🌘", label: "Distracted" },
-  { value: 3, icon: "🌗", label: "Present" },
-  { value: 4, icon: "🌖", label: "Focused" },
-  { value: 5, icon: "🌕", label: "Deep Focus" },
+  { value: 1, label: "Struggled" },
+  { value: 2, label: "Distracted" },
+  { value: 3, label: "Present" },
+  { value: 4, label: "Focused" },
+  { value: 5, label: "Deep Focus" },
 ];
 
 const COMMON_DISTRACTIONS = [
@@ -33,6 +43,19 @@ const COMMON_DISTRACTIONS = [
   "Rushing",
   "Worldly Thoughts",
 ];
+
+/** Format a date showing Hijri primary (emerald), Gregorian muted — per mockup spec */
+function JournalDate({ dateStr }: { dateStr: string }) {
+  const date = new Date(dateStr);
+  const hijri = getHijriDate(date);
+  const gregorian = date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  return (
+    <span className="text-[11px]">
+      <span className="font-semibold text-[var(--primary)]">{hijri}</span>
+      <span className="ml-1.5 text-[var(--mute)]">· {gregorian}</span>
+    </span>
+  );
+}
 
 function PrayerJournalPage() {
   const queryClient = useQueryClient();
@@ -89,45 +112,27 @@ function PrayerJournalPage() {
     .map((s) => s.trim())
     .filter(Boolean);
 
-  const prayerAverages = useMemo(() => {
-    if (!journalQuery.data) return [];
-    const sums = {
-      fajr: { total: 0, count: 0 },
-      dhuhr: { total: 0, count: 0 },
-      asr: { total: 0, count: 0 },
-      maghrib: { total: 0, count: 0 },
-      isha: { total: 0, count: 0 },
-    };
-    journalQuery.data.forEach((entry) => {
-      if (sums[entry.prayer_name]) {
-        sums[entry.prayer_name].total += entry.khushoo_rating;
-        sums[entry.prayer_name].count += 1;
-      }
-    });
-    return PRAYER_NAMES.map((name) => ({
-      name: PRAYER_LABELS[name].latin,
-      avg: sums[name].count > 0 ? Number((sums[name].total / sums[name].count).toFixed(1)) : 0,
-    }));
-  }, [journalQuery.data]);
+  /** Build sentence-based insight from PrayerInsights — never raw numbers */
+  const insightSentence = useMemo(() => {
+    const q = insightsQuery.data?.weekly_quality ?? 0;
+    const insights = insightsQuery.data?.insights ?? [];
+    if (q === 0) return "Log a few prayers to begin seeing insights about your khushoo.";
+    if (q >= 4) return `Your khushoo this week is running deep — ${insights[0] ?? "keep nurturing this quality."}`;
+    if (q >= 3) return `You've been present in prayer this week. ${insights[0] ?? "Consistency builds depth."}`;
+    return `Your focus is building. ${insights[0] ?? "Each prayer is a new beginning."}`;
+  }, [insightsQuery.data]);
 
-  const topDistractions = useMemo(() => {
-    if (!journalQuery.data) return [];
-    const counts: Record<string, number> = {};
-    journalQuery.data.forEach((entry) => {
-      if (entry.distractions) {
-        const items = entry.distractions
-          .split(",")
-          .map((s) => s.trim())
-          .filter(Boolean);
-        items.forEach((item) => {
-          counts[item] = (counts[item] || 0) + 1;
-        });
-      }
-    });
-    return Object.entries(counts)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 5)
-      .map(([name, count]) => ({ name, count }));
+  /** Build 7-day weekdots from journal data */
+  const weekdots = useMemo(() => {
+    if (!journalQuery.data) return Array<"on" | "part" | "off">(7).fill("off");
+    const today = new Date();
+    return Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(today);
+      d.setDate(today.getDate() - (6 - i));
+      const dateStr = d.toISOString().slice(0, 10);
+      const hasEntry = journalQuery.data.some((e) => e.date.slice(0, 10) === dateStr);
+      return hasEntry ? "on" : "off";
+    }) as Array<"on" | "part" | "off">;
   }, [journalQuery.data]);
 
   return (
@@ -138,25 +143,25 @@ function PrayerJournalPage() {
         <button
           onClick={() => setActiveTab("journal")}
           className={cn(
-            "shrink-0 rounded-full px-4 py-2 text-[13px] font-semibold transition-colors flex items-center",
+            "shrink-0 rounded-full px-4 py-2 text-[13px] font-semibold transition-colors flex items-center gap-2",
             activeTab === "journal"
               ? "bg-[var(--primary-soft)] text-[var(--primary)]"
               : "text-[var(--mute)] hover:bg-[var(--line)]"
           )}
         >
-          <Book className="mr-2 h-4 w-4" />
+          <Book className="h-4 w-4" />
           Journal
         </button>
         <button
           onClick={() => setActiveTab("insights")}
           className={cn(
-            "shrink-0 rounded-full px-4 py-2 text-[13px] font-semibold transition-colors flex items-center",
+            "shrink-0 rounded-full px-4 py-2 text-[13px] font-semibold transition-colors flex items-center gap-2",
             activeTab === "insights"
               ? "bg-[var(--primary-soft)] text-[var(--primary)]"
               : "text-[var(--mute)] hover:bg-[var(--line)]"
           )}
         >
-          <LineChart className="mr-2 h-4 w-4" />
+          <Sparkles className="h-4 w-4" />
           Insights
         </button>
       </div>
@@ -164,24 +169,22 @@ function PrayerJournalPage() {
       <div className="flex flex-col gap-4">
         {activeTab === "journal" && (
           <div className="flex flex-col gap-6">
-            <Card className="overflow-hidden relative bg-[var(--surface)]">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-[var(--primary-soft)] rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none" />
+            {/* New reflection form */}
+            <Card>
+              <CardContent className="pt-6 space-y-6">
+                <h3 className="font-semibold text-[15px] text-[var(--ink)]">New Reflection</h3>
 
-              <CardContent className="pt-6 relative z-10 space-y-6">
-                <h3 className="font-semibold text-[15px] flex items-center gap-2 text-[var(--ink)]">
-                  <Sparkles className="h-4 w-4 text-[var(--primary)]" /> New Reflection
-                </h3>
-
-                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide snap-x">
+                {/* Prayer selector */}
+                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
                   {PRAYER_NAMES.map((name) => (
                     <button
                       key={name}
                       onClick={() => setSelectedPrayer(name)}
                       className={cn(
-                        "snap-center shrink-0 rounded-full px-5 py-2 text-[13px] font-medium transition-all border",
+                        "shrink-0 rounded-full px-5 py-2 text-[13px] font-medium transition-all border",
                         selectedPrayer === name
-                          ? "border-[var(--primary)] bg-[var(--primary)] text-white shadow-md"
-                          : "border-[var(--line)] bg-[var(--bg)] text-[var(--mute)] hover:border-[var(--primary-soft)] hover:text-[var(--ink)]",
+                          ? "border-[var(--primary)] bg-[var(--primary)] text-white"
+                          : "border-[var(--line)] bg-[var(--bg)] text-[var(--mute)] hover:text-[var(--ink)]",
                       )}
                     >
                       {PRAYER_LABELS[name].latin}
@@ -189,11 +192,12 @@ function PrayerJournalPage() {
                   ))}
                 </div>
 
+                {/* Khushoo rating — using KhushooMoons component */}
                 <div className="pt-2">
                   <label className="mb-4 block text-[13px] font-medium text-[var(--ink)] text-center">
                     How was your focus during {PRAYER_LABELS[selectedPrayer].latin}?
                   </label>
-                  <div className="flex justify-between items-end px-2">
+                  <div className="flex items-center justify-center gap-3">
                     {KHUSHOO_LEVELS.map((level) => {
                       const isSelected = khushoo === level.value;
                       return (
@@ -201,17 +205,25 @@ function PrayerJournalPage() {
                           key={level.value}
                           onClick={() => setKhushoo(level.value)}
                           className={cn(
-                            "flex flex-col items-center gap-2 transition-all duration-300",
-                            isSelected
-                              ? "scale-110 opacity-100"
-                              : "scale-100 opacity-40 hover:opacity-70",
+                            "flex flex-col items-center gap-1.5 transition-all duration-200",
+                            isSelected ? "scale-110 opacity-100" : "scale-100 opacity-40 hover:opacity-70",
                           )}
                         >
-                          <span className="text-[28px] drop-shadow-sm">{level.icon}</span>
+                          {/* Single moon icon at this position */}
+                          <div
+                            className={cn(
+                              "flex h-[26px] w-[26px] items-center justify-center rounded-full border text-[12px]",
+                              isSelected
+                                ? "border-[var(--brass)] text-[var(--brass)]"
+                                : "border-[var(--line)]"
+                            )}
+                          >
+                            {["🌑", "🌘", "🌗", "🌖", "🌕"][level.value - 1]}
+                          </div>
                           <span
                             className={cn(
-                              "text-[10px] font-semibold transition-colors",
-                              isSelected ? "text-[var(--primary)]" : "text-[var(--mute)]",
+                              "text-[10px] font-semibold",
+                              isSelected ? "text-[var(--brass)]" : "text-[var(--mute)]"
                             )}
                           >
                             {level.label}
@@ -222,6 +234,7 @@ function PrayerJournalPage() {
                   </div>
                 </div>
 
+                {/* Guided prompts (optional) */}
                 <div className="border-t border-[var(--line)] pt-4">
                   <button
                     onClick={() => setShowPrompts(!showPrompts)}
@@ -285,17 +298,16 @@ function PrayerJournalPage() {
                 <button
                   onClick={() => logMutation.mutate()}
                   disabled={logMutation.isPending}
-                  className="w-full rounded-full bg-[var(--primary)] py-3 text-[14px] font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+                  className="w-full rounded-[11px] bg-[var(--primary)] py-[9px] text-[13px] font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50 dark:text-[#08120f]"
                 >
                   {logMutation.isPending ? "Saving..." : "Save Reflection"}
                 </button>
               </CardContent>
             </Card>
 
+            {/* Journal history */}
             <div>
-              <h3 className="mb-4 font-semibold text-[15px] text-[var(--ink)]">
-                Journal History
-              </h3>
+              <h3 className="mb-4 font-semibold text-[15px] text-[var(--ink)]">Journal History</h3>
               {journalQuery.isPending ? (
                 <LoadingBlock label="Loading journal..." />
               ) : journalQuery.isError ? (
@@ -307,50 +319,46 @@ function PrayerJournalPage() {
               ) : (
                 <div className="flex flex-col gap-3">
                   {journalQuery.data?.length === 0 ? (
-                    <div className="empty py-10 text-center">
-                      <p className="mt-1 text-[13px] leading-[1.6] text-[var(--mute)]">
-                        Log your first prayer to start tracking your khushoo journey.
-                      </p>
-                    </div>
+                    <EmptyState
+                      glyph="📖"
+                      description="Log your first prayer to start tracking your khushoo journey."
+                    />
                   ) : (
                     journalQuery.data?.map((entry) => {
-                      const iconInfo = KHUSHOO_LEVELS.find((l) => l.value === entry.khushoo_rating);
+                      const levelInfo = KHUSHOO_LEVELS.find(
+                        (l) => l.value === entry.khushoo_rating
+                      );
                       return (
                         <Card key={entry.id}>
                           <CardContent className="p-4">
-                            <div className="flex justify-between items-center mb-3">
-                              <div className="flex items-center gap-3">
-                                <span className="text-[24px] drop-shadow-sm">
-                                  {iconInfo?.icon || "🌗"}
+                            <div className="flex justify-between items-start mb-3">
+                              <div>
+                                <span className="font-semibold text-[14px] text-[var(--ink)] capitalize block leading-none mb-1">
+                                  {PRAYER_LABELS[entry.prayer_name].latin}
                                 </span>
-                                <div>
-                                  <span className="font-semibold text-[14px] text-[var(--ink)] capitalize block leading-none mb-1">
-                                    {PRAYER_LABELS[entry.prayer_name].latin}
-                                  </span>
-                                  <span className="text-[11px] font-medium text-[var(--primary)]">
-                                    {iconInfo?.label}
-                                  </span>
-                                </div>
+                                <JournalDate dateStr={entry.date} />
                               </div>
-                              <span className="text-[11px] font-medium text-[var(--mute)] bg-[var(--line)] px-2 py-1 rounded-md">
-                                {new Date(entry.date).toLocaleDateString(undefined, {
-                                  month: "short",
-                                  day: "numeric",
-                                })}
-                              </span>
+                              {/* Khushoo moons display */}
+                              <KhushooMoons
+                                rating={entry.khushoo_rating}
+                                caption={levelInfo?.label}
+                                className="mt-0"
+                              />
                             </div>
 
                             {(entry.notes || entry.distractions) && (
                               <div className="mt-3 space-y-2 pt-3 border-t border-[var(--line)]">
                                 {entry.notes && (
-                                  <p className="text-[13px] text-[var(--ink)] italic">"{entry.notes}"</p>
+                                  <p className="text-[13px] text-[var(--ink)] italic">
+                                    "{entry.notes}"
+                                  </p>
                                 )}
                                 {entry.distractions && (
                                   <div className="flex flex-wrap gap-1 mt-1">
                                     {entry.distractions.split(",").map((d) => (
                                       <span
                                         key={d}
-                                        className="text-[10px] bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 px-2 py-0.5 rounded-sm font-medium"
+                                        className="text-[10px] bg-[var(--primary-soft)] text-[var(--primary)] px-2 py-0.5 rounded-full font-medium"
                                       >
                                         {d.trim()}
                                       </span>
@@ -385,120 +393,81 @@ function PrayerJournalPage() {
               />
             ) : (
               <>
-                <div className="grid grid-cols-2 gap-4">
-                  <Card className="text-center overflow-hidden relative">
-                    <div className="absolute -top-4 -right-4 w-16 h-16 bg-[#d4af37]/10 rounded-full blur-xl pointer-events-none" />
-                    <CardContent className="p-5">
-                      <p className="text-[12px] font-medium text-[var(--mute)] mb-1 relative z-10">
-                        Weekly Quality
-                      </p>
-                      <p className="text-[28px] font-bold text-[#d4af37] drop-shadow-sm relative z-10">
-                        {insightsQuery.data?.weekly_quality.toFixed(1) || "N/A"}
-                      </p>
-                    </CardContent>
-                  </Card>
-                  <Card className="text-center overflow-hidden relative">
-                    <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-[var(--primary-soft)] rounded-full blur-xl pointer-events-none" />
-                    <CardContent className="p-5">
-                      <p className="text-[12px] font-medium text-[var(--mute)] mb-1 relative z-10">
-                        Monthly Quality
-                      </p>
-                      <p className="text-[28px] font-bold text-[var(--primary)] drop-shadow-sm relative z-10">
-                        {insightsQuery.data?.monthly_quality.toFixed(1) || "N/A"}
-                      </p>
-                    </CardContent>
-                  </Card>
-                </div>
-
+                {/* Sentence-based weekly insight */}
                 <Card>
-                  <CardContent className="p-6">
-                    <h3 className="mb-6 font-semibold text-[14px] text-[var(--ink)] flex items-center gap-2">
-                      <LineChart className="h-4 w-4 text-[var(--primary)]" /> Average Khushoo
+                  <CardContent className="p-5">
+                    <h3 className="mb-4 text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--mute)]">
+                      Weekly Khushoo
                     </h3>
-                    <div className="h-[200px] w-full -ml-4">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <BarChart
-                          data={prayerAverages}
-                          margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
-                        >
-                          <XAxis
-                            dataKey="name"
-                            axisLine={false}
-                            tickLine={false}
-                            tick={{
-                              fontSize: 11,
-                              fill: "var(--mute)",
-                              fontWeight: 500,
-                            }}
-                            dy={10}
-                          />
-                          <Tooltip
-                            cursor={{ fill: "var(--line)", opacity: 0.4 }}
-                            contentStyle={{
-                              borderRadius: "12px",
-                              border: "1px solid var(--line)",
-                              backgroundColor: "var(--surface)",
-                              boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
-                              fontSize: "12px",
-                              fontWeight: 600,
-                            }}
-                            itemStyle={{ color: "var(--primary)" }}
-                          />
-                          <Bar dataKey="avg" radius={[6, 6, 0, 0]} maxBarSize={40}>
-                            {prayerAverages.map((entry, index) => (
-                              <Cell
-                                key={`cell-${index}`}
-                                fill="var(--primary)"
-                                opacity={entry.avg > 0 ? 0.9 : 0.2}
-                              />
-                            ))}
-                          </Bar>
-                        </BarChart>
-                      </ResponsiveContainer>
-                    </div>
+                    <p className="text-[14px] text-[var(--ink)] leading-[1.65]">{insightSentence}</p>
+                    <WeekDots days={weekdots} />
+                    <ProgressMeta>
+                      <span>
+                        {journalQuery.data?.filter((e) => {
+                          const d = new Date(e.date);
+                          const weekAgo = new Date();
+                          weekAgo.setDate(weekAgo.getDate() - 7);
+                          return d >= weekAgo;
+                        }).length ?? 0}{" "}
+                        reflections this week
+                      </span>
+                    </ProgressMeta>
                   </CardContent>
                 </Card>
 
-                {topDistractions.length > 0 && (
-                  <Card>
-                    <CardContent className="p-6">
-                      <h3 className="mb-4 font-semibold text-[14px] text-[var(--ink)] flex items-center gap-2">
-                        Top Distractions
-                      </h3>
-                      <div className="flex flex-col gap-3">
-                        {topDistractions.map((item, i) => (
-                          <div
-                            key={i}
-                            className="flex items-center justify-between p-3 rounded-[12px] bg-[var(--bg)] border border-[var(--line)]"
-                          >
-                            <span className="text-[13px] font-medium text-[var(--ink)] capitalize">{item.name}</span>
-                            <span className="text-[11px] font-semibold text-[var(--mute)] bg-[var(--surface)] px-2 py-1 rounded-md border border-[var(--line)]">
-                              {item.count} {item.count === 1 ? "time" : "times"}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-
+                {/* AI insights if available */}
                 {insightsQuery.data?.insights && insightsQuery.data.insights.length > 0 && (
-                  <Card className="bg-gradient-to-br from-[var(--surface)] to-[var(--primary-soft)] border-[var(--line)]">
-                    <CardContent className="p-6">
-                      <h3 className="mb-5 font-semibold text-[14px] flex items-center gap-2 text-[var(--primary)]">
-                        <Sparkles className="h-4 w-4" /> AI Insights
+                  <Card>
+                    <CardContent className="p-5">
+                      <h3 className="mb-4 text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--mute)] flex items-center gap-2">
+                        <Sparkles className="h-3 w-3 text-[var(--primary)]" />
+                        Reflections
                       </h3>
                       <ul className="flex flex-col gap-4">
                         {insightsQuery.data.insights.map((insight, i) => (
                           <li
                             key={i}
-                            className="flex items-start gap-3 text-[13px] text-[var(--ink)] leading-relaxed"
+                            className="flex items-start gap-3 text-[13px] text-[var(--ink)] leading-[1.65]"
                           >
                             <div className="mt-1.5 h-1.5 w-1.5 rounded-full bg-[var(--primary)] shrink-0 opacity-60" />
                             {insight}
                           </li>
                         ))}
                       </ul>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Per-prayer breakdown */}
+                {journalQuery.data && journalQuery.data.length > 0 && (
+                  <Card>
+                    <CardContent className="p-5">
+                      <h3 className="mb-4 text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--mute)]">
+                        By Prayer
+                      </h3>
+                      <div className="flex flex-col gap-4">
+                        {PRAYER_NAMES.map((name) => {
+                          const entries = journalQuery.data!.filter((e) => e.prayer_name === name);
+                          if (entries.length === 0) return null;
+                          const avg =
+                            entries.reduce((s, e) => s + e.khushoo_rating, 0) / entries.length;
+                          const pct = Math.round((avg / 5) * 100);
+                          const avgLabel = avg.toFixed(1);
+                          return (
+                            <div key={name}>
+                              <div className="flex justify-between mb-1">
+                                <span className="text-[13px] font-medium text-[var(--ink)]">
+                                  {PRAYER_LABELS[name].latin}
+                                </span>
+                                <span className="text-[12px] text-[var(--mute)]">
+                                  avg {avgLabel}/5 · {entries.length} logged
+                                </span>
+                              </div>
+                              <ProgressBar percentage={pct} />
+                            </div>
+                          );
+                        })}
+                      </div>
                     </CardContent>
                   </Card>
                 )}

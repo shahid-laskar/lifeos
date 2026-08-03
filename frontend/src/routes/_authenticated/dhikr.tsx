@@ -1,12 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { LoadingBlock } from "@/components/brand/pattern";
 import { ErrorState } from "@/components/brand/states";
 import { DhikrCard } from "@/components/dhikr/dhikr-card";
 import { DhikrSummaryBar } from "@/components/dhikr/dhikr-summary-bar";
 import { DhikrSession } from "@/components/dhikr/dhikr-session";
 import { PageHeader } from "@/components/layout/page-header";
+import { EmptyState } from "@/components/ui/empty-state";
+import { CardSkeleton } from "@/components/home/skeletons";
 import { getDhikrItems, logDhikrSession } from "@/lib/api/endpoints";
 import type { DhikrCategory } from "@/lib/api/types";
 import { DHIKR_CATEGORIES } from "@/lib/api/types";
@@ -41,7 +42,7 @@ function DhikrPage() {
   const { data, isPending, isError, refetch } = useQuery({
     queryKey: ["dhikr-items", category],
     queryFn: () => getDhikrItems(category),
-    staleTime: 60 * 60 * 1000, // catalogue is stable for 1 h
+    staleTime: 60 * 60 * 1000,
   });
 
   const logMutation = useMutation({
@@ -74,7 +75,7 @@ function DhikrPage() {
       {/* Category selector */}
       <div
         role="tablist"
-        className="mb-6 flex gap-2 overflow-x-auto pb-2"
+        className="mb-6 flex gap-2 overflow-x-auto pb-2 scrollbar-none"
       >
         {DHIKR_CATEGORIES.map(({ value, label }) => (
           <button
@@ -110,19 +111,21 @@ function DhikrPage() {
         </div>
 
         {isPending ? (
-          <LoadingBlock label="Loading…" />
+          <div className="flex flex-col gap-3">
+            <CardSkeleton lines={2} />
+            <CardSkeleton lines={2} />
+          </div>
         ) : isError ? (
           <ErrorState
             title="Couldn't load dhikr"
-            message="Check your connection and try again."
+            message="Counting still works offline. Check your connection to refresh items."
             onRetry={() => refetch()}
           />
         ) : data.length === 0 ? (
-          <div className="empty py-12 text-center">
-            <p className="mt-1 text-[13px] leading-[1.6] text-[var(--mute)]">
-              No dhikr found for this category.
-            </p>
-          </div>
+          <EmptyState
+            glyph="✨"
+            description="No dhikr found for this category."
+          />
         ) : (
           data.map((item) => <DhikrCard key={item.id} item={item} />)
         )}
