@@ -535,6 +535,41 @@ export function calculateZakat(data: ZakatCalculatorRequest) {
   });
 }
 
+// ── Knowledge Domain (Phase 9) ─────────────────────────────────────────────────────────────
+
+export function getNotes() {
+  return apiFetch<NoteResponse[]>("/api/v1/knowledge/notes");
+}
+
+export function createNote(data: NoteCreate) {
+  return apiFetch<NoteResponse>("/api/v1/knowledge/notes", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export function getFlashcardDecks() {
+  return apiFetch<FlashcardDeckResponse[]>("/api/v1/knowledge/decks");
+}
+
+export function createFlashcardDeck(data: FlashcardDeckCreate) {
+  return apiFetch<FlashcardDeckResponse>("/api/v1/knowledge/decks", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export function getFlashcards(deckId: string) {
+  return apiFetch<FlashcardResponse[]>(`/api/v1/knowledge/decks/${deckId}/cards`);
+}
+
+export function createFlashcard(data: FlashcardCreate) {
+  return apiFetch<FlashcardResponse>("/api/v1/knowledge/cards", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
 export function getPlannerDay(date: string) {
   return apiFetch<PlannerDayResponse>(`/api/v1/planner/days/${date}`);
 }

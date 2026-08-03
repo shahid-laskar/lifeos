@@ -15,6 +15,7 @@ const NAV_LINKS = [
   { to: "/journal", label: "Journal", icon: BookOpen },
   { to: "/reading", label: "Reading", icon: BookOpen },
   { to: "/skills", label: "Skills", icon: Target },
+  { to: "/knowledge", label: "Knowledge", icon: BookOpen },
   { to: "/health", label: "Health", icon: Activity },
   { to: "/community", label: "Community", icon: Users },
   { to: "/planner", label: "Planner", icon: BookMarked },
