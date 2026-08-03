@@ -515,7 +515,25 @@ export function createEnergyLog(data: EnergyLogCreate) {
   });
 }
 
-// ── Planner ─────────────────────────────────────────────────────────────
+// ── Community Domain (Phase 8) ─────────────────────────────────────────────────────────────
+
+export function getDonations() {
+  return apiFetch<DonationResponse[]>("/api/v1/community/donations");
+}
+
+export function createDonation(data: DonationCreate) {
+  return apiFetch<DonationResponse>("/api/v1/community/donations", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export function calculateZakat(data: ZakatCalculatorRequest) {
+  return apiFetch<ZakatCalculatorResponse>("/api/v1/community/zakat-calculator", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
 
 export function getPlannerDay(date: string) {
   return apiFetch<PlannerDayResponse>(`/api/v1/planner/days/${date}`);

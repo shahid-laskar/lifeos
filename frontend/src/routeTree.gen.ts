@@ -18,6 +18,7 @@ import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedAssistantRouteImport } from './routes/_authenticated/assistant'
 import { Route as AuthenticatedCalendarRouteImport } from './routes/_authenticated/calendar'
+import { Route as AuthenticatedCommunityRouteImport } from './routes/_authenticated/community'
 import { Route as AuthenticatedDeepWorkRouteImport } from './routes/_authenticated/deep-work'
 import { Route as AuthenticatedDhikrRouteImport } from './routes/_authenticated/dhikr'
 import { Route as AuthenticatedDuasRouteImport } from './routes/_authenticated/duas'
@@ -81,6 +82,11 @@ const AuthenticatedAssistantRoute = AuthenticatedAssistantRouteImport.update({
 const AuthenticatedCalendarRoute = AuthenticatedCalendarRouteImport.update({
   id: '/calendar',
   path: '/calendar',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCommunityRoute = AuthenticatedCommunityRouteImport.update({
+  id: '/community',
+  path: '/community',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedDeepWorkRoute = AuthenticatedDeepWorkRouteImport.update({
@@ -194,6 +200,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/assistant': typeof AuthenticatedAssistantRoute
   '/calendar': typeof AuthenticatedCalendarRoute
+  '/community': typeof AuthenticatedCommunityRoute
   '/deep-work': typeof AuthenticatedDeepWorkRoute
   '/dhikr': typeof AuthenticatedDhikrRoute
   '/duas': typeof AuthenticatedDuasRoute
@@ -224,6 +231,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/assistant': typeof AuthenticatedAssistantRoute
   '/calendar': typeof AuthenticatedCalendarRoute
+  '/community': typeof AuthenticatedCommunityRoute
   '/deep-work': typeof AuthenticatedDeepWorkRoute
   '/dhikr': typeof AuthenticatedDhikrRoute
   '/duas': typeof AuthenticatedDuasRoute
@@ -256,6 +264,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/assistant': typeof AuthenticatedAssistantRoute
   '/_authenticated/calendar': typeof AuthenticatedCalendarRoute
+  '/_authenticated/community': typeof AuthenticatedCommunityRoute
   '/_authenticated/deep-work': typeof AuthenticatedDeepWorkRoute
   '/_authenticated/dhikr': typeof AuthenticatedDhikrRoute
   '/_authenticated/duas': typeof AuthenticatedDuasRoute
@@ -288,6 +297,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/assistant'
     | '/calendar'
+    | '/community'
     | '/deep-work'
     | '/dhikr'
     | '/duas'
@@ -318,6 +328,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/assistant'
     | '/calendar'
+    | '/community'
     | '/deep-work'
     | '/dhikr'
     | '/duas'
@@ -349,6 +360,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/_authenticated/assistant'
     | '/_authenticated/calendar'
+    | '/_authenticated/community'
     | '/_authenticated/deep-work'
     | '/_authenticated/dhikr'
     | '/_authenticated/duas'
@@ -444,6 +456,13 @@ declare module '@tanstack/react-router' {
       path: '/calendar'
       fullPath: '/calendar'
       preLoaderRoute: typeof AuthenticatedCalendarRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/community': {
+      id: '/_authenticated/community'
+      path: '/community'
+      fullPath: '/community'
+      preLoaderRoute: typeof AuthenticatedCommunityRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/deep-work': {
@@ -592,6 +611,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAssistantRoute: typeof AuthenticatedAssistantRoute
   AuthenticatedCalendarRoute: typeof AuthenticatedCalendarRoute
+  AuthenticatedCommunityRoute: typeof AuthenticatedCommunityRoute
   AuthenticatedDeepWorkRoute: typeof AuthenticatedDeepWorkRoute
   AuthenticatedDhikrRoute: typeof AuthenticatedDhikrRoute
   AuthenticatedDuasRoute: typeof AuthenticatedDuasRoute
@@ -617,6 +637,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAssistantRoute: AuthenticatedAssistantRoute,
   AuthenticatedCalendarRoute: AuthenticatedCalendarRoute,
+  AuthenticatedCommunityRoute: AuthenticatedCommunityRoute,
   AuthenticatedDeepWorkRoute: AuthenticatedDeepWorkRoute,
   AuthenticatedDhikrRoute: AuthenticatedDhikrRoute,
   AuthenticatedDuasRoute: AuthenticatedDuasRoute,

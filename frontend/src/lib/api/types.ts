@@ -147,6 +147,7 @@ export * from "./reading-types";
 export * from "./skills-types";
 export * from "./family-extended-types";
 export * from "./health-types";
+export * from "./community-types";
 
 export type QuranWeeklySummaryResponse = {
   surahs_read_last_7_days: number;

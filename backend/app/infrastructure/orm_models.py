@@ -501,3 +501,17 @@ class EnergyLogORM(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
 
+class DonationORM(Base):
+    __tablename__ = "donations"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    user_id: Mapped[str] = mapped_column(String(36), ForeignKey("users.id"), nullable=False, index=True)
+    donation_type: Mapped[str] = mapped_column(String(50), nullable=False) # sadaqah, zakat, fidyah
+    amount: Mapped[float] = mapped_column(nullable=False)
+    date: Mapped[date_type] = mapped_column(Date, nullable=False)
+    recipient: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    category: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
+
