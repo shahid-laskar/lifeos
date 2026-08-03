@@ -20,6 +20,7 @@ import { Route as AuthenticatedAssistantRouteImport } from './routes/_authentica
 import { Route as AuthenticatedDhikrRouteImport } from './routes/_authenticated/dhikr'
 import { Route as AuthenticatedDuasRouteImport } from './routes/_authenticated/duas'
 import { Route as AuthenticatedFamiliesRouteImport } from './routes/_authenticated/families'
+import { Route as AuthenticatedGoalsRouteImport } from './routes/_authenticated/goals'
 import { Route as AuthenticatedHadithRouteImport } from './routes/_authenticated/hadith'
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
 import { Route as AuthenticatedLearningRouteImport } from './routes/_authenticated/learning'
@@ -84,6 +85,11 @@ const AuthenticatedFamiliesRoute = AuthenticatedFamiliesRouteImport.update({
   path: '/families',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedGoalsRoute = AuthenticatedGoalsRouteImport.update({
+  id: '/goals',
+  path: '/goals',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedHadithRoute = AuthenticatedHadithRouteImport.update({
   id: '/hadith',
   path: '/hadith',
@@ -142,6 +148,7 @@ export interface FileRoutesByFullPath {
   '/dhikr': typeof AuthenticatedDhikrRoute
   '/duas': typeof AuthenticatedDuasRoute
   '/families': typeof AuthenticatedFamiliesRoute
+  '/goals': typeof AuthenticatedGoalsRoute
   '/hadith': typeof AuthenticatedHadithRoute
   '/home': typeof AuthenticatedHomeRoute
   '/learning': typeof AuthenticatedLearningRoute
@@ -163,6 +170,7 @@ export interface FileRoutesByTo {
   '/dhikr': typeof AuthenticatedDhikrRoute
   '/duas': typeof AuthenticatedDuasRoute
   '/families': typeof AuthenticatedFamiliesRoute
+  '/goals': typeof AuthenticatedGoalsRoute
   '/hadith': typeof AuthenticatedHadithRoute
   '/home': typeof AuthenticatedHomeRoute
   '/learning': typeof AuthenticatedLearningRoute
@@ -186,6 +194,7 @@ export interface FileRoutesById {
   '/_authenticated/dhikr': typeof AuthenticatedDhikrRoute
   '/_authenticated/duas': typeof AuthenticatedDuasRoute
   '/_authenticated/families': typeof AuthenticatedFamiliesRoute
+  '/_authenticated/goals': typeof AuthenticatedGoalsRoute
   '/_authenticated/hadith': typeof AuthenticatedHadithRoute
   '/_authenticated/home': typeof AuthenticatedHomeRoute
   '/_authenticated/learning': typeof AuthenticatedLearningRoute
@@ -209,6 +218,7 @@ export interface FileRouteTypes {
     | '/dhikr'
     | '/duas'
     | '/families'
+    | '/goals'
     | '/hadith'
     | '/home'
     | '/learning'
@@ -230,6 +240,7 @@ export interface FileRouteTypes {
     | '/dhikr'
     | '/duas'
     | '/families'
+    | '/goals'
     | '/hadith'
     | '/home'
     | '/learning'
@@ -252,6 +263,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dhikr'
     | '/_authenticated/duas'
     | '/_authenticated/families'
+    | '/_authenticated/goals'
     | '/_authenticated/hadith'
     | '/_authenticated/home'
     | '/_authenticated/learning'
@@ -352,6 +364,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFamiliesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/goals': {
+      id: '/_authenticated/goals'
+      path: '/goals'
+      fullPath: '/goals'
+      preLoaderRoute: typeof AuthenticatedGoalsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/hadith': {
       id: '/_authenticated/hadith'
       path: '/hadith'
@@ -423,6 +442,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDhikrRoute: typeof AuthenticatedDhikrRoute
   AuthenticatedDuasRoute: typeof AuthenticatedDuasRoute
   AuthenticatedFamiliesRoute: typeof AuthenticatedFamiliesRoute
+  AuthenticatedGoalsRoute: typeof AuthenticatedGoalsRoute
   AuthenticatedHadithRoute: typeof AuthenticatedHadithRoute
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
   AuthenticatedLearningRoute: typeof AuthenticatedLearningRoute
@@ -439,6 +459,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDhikrRoute: AuthenticatedDhikrRoute,
   AuthenticatedDuasRoute: AuthenticatedDuasRoute,
   AuthenticatedFamiliesRoute: AuthenticatedFamiliesRoute,
+  AuthenticatedGoalsRoute: AuthenticatedGoalsRoute,
   AuthenticatedHadithRoute: AuthenticatedHadithRoute,
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
   AuthenticatedLearningRoute: AuthenticatedLearningRoute,

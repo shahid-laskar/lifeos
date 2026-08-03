@@ -537,6 +537,52 @@ export function deleteTask(taskId: string) {
   });
 }
 
+// ── Goals ─────────────────────────────────────────────────────────────
+
+export function getGoals() {
+  return apiFetch<GoalResponse[]>("/api/v1/goals");
+}
+
+export function createGoal(data: GoalCreate) {
+  return apiFetch<GoalResponse>("/api/v1/goals", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export function updateGoal(goalId: string, data: GoalUpdate) {
+  return apiFetch<GoalResponse>(`/api/v1/goals/${goalId}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+}
+
+export function deleteGoal(goalId: string) {
+  return apiFetch<void>(`/api/v1/goals/${goalId}`, {
+    method: "DELETE",
+  });
+}
+
+export function addMilestone(goalId: string, data: GoalMilestoneCreate) {
+  return apiFetch<GoalMilestoneResponse>(`/api/v1/goals/${goalId}/milestones`, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export function updateMilestone(milestoneId: string, data: GoalMilestoneUpdate) {
+  return apiFetch<GoalMilestoneResponse>(`/api/v1/goals/milestones/${milestoneId}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+}
+
+export function deleteMilestone(milestoneId: string) {
+  return apiFetch<void>(`/api/v1/goals/milestones/${milestoneId}`, {
+    method: "DELETE",
+  });
+}
+
 export function completeLearningModule(moduleId: string) {
   return apiFetch<LearningEnrollmentResponse>("/api/v1/learning/enrollments/complete-module", {
     method: "POST",

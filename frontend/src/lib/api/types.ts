@@ -137,6 +137,7 @@ export type DhikrDailySummaryResponse = {
 
 export * from "./planner-types";
 export * from "./task-types";
+export * from "./goal-types";
 
 export type QuranWeeklySummaryResponse = {
   surahs_read_last_7_days: number;
