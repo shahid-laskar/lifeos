@@ -23,6 +23,7 @@ import { Route as AuthenticatedFamiliesRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedHadithRouteImport } from './routes/_authenticated/hadith'
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
 import { Route as AuthenticatedLearningRouteImport } from './routes/_authenticated/learning'
+import { Route as AuthenticatedPlannerRouteImport } from './routes/_authenticated/planner'
 import { Route as AuthenticatedPrayerJournalRouteImport } from './routes/_authenticated/prayer-journal'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedQuranRouteImport } from './routes/_authenticated/quran'
@@ -97,6 +98,11 @@ const AuthenticatedLearningRoute = AuthenticatedLearningRouteImport.update({
   path: '/learning',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPlannerRoute = AuthenticatedPlannerRouteImport.update({
+  id: '/planner',
+  path: '/planner',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedPrayerJournalRoute =
   AuthenticatedPrayerJournalRouteImport.update({
     id: '/prayer-journal',
@@ -133,6 +139,7 @@ export interface FileRoutesByFullPath {
   '/hadith': typeof AuthenticatedHadithRoute
   '/home': typeof AuthenticatedHomeRoute
   '/learning': typeof AuthenticatedLearningRoute
+  '/planner': typeof AuthenticatedPlannerRoute
   '/prayer-journal': typeof AuthenticatedPrayerJournalRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/quran': typeof AuthenticatedQuranRoute
@@ -152,6 +159,7 @@ export interface FileRoutesByTo {
   '/hadith': typeof AuthenticatedHadithRoute
   '/home': typeof AuthenticatedHomeRoute
   '/learning': typeof AuthenticatedLearningRoute
+  '/planner': typeof AuthenticatedPlannerRoute
   '/prayer-journal': typeof AuthenticatedPrayerJournalRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/quran': typeof AuthenticatedQuranRoute
@@ -173,6 +181,7 @@ export interface FileRoutesById {
   '/_authenticated/hadith': typeof AuthenticatedHadithRoute
   '/_authenticated/home': typeof AuthenticatedHomeRoute
   '/_authenticated/learning': typeof AuthenticatedLearningRoute
+  '/_authenticated/planner': typeof AuthenticatedPlannerRoute
   '/_authenticated/prayer-journal': typeof AuthenticatedPrayerJournalRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/quran': typeof AuthenticatedQuranRoute
@@ -194,6 +203,7 @@ export interface FileRouteTypes {
     | '/hadith'
     | '/home'
     | '/learning'
+    | '/planner'
     | '/prayer-journal'
     | '/profile'
     | '/quran'
@@ -213,6 +223,7 @@ export interface FileRouteTypes {
     | '/hadith'
     | '/home'
     | '/learning'
+    | '/planner'
     | '/prayer-journal'
     | '/profile'
     | '/quran'
@@ -233,6 +244,7 @@ export interface FileRouteTypes {
     | '/_authenticated/hadith'
     | '/_authenticated/home'
     | '/_authenticated/learning'
+    | '/_authenticated/planner'
     | '/_authenticated/prayer-journal'
     | '/_authenticated/profile'
     | '/_authenticated/quran'
@@ -349,6 +361,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLearningRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/planner': {
+      id: '/_authenticated/planner'
+      path: '/planner'
+      fullPath: '/planner'
+      preLoaderRoute: typeof AuthenticatedPlannerRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/prayer-journal': {
       id: '/_authenticated/prayer-journal'
       path: '/prayer-journal'
@@ -388,6 +407,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedHadithRoute: typeof AuthenticatedHadithRoute
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
   AuthenticatedLearningRoute: typeof AuthenticatedLearningRoute
+  AuthenticatedPlannerRoute: typeof AuthenticatedPlannerRoute
   AuthenticatedPrayerJournalRoute: typeof AuthenticatedPrayerJournalRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedQuranRoute: typeof AuthenticatedQuranRoute
@@ -402,6 +422,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedHadithRoute: AuthenticatedHadithRoute,
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
   AuthenticatedLearningRoute: AuthenticatedLearningRoute,
+  AuthenticatedPlannerRoute: AuthenticatedPlannerRoute,
   AuthenticatedPrayerJournalRoute: AuthenticatedPrayerJournalRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedQuranRoute: AuthenticatedQuranRoute,

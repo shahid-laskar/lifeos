@@ -476,7 +476,33 @@ export function getLearningEnrollments() {
 export function enrollInPath(pathId: string) {
   return apiFetch<LearningEnrollmentResponse>("/api/v1/learning/enrollments", {
     method: "POST",
-    body: { path_id: pathId },
+    body: JSON.stringify({ path_id: pathId }),
+  });
+}
+
+// ── Planner ─────────────────────────────────────────────────────────────
+
+export function getPlannerDay(date: string) {
+  return apiFetch<PlannerDayResponse>(`/api/v1/planner/days/${date}`);
+}
+
+export function addTimeBlock(date: string, data: TimeBlockCreate) {
+  return apiFetch<TimeBlockResponse>(`/api/v1/planner/days/${date}/blocks`, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export function updateTimeBlock(blockId: string, data: TimeBlockUpdate) {
+  return apiFetch<TimeBlockResponse>(`/api/v1/planner/blocks/${blockId}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+}
+
+export function deleteTimeBlock(blockId: string) {
+  return apiFetch<void>(`/api/v1/planner/blocks/${blockId}`, {
+    method: "DELETE",
   });
 }
 

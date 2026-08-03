@@ -10,6 +10,7 @@ const NAV_LINKS = [
   { to: "/assistant", label: "Assistant", icon: MessageCircle },
   { to: "/prayer-journal", label: "Prayer Journal", icon: BookMarked },
   { to: "/hadith", label: "Hadith", icon: BookOpen },
+  { to: "/planner", label: "Planner", icon: BookMarked },
   { to: "/families", label: "Family", icon: Users },
   { to: "/learning", label: "Learning", icon: BookOpen },
   { to: "/profile", label: "Profile", icon: User },
