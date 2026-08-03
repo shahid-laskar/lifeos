@@ -68,6 +68,24 @@ class QuranService:
     def get_memorisation_review_queue(self, user_id: str, today: date_type) -> list[MemorisationRecord]:
         return self._repository.get_memorisation_review_queue(user_id, today)
 
+    def get_memorisation_progress(self, user_id: str) -> list[dict]:
+        records = self._repository.get_all_memorisation(user_id)
+        from collections import defaultdict
+        grouped = defaultdict(list)
+        for r in records:
+            if r.status == "memorised":
+                grouped[r.surah_number].append(r.ayah_number)
+        
+        results = []
+        for surah_number, ayahs in grouped.items():
+            surah = self.get_surah(surah_number)
+            results.append({
+                "surah_number": surah_number,
+                "ayahs_memorised": sorted(ayahs),
+                "completion_percentage": len(ayahs) / surah.ayah_count if surah.ayah_count else 0
+            })
+        return results
+
     def get_tafsir(self, surah_number: int, ayah_number: int) -> dict:
         # Stub for tafsir data
         return {

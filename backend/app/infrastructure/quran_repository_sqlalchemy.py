@@ -92,31 +92,48 @@ class SqlAlchemyQuranRepository:
         return record
 
     def get_memorisation_review_queue(self, user_id: str, date_until: date_type) -> list[MemorisationRecord]:
-        from app.infrastructure.orm_models import QuranMemorisationORM
-        rows = (
-            self._session.query(QuranMemorisationORM)
-            .filter(
-                and_(
-                    QuranMemorisationORM.user_id == user_id,
-                    QuranMemorisationORM.next_review <= date_until,
-                    QuranMemorisationORM.status == 'memorised'
-                )
+        stmt = (
+            select(QuranMemorisationORM)
+            .where(
+                QuranMemorisationORM.user_id == user_id,
+                QuranMemorisationORM.next_review <= date_until,
+                QuranMemorisationORM.status == 'memorised'
             )
-            .all()
+            .order_by(QuranMemorisationORM.next_review.asc())
         )
+        
+        orms = self._session.execute(stmt).scalars().all()
         return [
             MemorisationRecord(
-                id=r.id,
-                user_id=r.user_id,
-                surah_number=r.surah_number,
-                ayah_number=r.ayah_number,
-                status=r.status,
-                last_reviewed=r.last_reviewed,
-                next_review=r.next_review,
-                strength=r.strength,
-                created_at=r.created_at,
-                updated_at=r.updated_at
-            ) for r in rows
+                id=orm.id,
+                user_id=orm.user_id,
+                surah_number=orm.surah_number,
+                ayah_number=orm.ayah_number,
+                status=orm.status,
+                last_reviewed=orm.last_reviewed,
+                next_review=orm.next_review,
+                strength=orm.strength,
+                created_at=orm.created_at,
+                updated_at=orm.updated_at
+            ) for orm in orms
+        ]
+
+    def get_all_memorisation(self, user_id: str) -> list[MemorisationRecord]:
+        stmt = select(QuranMemorisationORM).where(QuranMemorisationORM.user_id == user_id)
+        orms = self._session.execute(stmt).scalars().all()
+        return [
+            MemorisationRecord(
+                id=orm.id,
+                user_id=orm.user_id,
+                surah_number=orm.surah_number,
+                ayah_number=orm.ayah_number,
+                status=orm.status,
+                last_reviewed=orm.last_reviewed,
+                next_review=orm.next_review,
+                strength=orm.strength,
+                created_at=orm.created_at,
+                updated_at=orm.updated_at
+            ) for orm in orms
         ]
 
     def __init__(self, session: Session) -> None:

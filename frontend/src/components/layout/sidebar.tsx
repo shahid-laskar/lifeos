@@ -11,6 +11,7 @@ const NAV_LINKS = [
   { to: "/prayer-journal", label: "Prayer Journal", icon: BookMarked },
   { to: "/hadith", label: "Hadith", icon: BookOpen },
   { to: "/families", label: "Family", icon: Users },
+  { to: "/learning", label: "Learning", icon: BookOpen },
   { to: "/profile", label: "Profile", icon: User },
   { to: "/settings", label: "Settings", icon: Settings },
 ] as const;

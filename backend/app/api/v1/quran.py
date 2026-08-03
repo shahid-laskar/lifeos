@@ -79,6 +79,27 @@ def get_today_review(
         ) for r in records
     ]
 
+from pydantic import BaseModel
+
+class MemorisationProgressResponse(BaseModel):
+    surah_number: int
+    ayahs_memorised: list[int]
+    completion_percentage: float
+
+@router.get("/memorisation/progress", response_model=list[MemorisationProgressResponse])
+def get_memorisation_progress(
+    current_user: Annotated[UserRecord, Depends(get_current_user)],
+    quran_service: Annotated[QuranService, Depends(get_quran_service)],
+):
+    progress = quran_service.get_memorisation_progress(current_user.id)
+    return [
+        MemorisationProgressResponse(
+            surah_number=p["surah_number"],
+            ayahs_memorised=p["ayahs_memorised"],
+            completion_percentage=p["completion_percentage"]
+        ) for p in progress
+    ]
+
 @router.get("/surahs/{surah_number}/ayahs/{ayah_number}/tafsir", response_model=TafsirResponse)
 def get_tafsir(
     surah_number: int,

@@ -7,6 +7,7 @@ import { ErrorState } from "@/components/brand/states";
 import { HadithCard } from "@/components/hadith/hadith-card";
 import { PageHeader } from "@/components/layout/page-header";
 import { Input } from "@/components/ui/input";
+import { SearchBar } from "@/components/ui/search-bar";
 import { useToast } from "@/components/ui/use-toast";
 import {
   addHadithBookmark,
@@ -261,19 +262,17 @@ function HadithPage() {
               setSubmittedQuery(searchQuery.trim());
             }}
           >
-            <div className="relative flex-1">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--mute)]" />
-              <Input
+            <div className="flex-1">
+              <SearchBar
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
                 placeholder="Search translation, narrator, or chapter"
-                className="h-11 rounded-[14px] border border-[var(--line)] bg-[var(--surface)] pl-9 text-[14px] text-[var(--ink)] focus:border-[var(--primary)] focus:ring-0"
                 aria-label="Search hadiths"
               />
             </div>
             <button
               type="submit"
-              className="h-11 shrink-0 rounded-[14px] bg-[var(--primary)] px-5 text-[14px] font-medium text-white transition-opacity hover:opacity-90"
+              className="h-[38px] shrink-0 rounded-[11px] bg-[var(--primary)] px-5 text-[13px] font-medium text-white transition-opacity hover:opacity-90"
             >
               Search
             </button>

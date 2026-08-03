@@ -6,6 +6,7 @@ import { ErrorState } from "@/components/brand/states";
 import { DuaCard } from "@/components/dua/dua-card";
 import { PageHeader } from "@/components/layout/page-header";
 import { useToast } from "@/components/ui/use-toast";
+import { SearchBar } from "@/components/ui/search-bar";
 import { getDuaCategories, getDuas, getDuaBookmarks, addDuaBookmark, removeDuaBookmark } from "@/lib/api/endpoints";
 import type { DuaItemResponse } from "@/lib/api/types";
 import { cn } from "@/lib/utils";
@@ -34,6 +35,7 @@ type Tab = "browse" | "bookmarks";
 function DuasPage() {
   const [tab, setTab] = useState<Tab>("browse");
   const [selectedCategory, setSelectedCategory] = useState<string>("Morning");
+  const [searchQuery, setSearchQuery] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -83,6 +85,18 @@ function DuasPage() {
     },
   });
 
+  const filteredData = useMemo(() => {
+    if (!data) return [];
+    if (!searchQuery.trim()) return data;
+    const q = searchQuery.toLowerCase();
+    return data.filter(
+      (item) =>
+        item.translation.toLowerCase().includes(q) ||
+        item.transliteration.toLowerCase().includes(q) ||
+        item.arabic_text.includes(q)
+    );
+  }, [data, searchQuery]);
+
   return (
     <>
       <PageHeader title="Du'as" arabic="دُعَاء" subtitle="Supplications for every occasion" />
@@ -119,6 +133,13 @@ function DuasPage() {
 
       {tab === "browse" ? (
         <>
+          <div className="mb-6">
+            <SearchBar 
+              placeholder="Search Du'as..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
           {/* Category tab bar */}
           <div
             role="tablist"
@@ -155,14 +176,14 @@ function DuasPage() {
                 message="Check your connection and try again."
                 onRetry={() => refetch()}
               />
-            ) : data.length === 0 ? (
+            ) : filteredData.length === 0 ? (
               <div className="empty py-12 text-center">
                 <p className="mt-1 text-[13px] leading-[1.6] text-[var(--mute)]">
-                  No Du'as found for this category.
+                  No Du'as found.
                 </p>
               </div>
             ) : (
-              data.map((item) => (
+              filteredData.map((item) => (
                 <DuaCard 
                   key={item.id} 
                   item={item} 
