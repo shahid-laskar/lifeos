@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from app.api.dependencies import get_db, get_current_user
-from app.infrastructure.orm_models import UserORM
+from app.api.deps import get_db, get_current_user
+from app.domain.user.entities import UserRecord
 from app.domain.learning.models import (
     LearningPathResponse,
     LearningModuleResponse,
@@ -37,16 +37,16 @@ def add_module(path_id: str, req: ModuleCreateRequest, db: Session = Depends(get
     return svc.add_module(path_id, req)
 
 @router.post("/enrollments", response_model=LearningEnrollmentResponse)
-def enroll(req: EnrollRequest, user: UserORM = Depends(get_current_user), db: Session = Depends(get_db)):
+def enroll(req: EnrollRequest, user: UserRecord = Depends(get_current_user), db: Session = Depends(get_db)):
     svc = LearningService(db)
     return svc.enroll(user.id, req.path_id)
 
 @router.get("/enrollments", response_model=list[LearningEnrollmentResponse])
-def get_enrollments(user: UserORM = Depends(get_current_user), db: Session = Depends(get_db)):
+def get_enrollments(user: UserRecord = Depends(get_current_user), db: Session = Depends(get_db)):
     svc = LearningService(db)
     return svc.get_enrollments(user.id)
 
 @router.post("/enrollments/complete-module", response_model=LearningEnrollmentResponse)
-def complete_module(req: CompleteModuleRequest, user: UserORM = Depends(get_current_user), db: Session = Depends(get_db)):
+def complete_module(req: CompleteModuleRequest, user: UserRecord = Depends(get_current_user), db: Session = Depends(get_db)):
     svc = LearningService(db)
     return svc.complete_module(user.id, req.module_id)
