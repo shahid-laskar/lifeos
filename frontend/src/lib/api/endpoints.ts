@@ -480,6 +480,41 @@ export function enrollInPath(pathId: string) {
   });
 }
 
+// ── Health Domain (Phase 7) ───────────────────────────────────────────────────────────────
+
+export function getSleepLogs() {
+  return apiFetch<SleepLogResponse[]>("/api/v1/health/sleep");
+}
+
+export function createSleepLog(data: SleepLogCreate) {
+  return apiFetch<SleepLogResponse>("/api/v1/health/sleep", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export function getExerciseLogs() {
+  return apiFetch<ExerciseLogResponse[]>("/api/v1/health/exercise");
+}
+
+export function createExerciseLog(data: ExerciseLogCreate) {
+  return apiFetch<ExerciseLogResponse>("/api/v1/health/exercise", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export function getEnergyLogs() {
+  return apiFetch<EnergyLogResponse[]>("/api/v1/health/energy");
+}
+
+export function createEnergyLog(data: EnergyLogCreate) {
+  return apiFetch<EnergyLogResponse>("/api/v1/health/energy", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
 // ── Planner ─────────────────────────────────────────────────────────────
 
 export function getPlannerDay(date: string) {

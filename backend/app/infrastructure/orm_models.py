@@ -462,3 +462,42 @@ class FamilyTaskORM(Base):
     is_completed: Mapped[bool] = mapped_column(default=False, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
+class SleepLogORM(Base):
+    __tablename__ = "sleep_logs"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    user_id: Mapped[str] = mapped_column(String(36), ForeignKey("users.id"), nullable=False, index=True)
+    date: Mapped[date_type] = mapped_column(Date, nullable=False)
+    sleep_time: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    wake_time: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    quality: Mapped[int | None] = mapped_column(nullable=True) # 1-5
+    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
+class ExerciseLogORM(Base):
+    __tablename__ = "exercise_logs"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    user_id: Mapped[str] = mapped_column(String(36), ForeignKey("users.id"), nullable=False, index=True)
+    date: Mapped[date_type] = mapped_column(Date, nullable=False)
+    exercise_type: Mapped[str] = mapped_column(String(100), nullable=False)
+    duration_minutes: Mapped[int] = mapped_column(nullable=False)
+    intensity: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
+class EnergyLogORM(Base):
+    __tablename__ = "energy_logs"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    user_id: Mapped[str] = mapped_column(String(36), ForeignKey("users.id"), nullable=False, index=True)
+    date: Mapped[date_type] = mapped_column(Date, nullable=False)
+    energy_level: Mapped[int] = mapped_column(nullable=False) # 1-5
+    mood: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
